@@ -43,6 +43,7 @@
     <NMakeReBuildCommandLine>Rebuild.cmd</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)\exe</OutDir>
     <IntDir>obj</IntDir>
+    <IncludePath>$(KATANA_ROOT)/Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>hovercraft.elf</NMakeOutput>
