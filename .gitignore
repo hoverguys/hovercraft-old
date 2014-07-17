@@ -1,0 +1,6 @@
+obj
+exe
+tools/Emulator
+*.opensdf
+*.sdf
+*.suo
