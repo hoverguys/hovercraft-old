@@ -38,27 +38,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeOutput>hovercraft.elf</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>Build.cmd</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>Clean.cmd</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>Rebuild.cmd</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>make -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make clean &amp;&amp; make -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)\exe</OutDir>
-    <IntDir>obj</IntDir>
-    <IncludePath>$(KATANA_ROOT)/Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IntDir>log</IntDir>
+    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>hovercraft.elf</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\main.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Makefile" />
+    <None Include="Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
