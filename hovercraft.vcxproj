@@ -43,12 +43,12 @@
     <NMakeReBuildCommandLine>make clean &amp;&amp; make -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)\exe</OutDir>
     <IntDir>log</IntDir>
-    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include</IncludePath>
+    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>hovercraft.elf</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include</IncludePath>
+    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
