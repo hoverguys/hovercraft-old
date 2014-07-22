@@ -18,6 +18,7 @@ static GXRModeObj *rmode = NULL;
 static MODPlay play;
 
 void *initialise();
+void playMod();
 
 int main(int argc, char **argv) {
 
@@ -73,5 +74,6 @@ void* initialise() {
 void playMod() {
 	MODPlay_Init(&play);
 	MODPlay_SetMOD(&play, menumusic_mod);
+	MODPlay_SetFrequency(&play, 32000);
 	MODPlay_Start(&play);
 }
