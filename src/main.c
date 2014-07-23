@@ -5,9 +5,13 @@
 #include <ogcsys.h>
 #include <gccore.h>
 
-// include generated header
+// include generated headers
 // rename from modfile.mod to modfile_mod.h
 #include "menumusic_mod.h"
+#include "hovercraft_bmb.h"
+
+// Models
+#include "modeldata.h"
 
 // Audio
 #include <aesndlib.h>
@@ -19,12 +23,15 @@ static MODPlay play;
 
 void *initialise();
 void playMod();
+void checkModel();
 
 int main(int argc, char **argv) {
 
 	xfb = initialise();
 
 	playMod();
+
+	checkModel();
 
 	printf("\nHello World!\n");
 
@@ -68,7 +75,6 @@ void* initialise() {
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
 	return framebuffer;
-
 }
 
 void playMod() {
@@ -76,4 +82,14 @@ void playMod() {
 	MODPlay_SetMOD(&play, menumusic_mod);
 	MODPlay_SetFrequency(&play, 32000);
 	MODPlay_Start(&play);
+}
+
+void checkModel() {
+	printf("hovercraft_bmb_size: %u\n", hovercraft_bmb_size);
+	binheader_t* header = (binheader_t*)hovercraft_bmb;
+
+	printf("vcount: %u\n", header->vcount);
+	printf("ncount: %u\n", header->ncount);
+	printf("vtcount: %u\n", header->vtcount);
+	printf("fcount: %u\n", header->fcount);
 }

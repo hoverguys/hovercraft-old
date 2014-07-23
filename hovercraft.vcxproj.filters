@@ -22,4 +22,9 @@
   <ItemGroup>
     <None Include="Makefile" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="modeldata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

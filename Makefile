@@ -18,7 +18,8 @@ include $(DEVKITPPC)/gamecube_rules
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	obj
 SOURCES		:=	src
-DATA		:=	data  
+DATA		:=	data 
+MODELS		:=	models 
 INCLUDES	:=  include
 
 #---------------------------------------------------------------------------------
@@ -51,7 +52,8 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
+					$(foreach dir,$(MODELS),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
@@ -63,6 +65,8 @@ CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+OBJFILES	:=	$(foreach dir,$(MODELS),$(notdir $(wildcard $(dir)/*.obj)))
+BMBFILES	:=	$(OBJFILES:.obj=.bmb)
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -74,22 +78,23 @@ else
 endif
 
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
-			$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
-			$(sFILES:.s=.o) $(SFILES:.S=.o)
+					$(addsuffix .o,$(BMBFILES)) \
+					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
+					$(sFILES:.s=.o) $(SFILES:.S=.o)
 
 #---------------------------------------------------------------------------------
 # build a list of include paths
 #---------------------------------------------------------------------------------
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD) \
-			-I$(LIBOGC_INC)
+					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+					-I$(CURDIR)/$(BUILD) \
+					-I$(LIBOGC_INC)
 
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
-			-L$(LIBOGC_LIB)
+					-L$(LIBOGC_LIB)
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
@@ -134,6 +139,13 @@ $(OUTPUT).elf: $(OFILES)
 	@echo $(notdir $<)
 	$(bin2o)
 
+#---------------------------------------------------------------------------------
+# This rule links in binary data with the .obj extension
+#---------------------------------------------------------------------------------
+%.bmb.o	:	%.bmb
+	@echo $(notdir $<)
+	$(bin2o)
+	
 -include $(DEPENDS)
 
 #---------------------------------------------------------------------------------
