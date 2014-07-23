@@ -25,6 +25,11 @@ void *initialise();
 void playMod();
 void checkModel();
 
+#define PAD1 1<<0
+#define PAD2 1<<1
+#define PAD3 1<<2
+#define PAD4 1<<3
+
 int main(int argc, char **argv) {
 
 	xfb = initialise();
@@ -35,12 +40,20 @@ int main(int argc, char **argv) {
 
 	printf("\nHello World!\n");
 
+	printf("\nChecking pads..\n");
+
+	u32 connected = PAD_ScanPads();
+	if ((connected & PAD1) == PAD1) printf("\nPlayer 1 connected\n");
+	if ((connected & PAD2) == PAD2) printf("\nPlayer 2 connected\n");
+	if ((connected & PAD3) == PAD3) printf("\nPlayer 3 connected\n");
+	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
+
 	while (1) {
 
 		VIDEO_WaitVSync();
 		PAD_ScanPads();
 
-		int buttonsDown = PAD_ButtonsDown(0);
+		int buttonsDown = PAD_ButtonsDown(PAD1);
 
 		if (buttonsDown & PAD_BUTTON_A) {
 			printf("Button A pressed.\n");
@@ -85,11 +98,15 @@ void playMod() {
 }
 
 void checkModel() {
-	printf("hovercraft_bmb_size: %u\n", hovercraft_bmb_size);
 	binheader_t* header = (binheader_t*)hovercraft_bmb;
 
-	printf("vcount: %u\n", header->vcount);
-	printf("ncount: %u\n", header->ncount);
-	printf("vtcount: %u\n", header->vtcount);
-	printf("fcount: %u\n", header->fcount);
+	u32 posOffset = sizeof(binheader_t);
+	u32 nrmOffset = posOffset + (sizeof(f32)* header->vcount * 3);
+	u32 texOffset = nrmOffset + (sizeof(f32)* header->vcount * 3);
+	u32 indOffset = texOffset + (sizeof(f32)* header->vcount * 2);
+
+	f32* positions = (f32*)(hovercraft_bmb + posOffset);
+	f32* normals = (f32*)(hovercraft_bmb + nrmOffset);
+	f32* texcoords = (f32*)(hovercraft_bmb + texOffset);
+	u16* indices = (u16*)(hovercraft_bmb + indOffset);
 }
