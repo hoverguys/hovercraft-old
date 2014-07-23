@@ -23,7 +23,7 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="modeldata.h">
+    <ClInclude Include="include\modeldata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

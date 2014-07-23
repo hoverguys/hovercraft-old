@@ -13,6 +13,10 @@
 // Models
 #include "modeldata.h"
 
+// Textures
+#include "textures_tpl.h"
+#include "textures.h"
+
 // Audio
 #include <aesndlib.h>
 #include <gcmodplay.h>
@@ -20,6 +24,9 @@
 static void *xfb = NULL;
 static GXRModeObj *rmode = NULL;
 static MODPlay play;
+
+GXTexObj texObj;
+TPLFile TPLfile;
 
 void *initialise();
 void playMod();
@@ -36,9 +43,17 @@ int main(int argc, char **argv) {
 
 	playMod();
 
+	loadTexture();
+
 	checkModel();
 
-	printf("\nHello World!\n");
+	printf("\nChecking pads..\n");
+
+	u32 connected = PAD_ScanPads();
+	if ((connected & PAD1) == PAD1) printf("\nPlayer 1 connected\n");
+	if ((connected & PAD2) == PAD2) printf("\nPlayer 2 connected\n");
+	if ((connected & PAD3) == PAD3) printf("\nPlayer 3 connected\n");
+	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
 
 	printf("\nChecking pads..\n");
 
@@ -109,4 +124,22 @@ void checkModel() {
 	f32* normals = (f32*)(hovercraft_bmb + nrmOffset);
 	f32* texcoords = (f32*)(hovercraft_bmb + texOffset);
 	u16* indices = (u16*)(hovercraft_bmb + indOffset);
+}
+
+void loadTexture() {
+	// This has something to do on how the textures are generated (format, probably?)
+	GX_SetNumTexGens(1);
+	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+
+	// Free Texture cache
+	GX_InvalidateTexAll();
+
+	// Open TPL file from memory (statically linked in)
+	TPL_OpenTPLFromMemory(&TPLfile, (void *) textures_tpl, textures_tpl_size);
+
+	// Get my fabulous texture out
+	TPL_GetTexture(&TPLfile, hovercraftTex, &texObj);
+
+	// Load it into the first Texture map
+	GX_LoadTexObj(&texObj, GX_TEXMAP0);
 }
