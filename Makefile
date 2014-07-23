@@ -21,6 +21,7 @@ SOURCES		:=	src
 DATA		:=	data 
 MODELS		:=	models 
 INCLUDES	:=  include
+TEXTURES	:=	textures
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -53,7 +54,8 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
-					$(foreach dir,$(MODELS),$(CURDIR)/$(dir))
+					$(foreach dir,$(MODELS),$(CURDIR)/$(dir)) \
+					$(foreach dir,$(TEXTURES),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
@@ -66,7 +68,9 @@ sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 OBJFILES	:=	$(foreach dir,$(MODELS),$(notdir $(wildcard $(dir)/*.obj)))
+SCFFILES	:=	$(foreach dir,$(TEXTURES),$(notdir $(wildcard $(dir)/*.scf)))
 BMBFILES	:=	$(OBJFILES:.obj=.bmb)
+TPLFILES	:=	$(SCFFILES:.scf=.tpl)
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -79,6 +83,7 @@ endif
 
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(addsuffix .o,$(BMBFILES)) \
+					$(addsuffix .o,$(TPLFILES)) \
 					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 					$(sFILES:.s=.o) $(SFILES:.S=.o)
 
@@ -145,6 +150,12 @@ $(OUTPUT).elf: $(OFILES)
 %.bmb.o	:	%.bmb
 	@echo $(notdir $<)
 	$(bin2o)
+
+#---------------------------------------------------------------------------------
+%.tpl.o	:	%.tpl
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
 	
 -include $(DEPENDS)
 
