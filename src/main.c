@@ -25,6 +25,11 @@ void *initialise();
 void playMod();
 void checkModel();
 
+#define PAD1 1<<0
+#define PAD2 1<<1
+#define PAD3 1<<2
+#define PAD4 1<<3
+
 int main(int argc, char **argv) {
 
 	xfb = initialise();
@@ -34,6 +39,14 @@ int main(int argc, char **argv) {
 	checkModel();
 
 	printf("\nHello World!\n");
+
+	printf("\nChecking pads..\n");
+
+	u32 connected = PAD_ScanPads();
+	if ((connected & PAD1) == PAD1) printf("\nPlayer 1 connected\n");
+	if ((connected & PAD2) == PAD2) printf("\nPlayer 2 connected\n");
+	if ((connected & PAD3) == PAD3) printf("\nPlayer 3 connected\n");
+	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
 
 	while (1) {
 
