@@ -198,7 +198,7 @@ void setupCamera() {
 void playMod() {
 	MODPlay_Init(&play);
 	MODPlay_SetMOD(&play, menumusic_mod);
-	MODPlay_SetFrequency(&play, 32000);
+	// Fixed in Dolphin PR666 // MODPlay_SetFrequency(&play, 32000);
 	MODPlay_Start(&play);
 }
 
@@ -288,6 +288,5 @@ void loadTexture() {
 	// Load it into the first Texture map
 	GX_LoadTexObj(&texObj, GX_TEXMAP0);
 
-	GX_SetTevOp(GX_TEVSTAGE0, GX_DECAL);
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
