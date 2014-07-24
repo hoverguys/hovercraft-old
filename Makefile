@@ -10,7 +10,7 @@ endif
 include $(DEVKITPPC)/gamecube_rules
 
 # Put tools into the path (temporary)
-PATH        := $(PATH):$(CURDIR)/tools
+PATH        :=  $(PATH):$(CURDIR)/tools
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
