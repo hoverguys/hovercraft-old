@@ -11,7 +11,7 @@
 #include "hovercraft_bmb.h"
 
 // Models
-#include "modeldata.h"
+#include "model.h"
 
 // Textures
 #include "textures_tpl.h"
@@ -36,15 +36,13 @@ Mtx viewMtx;
 Mtx44 perspectiveMtx;
 
 // Model info
-void *modelList; // Storage for the display lists
-u32 modelListSize;   // Real display list sizes
+model_t* model;
 
 GXTexObj texObj;
 TPLFile TPLfile;
 
 void initialise();
 void playMod();
-u8 setupModel();
 void loadTexture();
 void setupCamera();
 void SetLight(Mtx view);
@@ -59,11 +57,13 @@ int main(int argc, char **argv) {
 	playMod();
 	loadTexture();
 
-	if (setupModel() != TRUE) {
+	model = MODEL_setup(hovercraft_bmb);
+	if (model == NULL) {
 		printf("Error generating model..\n");
 		exit(0);
 	}
-	
+
+	MODEL_setTexture(model, &texObj);
 
 	printf("\nChecking pads..\n");
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
 		}
 
 		// Draw here
-		GX_CallDispList(modelList, modelListSize);
+		MODEL_render(model);
 
 		//Finish up
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -138,8 +138,6 @@ void initialise() {
 	// Allocate frame buffers
 	xfb[0] = SYS_AllocateFramebuffer(rmode);
 	xfb[1] = SYS_AllocateFramebuffer(rmode);
-
-	//console_init(framebuffer, 20, 20, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth*VI_DISPLAY_PIX_SZ);
 
 	VIDEO_Configure(rmode);
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
@@ -198,84 +196,17 @@ void setupCamera() {
 void playMod() {
 	MODPlay_Init(&play);
 	MODPlay_SetMOD(&play, menumusic_mod);
-	// Fixed in Dolphin PR666 // MODPlay_SetFrequency(&play, 32000);
 	MODPlay_Start(&play);
 }
 
-u8 setupModel() {
-	binheader_t* header = (binheader_t*)hovercraft_bmb;
-
-	u32 posOffset = sizeof(binheader_t);
-	u32 nrmOffset = posOffset + (sizeof(f32)* header->vcount * 3);
-	u32 texOffset = nrmOffset + (sizeof(f32)* header->vcount * 3);
-	u32 indOffset = texOffset + (sizeof(f32)* header->vcount * 2);
-
-	f32* positions = (f32*)(hovercraft_bmb + posOffset);
-	f32* normals = (f32*)(hovercraft_bmb + nrmOffset);
-	f32* texcoords = (f32*)(hovercraft_bmb + texOffset);
-	u16* indices = (u16*)(hovercraft_bmb + indOffset);
-
-	//Calculate cost
-	/*
-		Setup:
-		 ?
-		Indices:
-		header->fcount * 3 * sizeof(u16) * 3
-	
-	*/
-
-	u32 indicesCount = header->fcount * 3;
-	u32 dispSize = 5312;
-
-	// Build displaylist
-	// Allocate and clear
-	u32 i;
-	modelList = memalign(32, dispSize);
-	memset(modelList, 0, dispSize);
-
-	// Set buffer data
-	//GX_InvVtxCache();
-	GX_ClearVtxDesc();
-	GX_SetVtxDesc(GX_VA_POS, GX_INDEX16);
-	GX_SetVtxDesc(GX_VA_NRM, GX_INDEX16);
-	GX_SetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-
-	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
-	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-
-	GX_SetArray(GX_VA_POS, positions, 3 * sizeof(GX_F32));
-	GX_SetArray(GX_VA_NRM, normals, 3 * sizeof(GX_F32));
-	GX_SetArray(GX_VA_TEX0, texcoords, 2 * sizeof(GX_F32));
-
-	//Texture?
-
-	// Fill
-	DCInvalidateRange(modelList, dispSize);
-	GX_BeginDispList(modelList, dispSize);
-	GX_Begin(GX_TRIANGLES, GX_VTXFMT0, indicesCount);
-	for (i = 0; i < indicesCount; i++) {
-		GX_Position1x16(indices[i]);
-		GX_Normal1x16(indices[i]);
-		GX_TexCoord1x16(indices[i]);
-	}
-	GX_End();
-
-	// Close
-	modelListSize = GX_EndDispList();
-	if (modelListSize == 0) {
-		return FALSE;
-	}
-
-	printf("modelListSize is %u\n", modelListSize);
-	return TRUE;
+void setupTexture() {
+	// Setup 1 texture channel
+	GX_SetNumTexGens(1);
+	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
 
 void loadTexture() {
-	// This has something to do on how the textures are generated (format, probably?)
-	GX_SetNumTexGens(1);
-	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-
 	// Free Texture cache
 	GX_InvalidateTexAll();
 
@@ -284,9 +215,4 @@ void loadTexture() {
 
 	// Get my fabulous texture out
 	TPL_GetTexture(&TPLfile, hovercraftTex, &texObj);
-
-	// Load it into the first Texture map
-	GX_LoadTexObj(&texObj, GX_TEXMAP0);
-
-	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
