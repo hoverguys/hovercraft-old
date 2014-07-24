@@ -9,6 +9,9 @@ endif
 
 include $(DEVKITPPC)/gamecube_rules
 
+# Put tools into the path (temporary)
+PATH        := $(PATH):$(CURDIR)/tools
+
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
@@ -129,6 +132,13 @@ $(OUTPUT).dol: $(OUTPUT).elf
 $(OUTPUT).elf: $(OFILES)
 
 #---------------------------------------------------------------------------------
+# This rule compiles model files (obj) to our own format (bmb)
+#---------------------------------------------------------------------------------
+%.bmb : %.obj
+	@echo $(notdir $<)
+	@obj2bin -i $< -o $@
+
+#---------------------------------------------------------------------------------
 # This rule links in binary data with the .jpg extension
 #---------------------------------------------------------------------------------
 %.jpg.o	:	%.jpg
@@ -145,7 +155,7 @@ $(OUTPUT).elf: $(OFILES)
 	$(bin2o)
 
 #---------------------------------------------------------------------------------
-# This rule links in binary data with the .obj extension
+# This rule links in binary data with the .bmb extension
 #---------------------------------------------------------------------------------
 %.bmb.o	:	%.bmb
 	@echo $(notdir $<)
