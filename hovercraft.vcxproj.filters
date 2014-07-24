@@ -26,5 +26,8 @@
     <ClInclude Include="include\modeldata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

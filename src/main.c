@@ -17,35 +17,53 @@
 #include "textures_tpl.h"
 #include "textures.h"
 
+#include "input.h"
+
 // Audio
 #include <aesndlib.h>
 #include <gcmodplay.h>
-
-static void *xfb = NULL;
-static GXRModeObj *rmode = NULL;
 static MODPlay play;
+
+// GX
+#define DEFAULT_FIFO_SIZE	(256*1024)
+static void *xfb[2] = { NULL, NULL};
+static u32 fbi = 0;
+static GXRModeObj *rmode = NULL;
+void *gpfifo = NULL;
+
+// Matrices
+Mtx viewMtx;
+Mtx44 perspectiveMtx;
+
+// Model info
+void *modelList; // Storage for the display lists
+u32 modelListSize;   // Real display list sizes
 
 GXTexObj texObj;
 TPLFile TPLfile;
 
-void *initialise();
+void initialise();
 void playMod();
-void checkModel();
+u8 setupModel();
+void loadTexture();
+void setupCamera();
+void SetLight(Mtx view);
 
-#define PAD1 1<<0
-#define PAD2 1<<1
-#define PAD3 1<<2
-#define PAD4 1<<3
 
 int main(int argc, char **argv) {
 
-	xfb = initialise();
+	initialise();
+
+	setupCamera();
 
 	playMod();
-
 	loadTexture();
 
-	checkModel();
+	if (setupModel() != TRUE) {
+		printf("Error generating model..\n");
+		exit(0);
+	}
+	
 
 	printf("\nChecking pads..\n");
 
@@ -55,17 +73,18 @@ int main(int argc, char **argv) {
 	if ((connected & PAD3) == PAD3) printf("\nPlayer 3 connected\n");
 	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
 
-	printf("\nChecking pads..\n");
-
-	u32 connected = PAD_ScanPads();
-	if ((connected & PAD1) == PAD1) printf("\nPlayer 1 connected\n");
-	if ((connected & PAD2) == PAD2) printf("\nPlayer 2 connected\n");
-	if ((connected & PAD3) == PAD3) printf("\nPlayer 3 connected\n");
-	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
-
+	u32 firstFrame = 1;
+	Mtx modelMtx, modelviewMtx;
 	while (1) {
+		guMtxIdentity(modelMtx);
+		guMtxTransApply(modelMtx, modelMtx, 0, 0, -10);
 
-		VIDEO_WaitVSync();
+		guMtxConcat(modelMtx, viewMtx, modelviewMtx);
+		GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
+
+		GX_SetNumChans(1);
+
+		// Input here
 		PAD_ScanPads();
 
 		int buttonsDown = PAD_ButtonsDown(PAD1);
@@ -75,34 +94,105 @@ int main(int argc, char **argv) {
 		}
 
 		if (buttonsDown & PAD_BUTTON_START) {
-			exit(0);
+			
 		}
+
+		if (firstFrame) {
+			firstFrame = 0;
+			VIDEO_SetBlack(FALSE);
+		}
+
+		// Draw here
+		GX_CallDispList(modelList, modelListSize);
+
+		//Finish up
+		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+		GX_SetColorUpdate(GX_TRUE);
+		GX_CopyDisp(xfb[fbi], GX_TRUE);
+
+		GX_DrawDone();
+
+		VIDEO_SetNextFramebuffer(xfb[fbi]);
+		VIDEO_Flush();
+		VIDEO_WaitVSync();
+		fbi ^= 1;
 	}
 
 	return 0;
 }
 
-void* initialise() {
+void initialise() {
 
-	void *framebuffer;
-
+	// Initialize systems
 	VIDEO_Init();
 	PAD_Init();
 	AESND_Init(NULL);
 
+	// Get render mode
 	rmode = VIDEO_GetPreferredMode(NULL);
 
-	framebuffer = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
-	console_init(framebuffer, 20, 20, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth*VI_DISPLAY_PIX_SZ);
+	// allocate the fifo buffer
+	gpfifo = memalign(32, DEFAULT_FIFO_SIZE);
+	memset(gpfifo, 0, DEFAULT_FIFO_SIZE);
+
+	// Allocate frame buffers
+	xfb[0] = SYS_AllocateFramebuffer(rmode);
+	xfb[1] = SYS_AllocateFramebuffer(rmode);
+
+	//console_init(framebuffer, 20, 20, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth*VI_DISPLAY_PIX_SZ);
 
 	VIDEO_Configure(rmode);
-	VIDEO_SetNextFramebuffer(framebuffer);
+	VIDEO_SetNextFramebuffer(xfb[fbi]);
 	VIDEO_SetBlack(FALSE);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	return framebuffer;
+	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
+
+	// Swap frames
+	fbi ^= 1;
+
+	// init the flipper
+	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
+
+	// clears the bg to color and clears the z buffer
+	GXColor background = { 0x00, 0x00, 0x00, 0xFF };
+	GX_SetCopyClear(background, 0x00FFFFFF);
+	
+	// fullscreen viewport setup
+	// Gx Setup
+	GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
+	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0, 0, rmode->fbWidth, rmode->efbHeight);
+	GX_SetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
+	GX_SetDispCopyDst(rmode->fbWidth, xfbHeight);
+	GX_SetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
+	GX_SetFieldMode(rmode->field_rendering, ((rmode->viHeight == 2 * rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE));
+
+	if (rmode->aa)
+		GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
+	else
+		GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+
+	GX_SetCullMode(GX_CULL_NONE);
+	GX_CopyDisp(xfb[fbi], GX_TRUE);
+	GX_SetDispCopyGamma(GX_GM_1_0);
+}
+
+void setupCamera() {
+	// Setup camera view and perspective
+	guVector
+		cam = { 0.0F, 0.0F, 0.0F },
+		up = { 0.0F, 1.0F, 0.0F },
+		look = { 0.0F, 0.0F, -1.0F };
+
+	guLookAt(viewMtx, &cam, &up, &look);
+	f32 w = rmode->viWidth;
+	f32 h = rmode->viHeight;
+	guPerspective(perspectiveMtx, 60, (f32)w / h, 0.1F, 300.0F);
+	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
 }
 
 void playMod() {
@@ -112,7 +202,7 @@ void playMod() {
 	MODPlay_Start(&play);
 }
 
-void checkModel() {
+u8 setupModel() {
 	binheader_t* header = (binheader_t*)hovercraft_bmb;
 
 	u32 posOffset = sizeof(binheader_t);
@@ -124,6 +214,61 @@ void checkModel() {
 	f32* normals = (f32*)(hovercraft_bmb + nrmOffset);
 	f32* texcoords = (f32*)(hovercraft_bmb + texOffset);
 	u16* indices = (u16*)(hovercraft_bmb + indOffset);
+
+	//Calculate cost
+	/*
+		Setup:
+		 ?
+		Indices:
+		header->fcount * 3 * sizeof(u16) * 3
+	
+	*/
+
+	u32 indicesCount = header->fcount * 3;
+	u32 dispSize = 5312;
+
+	// Build displaylist
+	// Allocate and clear
+	u32 i;
+	modelList = memalign(32, dispSize);
+	memset(modelList, 0, dispSize);
+
+	// Set buffer data
+	//GX_InvVtxCache();
+	GX_ClearVtxDesc();
+	GX_SetVtxDesc(GX_VA_POS, GX_INDEX16);
+	GX_SetVtxDesc(GX_VA_NRM, GX_INDEX16);
+	GX_SetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+
+	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+	GX_SetArray(GX_VA_POS, positions, 3 * sizeof(GX_F32));
+	GX_SetArray(GX_VA_NRM, normals, 3 * sizeof(GX_F32));
+	GX_SetArray(GX_VA_TEX0, texcoords, 2 * sizeof(GX_F32));
+
+	//Texture?
+
+	// Fill
+	DCInvalidateRange(modelList, dispSize);
+	GX_BeginDispList(modelList, dispSize);
+	GX_Begin(GX_TRIANGLES, GX_VTXFMT0, indicesCount);
+	for (i = 0; i < indicesCount; i++) {
+		GX_Position1x16(indices[i]);
+		GX_Normal1x16(indices[i]);
+		GX_TexCoord1x16(indices[i]);
+	}
+	GX_End();
+
+	// Close
+	modelListSize = GX_EndDispList();
+	if (modelListSize == 0) {
+		return FALSE;
+	}
+
+	printf("modelListSize is %u\n", modelListSize);
+	return TRUE;
 }
 
 void loadTexture() {
@@ -142,4 +287,7 @@ void loadTexture() {
 
 	// Load it into the first Texture map
 	GX_LoadTexObj(&texObj, GX_TEXMAP0);
+
+	GX_SetTevOp(GX_TEVSTAGE0, GX_DECAL);
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }

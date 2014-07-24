@@ -43,12 +43,13 @@
     <NMakeReBuildCommandLine>make clean &amp;&amp; make -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)\exe</OutDir>
     <IntDir>log</IntDir>
-    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj</IncludePath>
+    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj;.\include</IncludePath>
+    <LibraryPath>D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>hovercraft.elf</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj</IncludePath>
+    <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj;.\include</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
@@ -59,6 +60,7 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\input.h" />
     <ClInclude Include="include\modeldata.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
