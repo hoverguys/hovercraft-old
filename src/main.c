@@ -37,7 +37,7 @@ Mtx viewMtx;
 Mtx44 perspectiveMtx;
 
 // Model info
-model_t* model;
+model_t *modelHover, *modelTerrain;
 
 GXTexObj texObj;
 TPLFile TPLfile;
@@ -58,13 +58,11 @@ int main(int argc, char **argv) {
 	playMod();
 	loadTexture();
 
-	model = MODEL_setup(terrain_bmb);
-	if (model == NULL) {
-		printf("Error generating model..\n");
-		//exit(0);
-	}
+	modelHover = MODEL_setup(hovercraft_bmb);
+	modelTerrain = MODEL_setup(terrain_bmb);
 
-	MODEL_setTexture(model, &texObj);
+	MODEL_setTexture(modelHover, &texObj);
+	MODEL_setTexture(modelTerrain, &texObj);
 
 	printf("\nChecking pads..\n");
 
@@ -79,6 +77,7 @@ int main(int argc, char **argv) {
 	while (1) {
 		guMtxIdentity(modelMtx);
 		guMtxTransApply(modelMtx, modelMtx, 0, 0, -10);
+		guMtxApplyScale(modelMtx, modelMtx, 10, 10, 10);
 
 		guMtxConcat(modelMtx, viewMtx, modelviewMtx);
 		GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
@@ -100,7 +99,8 @@ int main(int argc, char **argv) {
 		}
 
 		// Draw here
-		MODEL_render(model);
+		MODEL_render(modelTerrain);
+		MODEL_render(modelHover);
 
 		//Finish up
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -143,7 +143,7 @@ void initialise() {
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
+	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
 
 	// Swap frames
 	fbi ^= 1;
