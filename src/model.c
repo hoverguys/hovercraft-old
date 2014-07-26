@@ -5,17 +5,17 @@
 #include <stdio.h>
 
 model_t* MODEL_setup(const u8* model_bmb) {
-	binheader_t* header = (binheader_t*)model_bmb;
+	binheader_t* header = (binheader_t*) model_bmb;
 
 	u32 posOffset = sizeof(binheader_t);
-	u32 nrmOffset = posOffset + (sizeof(f32)* header->vcount * 3);
-	u32 texOffset = nrmOffset + (sizeof(f32)* header->vcount * 3);
-	u32 indOffset = texOffset + (sizeof(f32)* header->vcount * 2);
+	u32 nrmOffset = posOffset + (sizeof(f32) * header->vcount * 3);
+	u32 texOffset = nrmOffset + (sizeof(f32) * header->vcount * 3);
+	u32 indOffset = texOffset + (sizeof(f32) * header->vcount * 2);
 
-	f32* positions = (f32*)(model_bmb + posOffset);
-	f32* normals = (f32*)(model_bmb + nrmOffset);
-	f32* texcoords = (f32*)(model_bmb + texOffset);
-	u16* indices = (u16*)(model_bmb + indOffset);
+	f32* positions = (f32*) (model_bmb + posOffset);
+	f32* normals = (f32*) (model_bmb + nrmOffset);
+	f32* texcoords = (f32*) (model_bmb + texOffset);
+	u16* indices = (u16*) (model_bmb + indOffset);
 
 	//Calculate cost
 	u32 indicesCount = header->fcount * 3;

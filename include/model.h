@@ -13,8 +13,8 @@ typedef struct {
 
 typedef struct {
 	GXTexObj* textureObject;
-	void *modelList; // Storage for the display lists
-	u32 modelListSize;   // Real display list sizes
+	void*     modelList;     // Storage for the display lists
+	u32       modelListSize; // Real display list sizes
 } model_t;
 
 model_t* MODEL_setup(const u8* model_bmb);

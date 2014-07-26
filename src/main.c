@@ -27,7 +27,7 @@ static MODPlay play;
 
 // GX
 #define DEFAULT_FIFO_SIZE	(256*1024)
-static void *xfb[2] = { NULL, NULL};
+static void *xfb[2] = { NULL, NULL };
 static u32 fbi = 0;
 static GXRModeObj *rmode = NULL;
 void *gpfifo = NULL;
@@ -94,10 +94,6 @@ int main(int argc, char **argv) {
 			printf("Button A pressed.\n");
 		}
 
-		if (buttonsDown & PAD_BUTTON_START) {
-			
-		}
-
 		if (firstFrame) {
 			firstFrame = 0;
 			VIDEO_SetBlack(FALSE);
@@ -158,7 +154,7 @@ void initialise() {
 	// clears the bg to color and clears the z buffer
 	GXColor background = { 0x00, 0x00, 0x00, 0xFF };
 	GX_SetCopyClear(background, 0x00FFFFFF);
-	
+
 	// fullscreen viewport setup
 	// Gx Setup
 	GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
@@ -190,7 +186,7 @@ void setupCamera() {
 	guLookAt(viewMtx, &cam, &up, &look);
 	f32 w = rmode->viWidth;
 	f32 h = rmode->viHeight;
-	guPerspective(perspectiveMtx, 60, (f32)w / h, 0.1F, 300.0F);
+	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);
 	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
 }
 
