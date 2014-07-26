@@ -56,13 +56,16 @@
   <ItemGroup>
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\model.c" />
+    <ClCompile Include="src\object.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\input.h" />
     <ClInclude Include="include\model.h" />
+    <ClInclude Include="include\object.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

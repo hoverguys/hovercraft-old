@@ -21,15 +21,22 @@
     <ClCompile Include="src\model.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\object.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
