@@ -21,8 +21,8 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	u32 indicesCount = header->fcount * 3;
 	u32 indicesSize = indicesCount * 3 * sizeof(u16); // 3 indices per vertex index (p,n,t) that are u16 in size
 	printf("indicesSize is %u\n", indicesSize);
-	u32 callSize = 80; // Size of setup vars
-	u32 dispSize = indicesSize + callSize;
+	u32 callSize = 89; // Size of setup vars
+	u32 dispSize = indicesSize + callSize + 63;
 	printf("guessed size is %u\n", dispSize);
 	dispSize = ((dispSize >> 5) + 1) << 5; //Round up to nearest 32 multiplication
 
@@ -62,6 +62,7 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	// Close
 	u32 modelListSize = GX_EndDispList();
 	if (modelListSize == 0) {
+		printf("Error: Display list not big enough [%u]\n", dispSize);
 		return NULL;
 	}
 
