@@ -1,3 +1,7 @@
+/*! \file object.h
+*  \brief Input management and detection
+*/
+
 #ifndef _INPUT_H
 #define _INPUT_H
 

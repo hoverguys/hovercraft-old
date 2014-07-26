@@ -1,3 +1,7 @@
+/*! \file object.h
+ *  \brief (Game)Object creation and handling
+ */
+
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
@@ -5,10 +9,11 @@
 #include "model.h"
 
 typedef struct {
-	guVector position;     //! World position
+	guVector     position; //! World position
 	guQuaternion rotation; //! Rotation
-	guVector scale;        //! Scale
-	u8 dirty;              //! Dirty flags for matrix operations
+	guVector     scale;    //! Scale
+	BOOL         dirty;    //! Dirty flag for matrix recalculation
+	Mtx          matrix;   //! Transform matrix (AUTO-GENERATED)
 } transform_t;
 
 typedef struct {
@@ -38,7 +43,7 @@ object_t* OBJECT_create(model_t*     mesh,
  */
 void OBJECT_render(object_t* object);
 
-/*! \brief Destory and object and free its allocated memory
+/*! \brief Destroy and object and free its allocated memory
  *  \param object Object to destroy
  *  \remarks This doesn't free the mesh, don't forget to MODEL_destroy(1)!
  */
