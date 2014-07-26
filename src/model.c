@@ -77,7 +77,7 @@ model_t* MODEL_setup(const u8* model_bmb) {
 
 void MODEL_destroy(model_t* model) {
 	free(model->modelList);
-	memset(model, 0, sizeof(model_t));
+	free(model);
 }
 
 void MODEL_render(model_t* model) {
