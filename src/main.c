@@ -75,11 +75,11 @@ int main(int argc, char **argv) {
 	u32 firstFrame = 1;
 	Mtx modelMtx, modelviewMtx;
 	while (1) {
-		guMtxIdentity(modelMtx);
-		guMtxTransApply(modelMtx, modelMtx, 0, 0, -10);
-		guMtxApplyScale(modelMtx, modelMtx, 10, 10, 10);
+		ps_guMtxIdentity(modelMtx);
+		ps_guMtxTransApply(modelMtx, modelMtx, 0, 0, -10);
+		ps_guMtxApplyScale(modelMtx, modelMtx, 10, 10, 10);
 
-		guMtxConcat(modelMtx, viewMtx, modelviewMtx);
+		ps_guMtxConcat(modelMtx, viewMtx, modelviewMtx);
 		GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
 
 		GX_SetNumChans(1);
