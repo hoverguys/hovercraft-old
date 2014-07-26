@@ -67,6 +67,13 @@
     <ClInclude Include="include\model.h" />
     <ClInclude Include="include\object.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="models\hovercraft.obj" />
+    <Object Include="models\terrain.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="textures\hovercraft.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

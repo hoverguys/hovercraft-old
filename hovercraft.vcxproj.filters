@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\models">
+      <UniqueIdentifier>{7edc9e93-d61e-4955-94dd-fbc548d37e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\textures">
+      <UniqueIdentifier>{f450bbfb-e09b-463e-801d-cd42cb0007fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.c">
@@ -39,5 +45,18 @@
     <ClInclude Include="include\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="models\terrain.obj">
+      <Filter>Resource Files\models</Filter>
+    </Object>
+    <Object Include="models\hovercraft.obj">
+      <Filter>Resource Files\models</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="textures\hovercraft.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
