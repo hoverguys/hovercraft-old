@@ -9,6 +9,7 @@
 // rename from modfile.mod to modfile_mod.h
 #include "menumusic_mod.h"
 #include "hovercraft_bmb.h"
+#include "terrain_bmb.h"
 
 // Models
 #include "model.h"
@@ -57,10 +58,10 @@ int main(int argc, char **argv) {
 	playMod();
 	loadTexture();
 
-	model = MODEL_setup(hovercraft_bmb);
+	model = MODEL_setup(terrain_bmb);
 	if (model == NULL) {
 		printf("Error generating model..\n");
-		exit(0);
+		//exit(0);
 	}
 
 	MODEL_setTexture(model, &texObj);
@@ -146,7 +147,7 @@ void initialise() {
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
+	CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
 
 	// Swap frames
 	fbi ^= 1;
