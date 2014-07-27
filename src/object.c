@@ -16,7 +16,7 @@ object_t* OBJECT_create(model_t*     mesh,
 	object->transform.position = position;
 	object->transform.rotation = rotation;
 	object->transform.scale = scale;
-	object->transform.dirty = DIRTY_POSITION | DIRTY_ROTATION | DIRTY_SCALE;
+	object->transform.dirty = TRUE;
 	return object;
 }
 
@@ -24,28 +24,28 @@ void OBJECT_destroy(object_t* object) {
 	free(object);
 }
 
-void OBJECT_render(object_t* object) {
-	if (object->mesh == NULL) {
-		printf("Can't render inexistent mesh");
-		return;
-	}
+void OBJECT_render(object_t* object, Mtx viewMtx) {
+	if (object->mesh == NULL) return;
 
 	/* Check dirty flag */
 	if (object->transform.dirty == TRUE)
 		_MakeMatrix(object);
 
+	Mtx modelviewMtx;
+	ps_guMtxConcat(object->transform.matrix, viewMtx, modelviewMtx);
+	GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
+
 	MODEL_render(object->mesh);
 }
 
 inline void _MakeMatrix(object_t* object) {
-
 	/* Reset matrix to identity */
 	Mtx* m = &object->transform.matrix;
 	ps_guMtxIdentity(*m);
 
-	/*TODO Can we merge translation and scale matrix?  *
-	 *     guMtxTrans and guMtxScale do very trivial   *
-	 *     matrix assignments that could be merged.    */
+	/* TODO Can we merge translation and scale matrix? *
+	 *      guMtxTrans and guMtxScale do very trivial  *
+	 *      matrix assignments that could be merged.   */
 
 	/* NOTE Currently using ps_* as they do FP/PS optimizations *
 	 *      The implementation of those functions are in ASM,   *

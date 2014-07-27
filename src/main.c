@@ -19,6 +19,7 @@
 
 #include "input.h"
 #include "model.h"
+#include "object.h"
 
 /* Music variable */
 static MODPlay play;
@@ -36,29 +37,40 @@ Mtx44 perspectiveMtx;
 
 /* Model info */
 model_t *modelHover, *modelTerrain;
+object_t *objectHover, *objectTerrain;
 
 /* Texture vars */
-GXTexObj texObj;
+GXTexObj hoverTexObj, terrainTexObj;
 TPLFile TPLfile;
 
 void initialise();
 void playMod();
-void loadTexture();
+void loadTextures();
 void setupCamera();
 void SetLight(Mtx view);
-
 
 int main(int argc, char **argv) {
 	initialise();
 	setupCamera();
 	playMod();
-	loadTexture();
+	loadTextures();
 
 	modelHover = MODEL_setup(hovercraft_bmb);
 	modelTerrain = MODEL_setup(terrain_bmb);
 
-	MODEL_setTexture(modelHover, &texObj);
-	MODEL_setTexture(modelTerrain, &texObj);
+	MODEL_setTexture(modelHover, &hoverTexObj);
+	MODEL_setTexture(modelTerrain, &terrainTexObj);
+
+	guVector zero, one, ten;
+	zero.x = 0; zero.y = 0; zero.z = 0;
+	ten.x = 100; ten.y = 100; ten.z = 100;
+	one.x = 1; one.y = 1; one.z = 1;
+	guQuaternion zeroq;
+	zeroq.x = 0; zeroq.y = 0; zeroq.z = 0; zeroq.w = 1;
+
+	/* THIS BREAKS FOR POSITION != zero */
+	objectHover = OBJECT_create(modelHover, zero, zeroq, one);
+	objectTerrain = OBJECT_create(modelTerrain, zero, zeroq, ten);
 
 	printf("\nChecking pads..\n");
 
@@ -69,15 +81,7 @@ int main(int argc, char **argv) {
 	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
 
 	u32 firstFrame = 1;
-	Mtx modelMtx, modelviewMtx;
 	while (1) {
-		ps_guMtxIdentity(modelMtx);
-		ps_guMtxTransApply(modelMtx, modelMtx, 0, 0, -10);
-		ps_guMtxApplyScale(modelMtx, modelMtx, 10, 10, 10);
-
-		ps_guMtxConcat(modelMtx, viewMtx, modelviewMtx);
-		GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
-
 		GX_SetNumChans(1);
 
 		if (firstFrame) {
@@ -86,8 +90,8 @@ int main(int argc, char **argv) {
 		}
 
 		/* Draw models */
-		MODEL_render(modelTerrain);
-		MODEL_render(modelHover);
+		OBJECT_render(objectHover, viewMtx);
+		OBJECT_render(objectTerrain, viewMtx);
 
 		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -115,7 +119,7 @@ void initialise() {
 	/* Get render mode */
 	rmode = VIDEO_GetPreferredMode(NULL);
 
-	/* allocate the fifo buffer */
+	/* Allocate the fifo buffer */
 	gpfifo = memalign(32, DEFAULT_FIFO_SIZE);
 	memset(gpfifo, 0, DEFAULT_FIFO_SIZE);
 
@@ -130,7 +134,7 @@ void initialise() {
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
+	CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
 
 	/* Swap frames */
 	fbi ^= 1;
@@ -188,7 +192,7 @@ void setupTexture() {
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
 
-void loadTexture() {
+void loadTextures() {
 	/* Clear texture cache */
 	GX_InvalidateTexAll();
 
@@ -196,5 +200,6 @@ void loadTexture() {
 	TPL_OpenTPLFromMemory(&TPLfile, (void *) textures_tpl, textures_tpl_size);
 
 	/* Get texture from TPL */
-	TPL_GetTexture(&TPLfile, hovercraftTex, &texObj);
+	TPL_GetTexture(&TPLfile, hovercraftTex, &hoverTexObj);
+	TPL_GetTexture(&TPLfile, terrainTex, &terrainTexObj);
 }

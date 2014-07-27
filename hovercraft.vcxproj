@@ -61,6 +61,7 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="Makefile" />
+    <None Include="textures\textures.scf" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\input.h" />
@@ -73,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\hovercraft.png" />
+    <Image Include="textures\terrain.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

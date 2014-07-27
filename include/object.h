@@ -21,11 +21,6 @@ typedef struct {
 	transform_t transform; //! Transform data (Position, Rotation, etc)
 } object_t;
 
-
-#define DIRTY_POSITION 1<<0
-#define DIRTY_ROTATION 1<<1
-#define DIRTY_SCALE    1<<2
-
 /*! \brief Create Object from mesh and basic transform data
  *  \param mesh Model to use
  *  \param position Initial position in the world
@@ -40,8 +35,9 @@ object_t* OBJECT_create(model_t*     mesh,
 
 /*! \brief Render the object
  *  \param object Object to render
+ *  \param viewMtx Camera's view matrix
  */
-void OBJECT_render(object_t* object);
+void OBJECT_render(object_t* object, Mtx viewMtx);
 
 /*! \brief Destroy and object and free its allocated memory
  *  \param object Object to destroy
