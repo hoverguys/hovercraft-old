@@ -17,22 +17,24 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	f32* texcoords = (f32*) (model_bmb + texOffset);
 	u16* indices = (u16*) (model_bmb + indOffset);
 
-	//Calculate cost
+	/* Calculate cost */
 	u32 indicesCount = header->fcount * 3;
-	u32 indicesSize = indicesCount * 3 * sizeof(u16); // 3 indices per vertex index (p,n,t) that are u16 in size
+	u32 indicesSize = indicesCount * 3 * sizeof(u16); /* 3 indices per vertex index (p,n,t) that are u16 in size */
 	printf("indicesSize is %u\n", indicesSize);
-	u32 callSize = 89; // Size of setup vars
+	u32 callSize = 89; /* Size of setup vars */
 	u32 dispSize = indicesSize + callSize + 63;
 	printf("guessed size is %u\n", dispSize);
-	dispSize = ((dispSize >> 5) + 1) << 5; //Round up to nearest 32 multiplication
 
-	// Build displaylist
-	// Allocate and clear
+	/* Round up to nearest 32 multiplication */
+	dispSize = ((dispSize >> 5) + 1) << 5;
+
+	/* Build display list */
+	/* Allocate and clear */
 	u32 i;
 	void* modelList = memalign(32, dispSize);
 	memset(modelList, 0, dispSize);
 
-	// Set buffer data
+	/* Set buffer data */
 	DCInvalidateRange(modelList, dispSize);
 	GX_BeginDispList(modelList, dispSize);
 
@@ -50,7 +52,7 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	GX_SetArray(GX_VA_NRM, normals, 3 * sizeof(GX_F32));
 	GX_SetArray(GX_VA_TEX0, texcoords, 2 * sizeof(GX_F32));
 
-	// Fill
+	/* Fill the list with indices */
 	GX_Begin(GX_TRIANGLES, GX_VTXFMT0, indicesCount);
 	for (i = 0; i < indicesCount; i++) {
 		GX_Position1x16(indices[i]);
@@ -59,7 +61,7 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	}
 	GX_End();
 
-	// Close
+	/* Close display list */
 	u32 modelListSize = GX_EndDispList();
 	if (modelListSize == 0) {
 		printf("Error: Display list not big enough [%u]\n", dispSize);
@@ -68,11 +70,12 @@ model_t* MODEL_setup(const u8* model_bmb) {
 
 	printf("modelListSize is %u\n", modelListSize);
 
-	// Return model info
+	/* Return model info */
 	model_t* model = malloc(sizeof(model_t));
 	memset(model, 0, sizeof(model_t));
 	model->modelList = modelList;
 	model->modelListSize = modelListSize;
+
 	return model;
 }
 

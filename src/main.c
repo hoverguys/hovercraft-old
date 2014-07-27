@@ -1,44 +1,43 @@
+/* System and SDK libraries */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 #include <ogcsys.h>
 #include <gccore.h>
+#include <aesndlib.h>  /*  Audio  */
+#include <gcmodplay.h> /* Modplay */
 
-// include generated headers
-// rename from modfile.mod to modfile_mod.h
+/* Generated assets headers */
 #include "menumusic_mod.h"
 #include "hovercraft_bmb.h"
 #include "terrain_bmb.h"
 
-// Models
-#include "model.h"
-
-// Textures
+/* Textures */
 #include "textures_tpl.h"
 #include "textures.h"
 
 #include "input.h"
+#include "model.h"
 
-// Audio
-#include <aesndlib.h>
-#include <gcmodplay.h>
+/* Music variable */
 static MODPlay play;
 
-// GX
+/* GX vars */
 #define DEFAULT_FIFO_SIZE	(256*1024)
 static void *xfb[2] = { NULL, NULL };
 static u32 fbi = 0;
 static GXRModeObj *rmode = NULL;
 void *gpfifo = NULL;
 
-// Matrices
+/* Matrices */
 Mtx viewMtx;
 Mtx44 perspectiveMtx;
 
-// Model info
+/* Model info */
 model_t *modelHover, *modelTerrain;
 
+/* Texture vars */
 GXTexObj texObj;
 TPLFile TPLfile;
 
@@ -50,11 +49,8 @@ void SetLight(Mtx view);
 
 
 int main(int argc, char **argv) {
-
 	initialise();
-
 	setupCamera();
-
 	playMod();
 	loadTexture();
 
@@ -84,25 +80,16 @@ int main(int argc, char **argv) {
 
 		GX_SetNumChans(1);
 
-		// Input here
-		PAD_ScanPads();
-
-		int buttonsDown = PAD_ButtonsDown(PAD1);
-
-		if (buttonsDown & PAD_BUTTON_A) {
-			printf("Button A pressed.\n");
-		}
-
 		if (firstFrame) {
 			firstFrame = 0;
 			VIDEO_SetBlack(FALSE);
 		}
 
-		// Draw here
+		/* Draw models */
 		MODEL_render(modelTerrain);
 		MODEL_render(modelHover);
 
-		//Finish up
+		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 		GX_SetColorUpdate(GX_TRUE);
 		GX_CopyDisp(xfb[fbi], GX_TRUE);
@@ -120,19 +107,19 @@ int main(int argc, char **argv) {
 
 void initialise() {
 
-	// Initialize systems
+	/* Initialize systems */
 	VIDEO_Init();
 	PAD_Init();
 	AESND_Init(NULL);
 
-	// Get render mode
+	/* Get render mode */
 	rmode = VIDEO_GetPreferredMode(NULL);
 
-	// allocate the fifo buffer
+	/* allocate the fifo buffer */
 	gpfifo = memalign(32, DEFAULT_FIFO_SIZE);
 	memset(gpfifo, 0, DEFAULT_FIFO_SIZE);
 
-	// Allocate frame buffers
+	/* Allocate frame buffers */
 	xfb[0] = SYS_AllocateFramebuffer(rmode);
 	xfb[1] = SYS_AllocateFramebuffer(rmode);
 
@@ -145,18 +132,17 @@ void initialise() {
 
 	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
 
-	// Swap frames
+	/* Swap frames */
 	fbi ^= 1;
 
-	// init the flipper
+	/* Init flipper */
 	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
 
-	// clears the bg to color and clears the z buffer
+	/* Clear the background to black and clear the Z buf */
 	GXColor background = { 0x00, 0x00, 0x00, 0xFF };
 	GX_SetCopyClear(background, 0x00FFFFFF);
 
-	// fullscreen viewport setup
-	// Gx Setup
+	/* Fullscreen viewport setup */
 	GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
 	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
@@ -177,11 +163,10 @@ void initialise() {
 }
 
 void setupCamera() {
-	// Setup camera view and perspective
-	guVector
-		cam = { 0.0F, 0.0F, 0.0F },
-		up = { 0.0F, 1.0F, 0.0F },
-		look = { 0.0F, 0.0F, -1.0F };
+	/* Setup camera view and perspective */
+	guVector cam = { 0.0F, 0.0F, 0.0F },
+			 up = { 0.0F, 1.0F, 0.0F },
+			 look = { 0.0F, 0.0F, -1.0F };
 
 	guLookAt(viewMtx, &cam, &up, &look);
 	f32 w = rmode->viWidth;
@@ -197,19 +182,19 @@ void playMod() {
 }
 
 void setupTexture() {
-	// Setup 1 texture channel
+	/* Setup 1 texture channel */
 	GX_SetNumTexGens(1);
 	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
 
 void loadTexture() {
-	// Free Texture cache
+	/* Clear texture cache */
 	GX_InvalidateTexAll();
 
-	// Open TPL file from memory (statically linked in)
+	/* Open TPL file from memory (statically linked in) */
 	TPL_OpenTPLFromMemory(&TPLfile, (void *) textures_tpl, textures_tpl_size);
 
-	// Get my fabulous texture out
+	/* Get texture from TPL */
 	TPL_GetTexture(&TPLfile, hovercraftTex, &texObj);
 }
