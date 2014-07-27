@@ -37,7 +37,7 @@ Mtx44 perspectiveMtx;
 
 /* Model info */
 model_t *modelHover, *modelTerrain;
-object_t *objectHover, *objectTerrain;
+object_t *objectHover, *objectHover2, *objectTerrain;
 
 /* Texture vars */
 GXTexObj hoverTexObj, terrainTexObj;
@@ -56,17 +56,21 @@ int main(int argc, char **argv) {
 	loadTextures();
 
 	modelHover = MODEL_setup(hovercraft_bmb);
-	modelTerrain = MODEL_setup(terrain_bmb);
+	//modelTerrain = MODEL_setup(terrain_bmb);
 
 	MODEL_setTexture(modelHover, &hoverTexObj);
-	MODEL_setTexture(modelTerrain, &terrainTexObj);
+	//MODEL_setTexture(modelTerrain, &terrainTexObj);
 
-	objectTerrain = OBJECT_create(modelTerrain);
-	OBJECT_moveTo(objectTerrain, 0, -1, -10);
-	OBJECT_scaleTo(objectTerrain, 100, 100, 100);
+	//objectTerrain = OBJECT_create(modelTerrain);
+	//OBJECT_moveTo(objectTerrain, 0, -1, -10);
+	//OBJECT_scaleTo(objectTerrain, 100, 100, 100);
 
 	objectHover = OBJECT_create(modelHover);
-	OBJECT_moveTo(objectHover, 0, 0, -10);
+	OBJECT_moveTo(objectHover, 0, 0, 0);
+
+	objectHover2 = OBJECT_create(modelHover);
+	OBJECT_moveTo(objectHover2, 3, 0, 0);
+	OBJECT_scaleTo(objectHover2, 2, 2, 2);
 
 	printf("\nChecking pads..\n");
 
@@ -77,7 +81,12 @@ int main(int argc, char **argv) {
 	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");
 
 	u32 firstFrame = 1;
+	f32 rot = 0;
 	while (1) {
+		rot += 0.1f;
+		OBJECT_rotateTo(objectHover2, 0, rot, 0);
+		OBJECT_rotateTo(objectHover, rot, 0, rot);
+
 		GX_SetNumChans(1);
 
 		if (firstFrame) {
@@ -87,7 +96,8 @@ int main(int argc, char **argv) {
 
 		/* Draw models */
 		OBJECT_render(objectHover, viewMtx);
-		OBJECT_render(objectTerrain, viewMtx);
+		OBJECT_render(objectHover2, viewMtx);
+		//OBJECT_render(objectTerrain, viewMtx);
 
 		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -164,7 +174,7 @@ void initialise() {
 
 void setupCamera() {
 	/* Setup camera view and perspective */
-	guVector cam = { 0.0F, 0.0F, 0.0F },
+	guVector cam = { 0.0F, 0.0F, 10.0F },
 			 up = { 0.0F, 1.0F, 0.0F },
 			 look = { 0.0F, 0.0F, -1.0F };
 

@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 /* Rebuild matrix on translate rather than setting dirty flag     *
  * Might be faster as we don't rebuild scale and rotation as well *
@@ -48,7 +49,7 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 		_MakeMatrix(object);
 
 	Mtx modelviewMtx;
-	ps_guMtxConcat(object->transform.matrix, viewMtx, modelviewMtx);
+	ps_guMtxConcat(viewMtx, object->transform.matrix, modelviewMtx);
 	GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
 
 	MODEL_render(object->mesh);
@@ -57,13 +58,14 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 inline void _MakeMatrix(object_t* object) {
 	/* Reset matrix to identity */
 	transform_t* t = &object->transform;
-	ps_guMtxIdentity(t->matrix);
+	MtxP matrix = t->matrix;
+	ps_guMtxIdentity(matrix);
 
 	/* Rotate, Scale, Translate */
 	c_guQuatNormalize(&t->rotation, &t->rotation);
-	c_guMtxQuat(t->matrix, &t->rotation);
-	ps_guMtxScaleApply(t->matrix, t->matrix, t->scale.x, t->scale.y, t->scale.z);
-	ps_guMtxTransApply(t->matrix, t->matrix, t->position.x, t->position.y, t->position.z);
+	c_guMtxQuat(matrix, &t->rotation);
+	ps_guMtxScaleApply(matrix, matrix, t->scale.x, t->scale.y, t->scale.z);
+	ps_guMtxTransApply(matrix, matrix, t->position.x, t->position.y, t->position.z);
 
 	object->transform.dirty = FALSE;
 }
@@ -89,21 +91,17 @@ void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ) {
 #endif
 }
 
-void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ, f32 rW) {
+void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ) {
 	transform_t* t = &object->transform;
-	t->rotation.x = rX;
-	t->rotation.y = rY;
-	t->rotation.z = rZ;
-	t->rotation.w = rW;
+	_EulerToQuaternion(&t->rotation, rX, rY, rZ);
 	t->dirty = TRUE;
 }
 
-void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ, f32 rW) {
+void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ) {
 	transform_t* t = &object->transform;
-	t->rotation.x += rX;
-	t->rotation.y += rY;
-	t->rotation.z += rZ;
-	t->rotation.w += rW;
+	guQuaternion deltaq;
+	_EulerToQuaternion(&deltaq, rX, rY, rZ);
+	c_guQuatMultiply(&t->rotation, &deltaq, &t->rotation);
 	t->dirty = TRUE;
 }
 
@@ -123,3 +121,25 @@ void OBJECT_scale(object_t* object, f32 sX, f32 sY, f32 sZ) {
 	t->dirty = TRUE;
 }
 
+void _EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ) {
+	const f32 c1 = cosf(rY / 2.0f);
+	const f32 s1 = sinf(rY / 2.0f);
+	const f32 c2 = cosf(rX / 2.0f);
+	const f32 s2 = sinf(rX / 2.0f);
+	const f32 c3 = cosf(rZ / 2.0f);
+	const f32 s3 = sinf(rZ / 2.0f);
+	const f32 c1c2 = c1*c2;
+	const f32 s1s2 = s1*s3;
+	q->w = c1c2*c3 - s1s2*s3;
+	q->x = c1c2*s3 + s1s2*c3;
+	q->y = s1*c2*c3 + c1*s2*s3;
+	q->z = c1*s2*c3 - s1*c2*s3;
+}
+
+void _AxisAngleToQuaternion(guQuaternion* q, const guVector rAxis, const f32 rAngle) {
+	const f32 s = sinf(rAngle / 2.0f);
+	q->x = rAxis.x * s;
+	q->y = rAxis.y * s;
+	q->z = rAxis.z * s;
+	q->w = cosf(rAngle / 2.0f);
+}
