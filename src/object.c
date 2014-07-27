@@ -24,9 +24,9 @@ object_t* OBJECT_create(model_t* mesh) {
 }
 
 object_t* OBJECT_createEx(model_t*     mesh,
-						  guVector     position,
-						  guQuaternion rotation,
-						  guVector     scale) {
+						  const guVector     position,
+						  const guQuaternion rotation,
+						  const guVector     scale) {
 	object_t* object = malloc(sizeof(object_t));
 	memset(object, 0, sizeof(object_t));
 	object->mesh = mesh;
@@ -71,7 +71,7 @@ inline void _MakeMatrix(object_t* object) {
 	object->transform.dirty = FALSE;
 }
 
-void OBJECT_moveTo(object_t* object, f32 tX, f32 tY, f32 tZ) {
+void OBJECT_moveTo(object_t* object, const f32 tX, const f32 tY, const f32 tZ) {
 	transform_t* t = &object->transform;
 	t->position.x = tX;
 	t->position.y = tY;
@@ -79,7 +79,7 @@ void OBJECT_moveTo(object_t* object, f32 tX, f32 tY, f32 tZ) {
 	t->dirty = TRUE;
 }
 
-void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ) {
+void OBJECT_move(object_t* object, const f32 tX, const f32 tY, const f32 tZ) {
 	transform_t* t = &object->transform;
 	guVector deltaPos;
 	deltaPos.x = tX; deltaPos.y = tY; deltaPos.z = tZ;
@@ -92,13 +92,13 @@ void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ) {
 #endif
 }
 
-void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ) {
+void OBJECT_rotateTo(object_t* object, const f32 rX, const f32 rY, const f32 rZ) {
 	transform_t* t = &object->transform;
 	EulerToQuaternion(&t->rotation, rX, rY, rZ);
 	t->dirty = TRUE;
 }
 
-void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ) {
+void OBJECT_rotate(object_t* object, const f32 rX, const f32 rY, const f32 rZ) {
 	transform_t* t = &object->transform;
 	guQuaternion deltaq;
 	EulerToQuaternion(&deltaq, rX, rY, rZ);
@@ -106,7 +106,7 @@ void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ) {
 	t->dirty = TRUE;
 }
 
-void OBJECT_scaleTo(object_t* object, f32 sX, f32 sY, f32 sZ) {
+void OBJECT_scaleTo(object_t* object, const f32 sX, const f32 sY, const f32 sZ) {
 	transform_t* t = &object->transform;
 	t->scale.x = sX;
 	t->scale.y = sY;
@@ -114,7 +114,7 @@ void OBJECT_scaleTo(object_t* object, f32 sX, f32 sY, f32 sZ) {
 	t->dirty = TRUE;
 }
 
-void OBJECT_scale(object_t* object, f32 sX, f32 sY, f32 sZ) {
+void OBJECT_scale(object_t* object, const f32 sX, const f32 sY, const f32 sZ) {
 	transform_t* t = &object->transform;
 	t->scale.x *= sX;
 	t->scale.y *= sY;

@@ -35,9 +35,9 @@ object_t* OBJECT_create(model_t* mesh);
  *  \return Pointer to Object structure
  */
 object_t* OBJECT_createEx(model_t*     mesh,
-						  guVector     position,
-						  guQuaternion rotation,
-						  guVector     scale);
+						  const guVector     position,
+						  const guQuaternion rotation,
+						  const guVector     scale);
 
 /*! \brief Render the object
  *  \param object  Object to render
@@ -57,7 +57,7 @@ void OBJECT_destroy(object_t* object);
  *  \param tY     Y coordinate
  *  \param tZ     Z coordinate
  */
-void OBJECT_moveTo(object_t* object, f32 tX, f32 tY, f32 tZ);
+void OBJECT_moveTo(object_t* object, const f32 tX, const f32 tY, const f32 tZ);
 
 /*! \brief Move an object of a certain position (RELATIVE)
  *  \param object Object to move
@@ -65,7 +65,7 @@ void OBJECT_moveTo(object_t* object, f32 tX, f32 tY, f32 tZ);
  *  \param tY     Y coordinate
  *  \param tZ     Z coordinate
  */
-void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ);
+void OBJECT_move(object_t* object, const f32 tX, const f32 tY, const f32 tZ);
 
 /*! \brief Set a specific rotation an object
  *  \param object Object to rotate
@@ -73,7 +73,7 @@ void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ);
  *  \param rY     Y coordinate
  *  \param rZ     Z coordinate
  */
-void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ);
+void OBJECT_rotateTo(object_t* object, const f32 rX, const f32 rY, const f32 rZ);
 
 /*! \brief Rotate an object of a certain rotation (RELATIVE)
  *  \param object Object to rotate
@@ -81,7 +81,7 @@ void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ);
  *  \param rY     Y coordinate
  *  \param rZ     Z coordinate
  */
-void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ);
+void OBJECT_rotate(object_t* object, const f32 rX, const f32 rY, const f32 rZ);
 
 /*! \brief Scale an object to a specific size
 *  \param object Object to scale
@@ -89,7 +89,7 @@ void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ);
 *  \param sY     Y coordinate
 *  \param sZ     Z coordinate
 */
-void OBJECT_scaleTo(object_t* object, f32 sX, f32 sY, f32 sZ);
+void OBJECT_scaleTo(object_t* object, const f32 sX, const f32 sY, const f32 sZ);
 
 /*! \brief Scale an object of a specific size (RELATIVE)
 *  \param object Object to scale
@@ -97,6 +97,6 @@ void OBJECT_scaleTo(object_t* object, f32 sX, f32 sY, f32 sZ);
 *  \param sY     Y coordinate
 *  \param sZ     Z coordinate
 */
-void OBJECT_scale(object_t* object, f32 sX, f32 sY, f32 sZ);
+void OBJECT_scale(object_t* object, const f32 sX, const f32 sY, const f32 sZ);
 
 #endif
