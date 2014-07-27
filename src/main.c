@@ -61,16 +61,12 @@ int main(int argc, char **argv) {
 	MODEL_setTexture(modelHover, &hoverTexObj);
 	MODEL_setTexture(modelTerrain, &terrainTexObj);
 
-	guVector zero, one, ten;
-	zero.x = 0; zero.y = -1; zero.z = -10;
-	ten.x = 100; ten.y = 100; ten.z = 100;
-	one.x = 1; one.y = 1; one.z = 1;
-	guQuaternion zeroq;
-	zeroq.x = 0; zeroq.y = 0; zeroq.z = 0; zeroq.w = 1;
+	objectTerrain = OBJECT_create(modelTerrain);
+	OBJECT_moveTo(objectTerrain, 0, -1, -10);
+	OBJECT_scaleTo(objectTerrain, 100, 100, 100);
 
-	/* THIS BREAKS FOR POSITION != zero */
-	objectTerrain = OBJECT_create(modelTerrain, zero, zeroq, ten);
-	objectHover = OBJECT_create(modelHover, zero, zeroq, one);
+	objectHover = OBJECT_create(modelHover);
+	OBJECT_moveTo(objectHover, 0, 0, -10);
 
 	printf("\nChecking pads..\n");
 
