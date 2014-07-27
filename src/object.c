@@ -23,7 +23,7 @@ object_t* OBJECT_create(model_t* mesh) {
 	position.x = position.y = position.z = 0;
 	scale.x = scale.y = scale.z = 1;
 	guQuaternion rotation;
-	rotation.x = rotation.y = rotation.z = rotation.w = 0;
+	EulerToQuaternion(&rotation, 0, 0, 0);
 
 	return OBJECT_createEx(mesh, position, rotation, scale);
 }
@@ -78,6 +78,14 @@ inline void _MakeMatrix(object_t* object) {
 	t->forward.x = matrix[0][2];
 	t->forward.y = matrix[1][2];
 	t->forward.z = matrix[2][2];
+
+	t->up.x = matrix[0][1];
+	t->up.y = matrix[1][1];
+	t->up.z = matrix[2][1];
+
+	t->right.x = matrix[0][0];
+	t->right.y = matrix[1][0];
+	t->right.z = matrix[2][0];
 #else
 	//TODO Slow vector calc
 #endif

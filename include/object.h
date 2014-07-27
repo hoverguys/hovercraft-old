@@ -16,7 +16,7 @@ typedef struct {
 	Mtx          matrix;   /*< Transform matrix   (AUTO-GENERATED)  */
 	guVector     forward;  /*< Forward vector     (AUTO-GENERATED)  */
 	guVector     up;       /*< Up vector          (AUTO-GENERATED)  */
-	guVector     left;     /*< Left vector        (AUTO-GENERATED)  */
+	guVector     right;    /*< Right vector       (AUTO-GENERATED)  */
 } transform_t;
 
 typedef struct {

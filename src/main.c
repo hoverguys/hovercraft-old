@@ -73,15 +73,14 @@ int main(int argc, char **argv) {
 	OBJECT_scaleTo(objectHover2, 2, 2, 2);
 
 	u32 firstFrame = 1;
-	f32 rot = 0;
 	while (1) {
 		INPUT_update();
 
-		rot += INPUT_AnalogX(0) / 10.f;
-		OBJECT_rotateTo(objectHover, 0, rot, 0);
+		f32 rot = INPUT_AnalogX(0) / 10.f;
+		OBJECT_rotate(objectHover, 0, rot, 0);
 		f32 speed = INPUT_TriggerR(0) / 10.f;
 		guVector speedVec;
-		ps_guVecScale(&objectHover->transform.forward, &speedVec, -speed);
+		ps_guVecScale(&objectHover->transform.forward, &speedVec, speed);
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
 		GX_SetNumChans(1);

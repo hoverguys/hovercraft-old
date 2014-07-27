@@ -29,36 +29,36 @@ inline BOOL INPUT_isConnected(const u8 id);
  *  \param id Gamepad slot
  *  \return Current analog value, normalized from -1 to 1 
  */
-inline f32 INPUT_AnalogX(const u8 id);
+f32 INPUT_AnalogX(const u8 id);
 
 /*! \brief Get Analog stick's Y axis value
 *  \param id Gamepad slot
 *  \return Current analog value, normalized from -1 to 1
 */
-inline f32 INPUT_AnalogY(const u8 id);
+f32 INPUT_AnalogY(const u8 id);
 
 /*! \brief Get C-stick's X axis value
 *  \param id Gamepad slot
 *  \return Current analog value, normalized from -1 to 1
 */
-inline f32 INPUT_CStickX(const u8 id);
+f32 INPUT_CStickX(const u8 id);
 
 /*! \brief Get C-stick's Y axis value
 *  \param id Gamepad slot
 *  \return Current analog value, normalized from -1 to 1
 */
-inline f32 INPUT_CStickY(const u8 id);
+f32 INPUT_CStickY(const u8 id);
 
 /*! \brief Get L trigger analog value
 *  \param id Gamepad slot
 *  \return Current analog value, normalized from -1 to 1
 */
-inline f32 INPUT_TriggerL(const u8 id);
+f32 INPUT_TriggerL(const u8 id);
 
 /*! \brief Get R trigger analog value
 *  \param id Gamepad slot
 *  \return Current analog value, normalized from -1 to 1
 */
-inline f32 INPUT_TriggerR(const u8 id);
+f32 INPUT_TriggerR(const u8 id);
 
 #endif
