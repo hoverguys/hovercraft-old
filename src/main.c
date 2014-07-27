@@ -72,22 +72,17 @@ int main(int argc, char **argv) {
 	OBJECT_moveTo(objectHover2, 3, 0, 0);
 	OBJECT_scaleTo(objectHover2, 2, 2, 2);
 
-	printf("\nChecking pads..\n");
-	/*
-	u32 connected = PAD_ScanPads();
-	if ((connected & PAD1) == PAD1) printf("\nPlayer 1 connected\n");
-	if ((connected & PAD2) == PAD2) printf("\nPlayer 2 connected\n");
-	if ((connected & PAD3) == PAD3) printf("\nPlayer 3 connected\n");
-	if ((connected & PAD4) == PAD4) printf("\nPlayer 4 connected\n");*/
-
 	u32 firstFrame = 1;
 	f32 rot = 0;
 	while (1) {
-		rot += 0.1f;
-		OBJECT_rotateTo(objectHover2, 0, rot, 0);
-		OBJECT_rotateTo(objectHover, rot, 0, rot);
-		printf("Rotation %g %g %g %g\n", objectHover->transform.rotation.x, objectHover->transform.rotation.y,
-									     objectHover->transform.rotation.y, objectHover->transform.rotation.w);
+		INPUT_update();
+
+		rot += INPUT_AnalogX(0) / 10.f;
+		OBJECT_rotateTo(objectHover, 0, rot, 0);
+		f32 speed = INPUT_TriggerR(0) / 10.f;
+		guVector speedVec;
+		ps_guVecScale(&objectHover->transform.forward, &speedVec, -speed);
+		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
 		GX_SetNumChans(1);
 
@@ -121,7 +116,7 @@ void initialise() {
 
 	/* Initialize systems */
 	VIDEO_Init();
-	PAD_Init();
+	INPUT_init();
 	AESND_Init(NULL);
 
 	/* Get render mode */
