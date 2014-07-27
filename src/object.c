@@ -80,9 +80,9 @@ void OBJECT_moveTo(object_t* object, f32 tX, f32 tY, f32 tZ) {
 
 void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ) {
 	transform_t* t = &object->transform;
-	t->position.x += tX;
-	t->position.y += tY;
-	t->position.z += tZ;
+	guVector deltaPos;
+	deltaPos.x = tX; deltaPos.y = tY; deltaPos.z = tZ;
+	ps_guVecAdd(&t->position, &deltaPos, &t->position);
 #ifdef TRANSLATE_DIRECT
 	/* ps_* doesn't do src/dst checks, so this is faster */
 	c_guMtxTransApply(t->matrix, t->matrix, tX, tY, tZ);
@@ -122,24 +122,29 @@ void OBJECT_scale(object_t* object, f32 sX, f32 sY, f32 sZ) {
 }
 
 void _EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ) {
-	const f32 c1 = cosf(rY / 2.0f);
-	const f32 s1 = sinf(rY / 2.0f);
-	const f32 c2 = cosf(rX / 2.0f);
-	const f32 s2 = sinf(rX / 2.0f);
-	const f32 c3 = cosf(rZ / 2.0f);
-	const f32 s3 = sinf(rZ / 2.0f);
-	const f32 c1c2 = c1*c2;
-	const f32 s1s2 = s1*s3;
+	guVector vec;
+	vec.x = rX; vec.y = rY; vec.z = rZ;
+	ps_guVecScale(&vec, &vec, 0.5f);
+	f32 c1, s1, c2, s2, c3, s3;
+	sincosf(vec.y, &c1, &s1);
+	sincosf(vec.x, &c2, &s2);
+	sincosf(vec.z, &c3, &s3);
+	f32 c1c2 = c1*c2;
+	f32 s1s2 = s1*s3;
 	q->w = c1c2*c3 - s1s2*s3;
 	q->x = c1c2*s3 + s1s2*c3;
 	q->y = s1*c2*c3 + c1*s2*s3;
 	q->z = c1*s2*c3 - s1*c2*s3;
 }
 
+
 void _AxisAngleToQuaternion(guQuaternion* q, const guVector rAxis, const f32 rAngle) {
-	const f32 s = sinf(rAngle / 2.0f);
-	q->x = rAxis.x * s;
-	q->y = rAxis.y * s;
-	q->z = rAxis.z * s;
-	q->w = cosf(rAngle / 2.0f);
+	f32 s, c;
+	sincosf(rAngle / 2.0f, &s, &c);
+	guVector out;
+	ps_guVecScale(&rAxis, &out, s);
+	q->x = out.x;
+	q->y = out.y;
+	q->z = out.z;
+	q->w = c;
 }
