@@ -68,22 +68,18 @@ void OBJECT_moveTo(object_t* object, f32 tX, f32 tY, f32 tZ);
 void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ);
 
 /*! \brief Set a specific rotation an object
- *  Uses quaternions, don't do Euler!
  *  \param object Object to rotate
  *  \param rX     X coordinate
  *  \param rY     Y coordinate
  *  \param rZ     Z coordinate
- *  \param rW     W coordinate
  */
 void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ);
 
 /*! \brief Rotate an object of a certain rotation (RELATIVE)
- *  Uses quaternions, don't do Euler!
  *  \param object Object to rotate
  *  \param rX     X coordinate
  *  \param rY     Y coordinate
  *  \param rZ     Z coordinate
- *  \param rW     W coordinate
  */
 void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ);
 
@@ -102,9 +98,5 @@ void OBJECT_scaleTo(object_t* object, f32 sX, f32 sY, f32 sZ);
 *  \param sZ     Z coordinate
 */
 void OBJECT_scale(object_t* object, f32 sX, f32 sY, f32 sZ);
-
-void _EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ);
-
-void _AxisAngleToQuaternion(guQuaternion* q, const guVector rAxis, const f32 rAngle);
 
 #endif

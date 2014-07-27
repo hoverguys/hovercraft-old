@@ -55,6 +55,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\mathutil.c" />
     <ClCompile Include="src\model.c" />
     <ClCompile Include="src\object.c" />
   </ItemGroup>
@@ -65,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\input.h" />
+    <ClInclude Include="include\mathutil.h" />
     <ClInclude Include="include\model.h" />
     <ClInclude Include="include\object.h" />
   </ItemGroup>

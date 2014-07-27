@@ -30,6 +30,9 @@
     <ClCompile Include="src\object.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\mathutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -46,6 +49,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mathutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

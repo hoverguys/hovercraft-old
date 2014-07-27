@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include "mathutil.h"
 
 /* Rebuild matrix on translate rather than setting dirty flag     *
  * Might be faster as we don't rebuild scale and rotation as well *
@@ -93,14 +94,14 @@ void OBJECT_move(object_t* object, f32 tX, f32 tY, f32 tZ) {
 
 void OBJECT_rotateTo(object_t* object, f32 rX, f32 rY, f32 rZ) {
 	transform_t* t = &object->transform;
-	_EulerToQuaternion(&t->rotation, rX, rY, rZ);
+	EulerToQuaternion(&t->rotation, rX, rY, rZ);
 	t->dirty = TRUE;
 }
 
 void OBJECT_rotate(object_t* object, f32 rX, f32 rY, f32 rZ) {
 	transform_t* t = &object->transform;
 	guQuaternion deltaq;
-	_EulerToQuaternion(&deltaq, rX, rY, rZ);
+	EulerToQuaternion(&deltaq, rX, rY, rZ);
 	c_guQuatMultiply(&t->rotation, &deltaq, &t->rotation);
 	t->dirty = TRUE;
 }
@@ -121,30 +122,3 @@ void OBJECT_scale(object_t* object, f32 sX, f32 sY, f32 sZ) {
 	t->dirty = TRUE;
 }
 
-void _EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ) {
-	guVector vec;
-	vec.x = rX; vec.y = rY; vec.z = rZ;
-	ps_guVecScale(&vec, &vec, 0.5f);
-	f32 c1, s1, c2, s2, c3, s3;
-	sincosf(vec.y, &c1, &s1);
-	sincosf(vec.x, &c2, &s2);
-	sincosf(vec.z, &c3, &s3);
-	f32 c1c2 = c1*c2;
-	f32 s1s2 = s1*s3;
-	q->w = c1c2*c3 - s1s2*s3;
-	q->x = c1c2*s3 + s1s2*c3;
-	q->y = s1*c2*c3 + c1*s2*s3;
-	q->z = c1*s2*c3 - s1*c2*s3;
-}
-
-
-void _AxisAngleToQuaternion(guQuaternion* q, const guVector rAxis, const f32 rAngle) {
-	f32 s, c;
-	sincosf(rAngle / 2.0f, &s, &c);
-	guVector out;
-	ps_guVecScale(&rAxis, &out, s);
-	q->x = out.x;
-	q->y = out.y;
-	q->z = out.z;
-	q->w = c;
-}
