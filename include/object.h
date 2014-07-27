@@ -9,16 +9,19 @@
 #include "model.h"
 
 typedef struct {
-	guVector     position; //! World position
-	guQuaternion rotation; //! Rotation
-	guVector     scale;    //! Scale
-	BOOL         dirty;    //! Dirty flag for matrix recalculation
-	Mtx          matrix;   //! Transform matrix (AUTO-GENERATED)
+	guVector     position; /*< World position                       */
+	guQuaternion rotation; /*< Rotation                             */
+	guVector     scale;    /*< Scale                                */
+	BOOL         dirty;    /*< Dirty flag for matrix recalculation  */
+	Mtx          matrix;   /*< Transform matrix   (AUTO-GENERATED)  */
+	guVector     forward;  /*< Forward vector     (AUTO-GENERATED)  */
+	guVector     up;       /*< Up vector          (AUTO-GENERATED)  */
+	guVector     left;     /*< Left vector        (AUTO-GENERATED)  */
 } transform_t;
 
 typedef struct {
-	model_t* mesh;         //! Model
-	transform_t transform; //! Transform data (Position, Rotation, etc)
+	model_t* mesh;         /*< Model                                    */
+	transform_t transform; /*< Transform data (Position, Rotation, etc) */
 } object_t;
 
 /*! \brief Create Object from mesh with default transforms

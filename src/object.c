@@ -11,6 +11,11 @@
  * Can become a waste if we do more translations per frame        */
 #define TRANSLATE_DIRECT
 
+/* Finding the Forward/Up/Left vectors requires quaternion math   *
+ * which can be expensive, we can do some hacks to try and avoid  *
+ * that.                                                          */
+#define QUICK_VECTOR_CALC
+
 void _MakeMatrix(object_t* object);
 
 object_t* OBJECT_create(model_t* mesh) {
@@ -67,6 +72,15 @@ inline void _MakeMatrix(object_t* object) {
 	c_guMtxQuat(matrix, &t->rotation);
 	ps_guMtxScaleApply(matrix, matrix, t->scale.x, t->scale.y, t->scale.z);
 	ps_guMtxTransApply(matrix, matrix, t->position.x, t->position.y, t->position.z);
+
+	/* Calculate forward/up/left vectors */
+#ifdef QUICK_VECTOR_CALC
+	t->forward.x = matrix[0][2];
+	t->forward.y = matrix[1][2];
+	t->forward.z = matrix[2][2];
+#else
+	//TODO Slow vector calc
+#endif
 
 	object->transform.dirty = FALSE;
 }
