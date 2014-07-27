@@ -62,15 +62,15 @@ int main(int argc, char **argv) {
 	MODEL_setTexture(modelTerrain, &terrainTexObj);
 
 	guVector zero, one, ten;
-	zero.x = 0; zero.y = 0; zero.z = 0;
+	zero.x = 0; zero.y = -1; zero.z = -10;
 	ten.x = 100; ten.y = 100; ten.z = 100;
 	one.x = 1; one.y = 1; one.z = 1;
 	guQuaternion zeroq;
 	zeroq.x = 0; zeroq.y = 0; zeroq.z = 0; zeroq.w = 1;
 
 	/* THIS BREAKS FOR POSITION != zero */
-	objectHover = OBJECT_create(modelHover, zero, zeroq, one);
 	objectTerrain = OBJECT_create(modelTerrain, zero, zeroq, ten);
+	objectHover = OBJECT_create(modelHover, zero, zeroq, one);
 
 	printf("\nChecking pads..\n");
 
@@ -134,7 +134,7 @@ void initialise() {
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
+	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
 
 	/* Swap frames */
 	fbi ^= 1;

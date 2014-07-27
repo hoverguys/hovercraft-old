@@ -40,45 +40,15 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 
 inline void _MakeMatrix(object_t* object) {
 	/* Reset matrix to identity */
-	Mtx* m = &object->transform.matrix;
-	ps_guMtxIdentity(*m);
-
-	/* TODO Can we merge translation and scale matrix? *
-	 *      guMtxTrans and guMtxScale do very trivial  *
-	 *      matrix assignments that could be merged.   */
-
-	/* NOTE Currently using ps_* as they do FP/PS optimizations *
-	 *      The implementation of those functions are in ASM,   *
-	 *      considering swtching to c_* for debugging.          */
-
-	/* Create translation matrix */
-	Mtx translationMatrix;
-	ps_guMtxTrans(translationMatrix,
-			   object->transform.position.x,
-			   object->transform.position.y,
-			   object->transform.position.z);
-
-	/* Create scale matrix */
-	Mtx scaleMatrix;
-	ps_guMtxScale(scaleMatrix,
-			   object->transform.scale.x,
-			   object->transform.scale.y,
-			   object->transform.scale.z);
-
-	/* Create rotation matrix */
-	Mtx rotationMatrix;
-	/* Couldn't find the ps_* version */
-	c_guMtxQuat(rotationMatrix,
-			    &object->transform.rotation);
-
-	/* Merge all matrices */
+	transform_t* t = &object->transform;
+	ps_guMtxIdentity(t->matrix);
 
 	/* Current order: Scale, Rotation, Translation *
 	* based on http://bit.ly/1ppBW33              *
 	* Might be wrong, beware of bugs.             */
-	ps_guMtxConcat(*m, scaleMatrix, *m);
-	ps_guMtxConcat(*m, rotationMatrix, *m);
-	ps_guMtxConcat(*m, translationMatrix, *m);
+	c_guMtxQuat(t->matrix, &t->rotation);
+	ps_guMtxScaleApply(t->matrix, t->matrix, t->scale.x, t->scale.y, t->scale.z);
+	ps_guMtxTransApply(t->matrix, t->matrix, t->position.x, t->position.y, t->position.z);
 
 	object->transform.dirty = FALSE;
 }
