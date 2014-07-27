@@ -5,9 +5,60 @@
 #ifndef _INPUT_H
 #define _INPUT_H
 
-#define PAD1 1<<0
-#define PAD2 1<<1
-#define PAD3 1<<2
-#define PAD4 1<<3
+#include <gctypes.h>
+
+#define INPUT_DEADZONE 10
+#define INPUT_STICK_THRESHOLD 70
+#define INPUT_TRIGGER_THRESHOLD 250
+
+/*! \brief Initialize input
+ */
+void INPUT_init();
+
+/*! \brief Scan for new input and detect new gamepads
+ */
+void INPUT_update();
+
+/*! \brief Check if a specific pad is connected
+ *  \param id Gamepad slot
+ *  \return TRUE if connected, FALSE otherwise
+ */
+inline BOOL INPUT_isConnected(const u8 id);
+
+/*! \brief Get Analog stick's X axis value
+ *  \param id Gamepad slot
+ *  \return Current analog value, normalized from -1 to 1 
+ */
+inline f32 INPUT_AnalogX(const u8 id);
+
+/*! \brief Get Analog stick's Y axis value
+*  \param id Gamepad slot
+*  \return Current analog value, normalized from -1 to 1
+*/
+inline f32 INPUT_AnalogY(const u8 id);
+
+/*! \brief Get C-stick's X axis value
+*  \param id Gamepad slot
+*  \return Current analog value, normalized from -1 to 1
+*/
+inline f32 INPUT_CStickX(const u8 id);
+
+/*! \brief Get C-stick's Y axis value
+*  \param id Gamepad slot
+*  \return Current analog value, normalized from -1 to 1
+*/
+inline f32 INPUT_CStickY(const u8 id);
+
+/*! \brief Get L trigger analog value
+*  \param id Gamepad slot
+*  \return Current analog value, normalized from -1 to 1
+*/
+inline f32 INPUT_TriggerL(const u8 id);
+
+/*! \brief Get R trigger analog value
+*  \param id Gamepad slot
+*  \return Current analog value, normalized from -1 to 1
+*/
+inline f32 INPUT_TriggerR(const u8 id);
 
 #endif

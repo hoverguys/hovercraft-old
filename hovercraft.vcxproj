@@ -54,6 +54,7 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\input.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\mathutil.c" />
     <ClCompile Include="src\model.c" />
