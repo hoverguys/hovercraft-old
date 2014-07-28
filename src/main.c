@@ -20,6 +20,7 @@
 #include "input.h"
 #include "model.h"
 #include "object.h"
+#include "mathutil.h"
 
 /* Music variable */
 static MODPlay play;
@@ -77,7 +78,7 @@ int main(int argc, char **argv) {
 		INPUT_update();
 
 		f32 rot = INPUT_AnalogX(0) / 10.f;
-		OBJECT_rotate(objectHover, 0, rot, 0);
+		OBJECT_rotate(objectHover, 0, -rot, 0);
 		f32 speed = INPUT_TriggerR(0) / 10.f;
 		guVector speedVec;
 		ps_guVecScale(&objectHover->transform.forward, &speedVec, speed);

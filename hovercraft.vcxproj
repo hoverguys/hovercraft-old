@@ -63,6 +63,7 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="Makefile" />
+    <ClCompile Include="src\psopt.s" />
     <None Include="textures\textures.scf" />
   </ItemGroup>
   <ItemGroup>

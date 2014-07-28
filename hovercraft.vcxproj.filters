@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\textures">
       <UniqueIdentifier>{f450bbfb-e09b-463e-801d-cd42cb0007fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assembly files">
+      <UniqueIdentifier>{1cee3868-367a-49de-a15a-5c2a1af9515c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.c">
@@ -35,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="src\input.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\psopt.s">
+      <Filter>Assembly files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
