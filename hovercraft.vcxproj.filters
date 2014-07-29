@@ -71,12 +71,18 @@
     <Object Include="models\hovercraft.obj">
       <Filter>Resource Files\models</Filter>
     </Object>
+    <Object Include="models\plane.obj">
+      <Filter>Resource Files\models</Filter>
+    </Object>
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\hovercraft.png">
       <Filter>Resource Files\textures</Filter>
     </Image>
     <Image Include="textures\terrain.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\water.png">
       <Filter>Resource Files\textures</Filter>
     </Image>
   </ItemGroup>

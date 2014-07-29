@@ -11,6 +11,7 @@
 /* Generated assets headers */
 #include "menumusic_mod.h"
 #include "hovercraft_bmb.h"
+#include "plane_bmb.h"
 #include "terrain_bmb.h"
 
 /* Textures */
@@ -37,49 +38,49 @@ Mtx viewMtx;
 Mtx44 perspectiveMtx;
 
 /* Model info */
-model_t *modelHover, *modelTerrain;
-object_t *objectHover, *objectHover2, *objectTerrain;
+model_t *modelHover, *modelTerrain, *modelPlane;
+object_t *objectHover, *objectTerrain, *objectPlane;
 
 /* Texture vars */
-GXTexObj hoverTexObj, terrainTexObj;
+GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
 TPLFile TPLfile;
 
 void initialise();
 void playMod();
 void loadTextures();
-void setupCamera();
-void SetLight(Mtx view);
+void followCamera(transform_t* target, float distance);
 
 int main(int argc, char **argv) {
 	initialise();
-	setupCamera();
 	playMod();
 	loadTextures();
 
 	modelHover = MODEL_setup(hovercraft_bmb);
-	//modelTerrain = MODEL_setup(terrain_bmb);
+	modelTerrain = MODEL_setup(terrain_bmb);
+	modelPlane = MODEL_setup(plane_bmb);
 
 	MODEL_setTexture(modelHover, &hoverTexObj);
-	//MODEL_setTexture(modelTerrain, &terrainTexObj);
+	MODEL_setTexture(modelTerrain, &terrainTexObj);
+	MODEL_setTexture(modelPlane, &waterTexObj);
 
-	//objectTerrain = OBJECT_create(modelTerrain);
-	//OBJECT_moveTo(objectTerrain, 0, -1, -10);
-	//OBJECT_scaleTo(objectTerrain, 100, 100, 100);
+	objectTerrain = OBJECT_create(modelTerrain);
+	OBJECT_moveTo(objectTerrain, 0, -2.8f, 0);
+	OBJECT_scaleTo(objectTerrain, 100, 100, 100);
 
 	objectHover = OBJECT_create(modelHover);
-	OBJECT_moveTo(objectHover, 0, 0, 0);
+	OBJECT_moveTo(objectHover, 50, 0, 0);
 
-	objectHover2 = OBJECT_create(modelHover);
-	OBJECT_moveTo(objectHover2, 3, 0, 0);
-	OBJECT_scaleTo(objectHover2, 2, 2, 2);
-
+	objectPlane = OBJECT_create(modelPlane);
+	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
+	OBJECT_moveTo(objectPlane, -500, 0.05f, -500);
+	OBJECT_render(objectHover, viewMtx);
 	u32 firstFrame = 1;
 	while (1) {
 		INPUT_update();
 
-		f32 rot = INPUT_AnalogX(0) / 10.f;
+		f32 rot = INPUT_AnalogX(0) / 20.f;
 		OBJECT_rotate(objectHover, 0, rot, 0);
-		f32 speed = INPUT_TriggerR(0) / 10.f;
+		f32 speed = INPUT_TriggerR(0) / 5.f;
 		guVector speedVec;
 		ps_guVecScale(&objectHover->transform.forward, &speedVec, speed);
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
@@ -91,10 +92,13 @@ int main(int argc, char **argv) {
 			VIDEO_SetBlack(FALSE);
 		}
 
+		/* Follow hovercraft */
+		followCamera(&objectHover->transform, 7.f);
+
 		/* Draw models */
+		OBJECT_render(objectTerrain, viewMtx);
+		OBJECT_render(objectPlane, viewMtx);
 		OBJECT_render(objectHover, viewMtx);
-		OBJECT_render(objectHover2, viewMtx);
-		//OBJECT_render(objectTerrain, viewMtx);
 
 		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -147,7 +151,7 @@ void initialise() {
 	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
 
 	/* Clear the background to black and clear the Z buf */
-	GXColor background = { 0x00, 0x00, 0x00, 0xFF };
+	GXColor background = { 0xA0, 0xE0, 0xF0, 0xFF };
 	GX_SetCopyClear(background, 0x00FFFFFF);
 
 	/* Fullscreen viewport setup */
@@ -170,13 +174,13 @@ void initialise() {
 	GX_SetDispCopyGamma(GX_GM_1_0);
 }
 
-void setupCamera() {
+void followCamera(transform_t* target, float distance) {
 	/* Setup camera view and perspective */
-	guVector cam = { 0.0F, 0.0F, 10.0F },
-			 up = { 0.0F, 1.0F, 0.0F },
-			 look = { 0.0F, 0.0F, -1.0F };
+	guVector cam = { target->position.x - target->forward.x * distance,
+		target->position.y - target->forward.y * distance + distance * .5f,
+		target->position.z - target->forward.z * distance };
 
-	guLookAt(viewMtx, &cam, &up, &look);
+	guLookAt(viewMtx, &cam, &target->up, &target->position);
 	f32 w = rmode->viWidth;
 	f32 h = rmode->viHeight;
 	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);
@@ -206,4 +210,5 @@ void loadTextures() {
 	/* Get texture from TPL */
 	TPL_GetTexture(&TPLfile, hovercraftTex, &hoverTexObj);
 	TPL_GetTexture(&TPLfile, terrainTex, &terrainTexObj);
+	TPL_GetTexture(&TPLfile, waterTex, &waterTexObj);
 }
