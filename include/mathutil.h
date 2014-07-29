@@ -31,13 +31,13 @@ void AxisAngleToQuaternion(guQuaternion* q, guVector rAxis, const f32 rAngle);
  */
 inline void ps_float2Mul(f32* opA, f32* opB, f32* result);
 
-/*! \brief Multiplies three float32 pairs together
- *         xy = x * y; yz = y * z; xz = x * z;
- *  \param[in,out] x First pair of float32 - Will hold XY (First * Second pair)
- *  \param[in,out] y Second pair of float32 - Will hold YZ (Second * Third pair)
- *  \param[in,out] z Third pair of float32 - Will hold XZ (First * Third pair)
+/*! \brief ASM part of EulerToQuaternion, don't use alone!
+ *  \param[in] x Sin/Cos of Euler X
+ *  \param[in] y Sin/Cos of Euler Y
+ *  \param[in] z Sin/Cos of Euler Z
+ *  \param[out] out Resultant quaternion
  */
-inline void ps_float3Mul(f32* x, f32* y, f32* z);
+inline void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
 
 #endif
 
