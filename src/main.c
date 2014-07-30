@@ -48,8 +48,8 @@ TPLFile TPLfile;
 
 /* Light */
 static GXColor lightColor[] = {
-	{ 0x1f, 0x1f, 0x1f, 0xFF }, // Light color
-	{ 0xc0, 0xc0, 0xc0, 0xFF }, // Ambient color
+	{ 0xff, 0xff, 0xff, 0xFF }, // Light color
+	{ 0xcf, 0xcf, 0xcf, 0xFF }, // Ambient color
 	{ 0xcc, 0xcc, 0xcc, 0xFF }  // Mat color
 };
 
@@ -263,17 +263,18 @@ void SetLight(Mtx view) {
 	guVector lpos;
 	GXLightObj lobj;
 
-	lpos.x = 0;	lpos.y = -1; lpos.z = -1;
+	lpos.x = 0;	lpos.y = -1; lpos.z = 0;
+	guVecNormalize(&lpos);
 	guVecMultiplySR(view, &lpos, &lpos);
 
 	GX_InitSpecularDirv(&lobj, &lpos);
 	GX_InitLightColor(&lobj, lightColor[0]);
-	GX_InitLightShininess(&lobj, 1);
+	GX_InitLightShininess(&lobj, 0.8f);
 	GX_LoadLightObj(&lobj, GX_LIGHT0);
 
 	// set number of rasterized color channels
 	GX_SetNumChans(1);
-	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_SPEC);
 	GX_SetChanAmbColor(GX_COLOR0A0, lightColor[1]);
 	GX_SetChanMatColor(GX_COLOR0A0, lightColor[2]);
 }
