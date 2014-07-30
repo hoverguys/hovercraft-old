@@ -83,27 +83,27 @@ int main(int argc, char **argv) {
 
 	objectPlane = OBJECT_create(modelPlane);
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
-	OBJECT_moveTo(objectPlane, -500, 0.05f, -500);
+	OBJECT_moveTo(objectPlane, -500, .05f, -500);
 	OBJECT_render(objectHover, viewMtx);
 
 	oldcam.x = oldcam.y = oldcam.z = 0;
-	u32 firstFrame = 1;
+	BOOL firstFrame = TRUE;
 	guVector speedVec;
 
 	while (1) {
 		INPUT_update();
 
-		f32 rot = INPUT_AnalogX(0) / 30.f;
+		f32 rot = INPUT_AnalogX(0) * .033f;
 		OBJECT_rotate(objectHover, 0, rot, 0);
-		f32 accel = INPUT_TriggerR(0) / 50.f;
-		f32 decel = 0.02f + INPUT_TriggerL(0) / 30.f;
-		const f32 maxspeed = 0.3f;
+		f32 accel = INPUT_TriggerR(0) * .02f;
+		f32 decel = 0.02f + INPUT_TriggerL(0) * .033f;
+		const f32 maxspeed = .3f;
 		guVector momem, decelVec;
 		ps_guVecScale(&objectHover->transform.forward, &momem, accel);
 		ps_guVecScale(&speedVec, &decelVec, decel);
 		ps_guVecSub(&speedVec, &decelVec, &speedVec);
 		ps_guVecAdd(&speedVec, &momem, &speedVec);
-		if (sqrtf(speedVec.x*speedVec.x+speedVec.y*speedVec.y+speedVec.z*speedVec.z) > maxspeed) {
+		if (sqrtf(speedVec.x*speedVec.x + speedVec.y*speedVec.y + speedVec.z*speedVec.z) > maxspeed) {
 			ps_guVecNormalize(&speedVec);
 			ps_guVecScale(&speedVec, &speedVec, maxspeed);
 		}
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
 		GX_SetNumChans(1);
 
 		if (firstFrame) {
-			firstFrame = 0;
+			firstFrame = FALSE;
 			VIDEO_SetBlack(FALSE);
 		}
 
@@ -171,7 +171,6 @@ void initialise() {
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	//CON_InitEx(rmode, 20, 20, rmode->fbWidth / 2 - 20, rmode->xfbHeight - 40);
 	CON_EnableGecko(1, FALSE);
 
 	/* Swap frames */
@@ -215,7 +214,7 @@ void followCamera(transform_t* target, float distance) {
 	guVector targetPos = { target->position.x - target->forward.x * distance,
 		target->position.y - target->forward.y * distance + distance * .5f,
 		target->position.z - target->forward.z * distance };
-	float t = 1.f/10.f;
+	float t = 1.f / 10.f;
 	guVector cam = { oldcam.x + t * (targetPos.x - oldcam.x),
 					 oldcam.y + t * (targetPos.y - oldcam.y),
 					 oldcam.z + t * (targetPos.z - oldcam.z) };
