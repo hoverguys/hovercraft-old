@@ -46,12 +46,19 @@ object_t *objectHover, *objectTerrain, *objectPlane;
 GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
 TPLFile TPLfile;
 
+/* Light */
+static GXColor lightColor[] = {
+	{ 0x1f, 0x1f, 0x1f, 0xFF }, // Light color
+	{ 0xc0, 0xc0, 0xc0, 0xFF }, // Ambient color
+	{ 0xcc, 0xcc, 0xcc, 0xFF }  // Mat color
+};
 
 guVector oldcam;
 
 void initialise();
 void playMod();
 void loadTextures();
+void SetLight (Mtx view);
 void followCamera(transform_t* target, float distance);
 
 int main(int argc, char **argv) {
@@ -78,9 +85,11 @@ int main(int argc, char **argv) {
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
 	OBJECT_moveTo(objectPlane, -500, 0.05f, -500);
 	OBJECT_render(objectHover, viewMtx);
+
 	oldcam.x = oldcam.y = oldcam.z = 0;
 	u32 firstFrame = 1;
 	guVector speedVec;
+
 	while (1) {
 		INPUT_update();
 
@@ -110,10 +119,16 @@ int main(int argc, char **argv) {
 		/* Follow hovercraft */
 		followCamera(&objectHover->transform, 5.f);
 
+		/* Enable Light */
+		SetLight(viewMtx);
+
 		/* Draw models */
 		OBJECT_render(objectTerrain, viewMtx);
-		OBJECT_render(objectPlane, viewMtx);
 		OBJECT_render(objectHover, viewMtx);
+
+		GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+		OBJECT_render(objectPlane, viewMtx);
+		GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 
 		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -187,6 +202,12 @@ void initialise() {
 	GX_SetCullMode(GX_CULL_NONE);
 	GX_CopyDisp(xfb[fbi], GX_TRUE);
 	GX_SetDispCopyGamma(GX_GM_1_0);
+
+
+	f32 w = rmode->viWidth;
+	f32 h = rmode->viHeight;
+	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);
+	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
 }
 
 void followCamera(transform_t* target, float distance) {
@@ -200,10 +221,6 @@ void followCamera(transform_t* target, float distance) {
 					 oldcam.z + t * (targetPos.z - oldcam.z) };
 
 	guLookAt(viewMtx, &cam, &target->up, &target->position);
-	f32 w = rmode->viWidth;
-	f32 h = rmode->viHeight;
-	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);
-	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
 	oldcam = cam;
 }
 
@@ -231,4 +248,29 @@ void loadTextures() {
 	TPL_GetTexture(&TPLfile, hovercraftTex, &hoverTexObj);
 	TPL_GetTexture(&TPLfile, terrainTex, &terrainTexObj);
 	TPL_GetTexture(&TPLfile, waterTex, &waterTexObj);
+
+	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+
+	// Set up TEV to paint the textures properly.
+	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+}
+
+void SetLight(Mtx view) {
+	guVector lpos;
+	GXLightObj lobj;
+
+	lpos.x = 0;	lpos.y = -1; lpos.z = -1;
+	guVecMultiplySR(view, &lpos, &lpos);
+
+	GX_InitSpecularDirv(&lobj, &lpos);
+	GX_InitLightColor(&lobj, lightColor[0]);
+	GX_InitLightShininess(&lobj, 1);
+	GX_LoadLightObj(&lobj, GX_LIGHT0);
+
+	// set number of rasterized color channels
+	GX_SetNumChans(1);
+	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+	GX_SetChanAmbColor(GX_COLOR0A0, lightColor[1]);
+	GX_SetChanMatColor(GX_COLOR0A0, lightColor[2]);
 }
