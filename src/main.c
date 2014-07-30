@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
 	while (1) {
 		INPUT_update();
 
-		f32 rot = INPUT_AnalogX(0) / 20.f;
+		f32 rot = INPUT_AnalogX(0) / 30.f;
 		OBJECT_rotate(objectHover, 0, rot, 0);
 		f32 accel = INPUT_TriggerR(0) / 50.f;
 		f32 decel = 0.02f + INPUT_TriggerL(0) / 30.f;
