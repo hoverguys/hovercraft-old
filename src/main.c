@@ -220,6 +220,10 @@ void followCamera(transform_t* target, float distance) {
 					 oldcam.z + t * (targetPos.z - oldcam.z) };
 
 	guLookAt(viewMtx, &cam, &target->up, &target->position);
+	f32 w = rmode->viWidth;
+	f32 h = rmode->viHeight;
+	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);
+	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
 	oldcam = cam;
 }
 
