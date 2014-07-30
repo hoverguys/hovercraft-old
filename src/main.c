@@ -7,6 +7,7 @@
 #include <gccore.h>
 #include <aesndlib.h>  /*  Audio  */
 #include <gcmodplay.h> /* Modplay */
+#include <math.h>
 
 /* Generated assets headers */
 #include "menumusic_mod.h"
@@ -45,6 +46,9 @@ object_t *objectHover, *objectTerrain, *objectPlane;
 GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
 TPLFile TPLfile;
 
+
+guVector oldcam;
+
 void initialise();
 void playMod();
 void loadTextures();
@@ -64,8 +68,8 @@ int main(int argc, char **argv) {
 	MODEL_setTexture(modelPlane, &waterTexObj);
 
 	objectTerrain = OBJECT_create(modelTerrain);
-	OBJECT_moveTo(objectTerrain, 0, -2.8f, 0);
-	OBJECT_scaleTo(objectTerrain, 100, 100, 100);
+	OBJECT_moveTo(objectTerrain, 0, -6.f, 0);
+	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
 
 	objectHover = OBJECT_create(modelHover);
 	OBJECT_moveTo(objectHover, 50, 0, 0);
@@ -74,15 +78,26 @@ int main(int argc, char **argv) {
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
 	OBJECT_moveTo(objectPlane, -500, 0.05f, -500);
 	OBJECT_render(objectHover, viewMtx);
+	oldcam.x = oldcam.y = oldcam.z = 0;
 	u32 firstFrame = 1;
+	guVector speedVec;
 	while (1) {
 		INPUT_update();
 
 		f32 rot = INPUT_AnalogX(0) / 20.f;
 		OBJECT_rotate(objectHover, 0, rot, 0);
-		f32 speed = INPUT_TriggerR(0) / 5.f;
-		guVector speedVec;
-		ps_guVecScale(&objectHover->transform.forward, &speedVec, speed);
+		f32 accel = INPUT_TriggerR(0) / 50.f;
+		f32 decel = 0.02f + INPUT_TriggerL(0) / 30.f;
+		const f32 maxspeed = 0.3f;
+		guVector momem, decelVec;
+		ps_guVecScale(&objectHover->transform.forward, &momem, accel);
+		ps_guVecScale(&speedVec, &decelVec, decel);
+		ps_guVecSub(&speedVec, &decelVec, &speedVec);
+		ps_guVecAdd(&speedVec, &momem, &speedVec);
+		if (sqrtf(speedVec.x*speedVec.x+speedVec.y*speedVec.y+speedVec.z*speedVec.z) > maxspeed) {
+			ps_guVecNormalize(&speedVec);
+			ps_guVecScale(&speedVec, &speedVec, maxspeed);
+		}
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
 		GX_SetNumChans(1);
@@ -93,7 +108,7 @@ int main(int argc, char **argv) {
 		}
 
 		/* Follow hovercraft */
-		followCamera(&objectHover->transform, 7.f);
+		followCamera(&objectHover->transform, 5.f);
 
 		/* Draw models */
 		OBJECT_render(objectTerrain, viewMtx);
@@ -176,15 +191,20 @@ void initialise() {
 
 void followCamera(transform_t* target, float distance) {
 	/* Setup camera view and perspective */
-	guVector cam = { target->position.x - target->forward.x * distance,
+	guVector targetPos = { target->position.x - target->forward.x * distance,
 		target->position.y - target->forward.y * distance + distance * .5f,
 		target->position.z - target->forward.z * distance };
+	float t = 1.f/10.f;
+	guVector cam = { oldcam.x + t * (targetPos.x - oldcam.x),
+					 oldcam.y + t * (targetPos.y - oldcam.y),
+					 oldcam.z + t * (targetPos.z - oldcam.z) };
 
 	guLookAt(viewMtx, &cam, &target->up, &target->position);
 	f32 w = rmode->viWidth;
 	f32 h = rmode->viHeight;
 	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);
 	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
+	oldcam = cam;
 }
 
 void playMod() {
