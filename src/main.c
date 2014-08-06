@@ -100,13 +100,13 @@ int main(int argc, char **argv) {
 		f32 decel = 0.02f + INPUT_TriggerL(0) * .033f;
 		const f32 maxspeed = .3f;
 		guVector momem, decelVec;
-		ps_guVecScale(&objectHover->transform.forward, &momem, accel);
-		ps_guVecScale(&speedVec, &decelVec, decel);
-		ps_guVecSub(&speedVec, &decelVec, &speedVec);
-		ps_guVecAdd(&speedVec, &momem, &speedVec);
+		guVecScale(&objectHover->transform.forward, &momem, accel);
+		guVecScale(&speedVec, &decelVec, decel);
+		guVecSub(&speedVec, &decelVec, &speedVec);
+		guVecAdd(&speedVec, &momem, &speedVec);
 		if (sqrtf(speedVec.x*speedVec.x + speedVec.y*speedVec.y + speedVec.z*speedVec.z) > maxspeed) {
-			ps_guVecNormalize(&speedVec);
-			ps_guVecScale(&speedVec, &speedVec, maxspeed);
+			guVecNormalize(&speedVec);
+			guVecScale(&speedVec, &speedVec, maxspeed);
 		}
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 

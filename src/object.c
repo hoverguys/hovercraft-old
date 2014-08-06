@@ -58,7 +58,7 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 	OBJECT_flush(object);
 
 	Mtx modelviewMtx;
-	ps_guMtxConcat(viewMtx, object->transform.matrix, modelviewMtx);
+	guMtxConcat(viewMtx, object->transform.matrix, modelviewMtx);
 	GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
 
 	MODEL_render(object->mesh);
@@ -68,13 +68,13 @@ inline void _MakeMatrix(object_t* object) {
 	/* Reset matrix to identity */
 	transform_t* t = &object->transform;
 	MtxP matrix = t->matrix;
-	ps_guMtxIdentity(matrix);
+	guMtxIdentity(matrix);
 
 	/* Rotate, Scale, Translate */
-	c_guQuatNormalize(&t->rotation, &t->rotation);
+	guQuatNormalize(&t->rotation, &t->rotation);
 	c_guMtxQuat(matrix, &t->rotation);
-	ps_guMtxScaleApply(matrix, matrix, t->scale.x, t->scale.y, t->scale.z);
-	ps_guMtxTransApply(matrix, matrix, t->position.x, t->position.y, t->position.z);
+	guMtxScaleApply(matrix, matrix, t->scale.x, t->scale.y, t->scale.z);
+	guMtxTransApply(matrix, matrix, t->position.x, t->position.y, t->position.z);
 
 	/* Calculate forward/up/left vectors */
 	t->forward.x = matrix[0][2];
@@ -104,10 +104,10 @@ void OBJECT_move(object_t* object, const f32 tX, const f32 tY, const f32 tZ) {
 	transform_t* t = &object->transform;
 	guVector deltaPos;
 	deltaPos.x = tX; deltaPos.y = tY; deltaPos.z = tZ;
-	ps_guVecAdd(&t->position, &deltaPos, &t->position);
+	guVecAdd(&t->position, &deltaPos, &t->position);
 #ifdef TRANSLATE_DIRECT
 	/* ps_* doesn't do src/dst checks, so this is faster */
-	c_guMtxTransApply(t->matrix, t->matrix, tX, tY, tZ);
+	guMtxTransApply(t->matrix, t->matrix, tX, tY, tZ);
 #else
 	t->dirty = TRUE;
 #endif
@@ -123,7 +123,7 @@ void OBJECT_rotate(object_t* object, const f32 rX, const f32 rY, const f32 rZ) {
 	transform_t* t = &object->transform;
 	guQuaternion deltaq;
 	EulerToQuaternion(&deltaq, rX, rY, rZ);
-	c_guQuatMultiply(&t->rotation, &deltaq, &t->rotation);
+	guQuatMultiply(&t->rotation, &deltaq, &t->rotation);
 	t->dirty = TRUE;
 }
 

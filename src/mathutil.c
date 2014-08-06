@@ -4,7 +4,7 @@
 void EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ) {
 	guVector vec;
 	vec.x = rX; vec.y = rY; vec.z = rZ;
-	ps_guVecScale(&vec, &vec, 0.5f);
+	guVecScale(&vec, &vec, 0.5f);
 
 	f32 x[2], y[2], z[2];
 
@@ -19,7 +19,7 @@ void AxisAngleToQuaternion(guQuaternion* q, guVector rAxis, const f32 rAngle) {
 	f32 s, c;
 	sincosf(rAngle / 2.0f, &s, &c);
 	guVector out;
-	ps_guVecScale(&rAxis, &out, s);
+	guVecScale(&rAxis, &out, s);
 	q->x = out.x;
 	q->y = out.y;
 	q->z = out.z;
