@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define EPSILON 0.001f
+#define EPSILON 0.00001f
 
 f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
 	//Init data
@@ -37,11 +37,8 @@ f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
 
 		guVecSub(point1, point0, &edge1);
 		guVecSub(point2, point0, &edge2);
-		//guVecCross(&rayD, &edge2, &pvec);
-		guVecCross(&edge2, &rayD, &pvec);
+		guVecCross(&rayD, &edge2, &pvec);
 		det = guVecDotProduct(&edge1, &pvec);
-
-		//printf("det %f\n", det);
 
 		/* hit check */
 		if (det < EPSILON) {
@@ -51,8 +48,11 @@ f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
 		guVecSub(&rayO, point0, &tvec);
 		u = guVecDotProduct(&tvec, &pvec);
 
-		//guVecCross(&tvec, &edge2, &qvec);
-		guVecCross(&edge2, &tvec, &qvec);
+		if (u < 0.0f || u > det) {
+			goto next;
+		}
+
+		guVecCross(&tvec, &edge2, &qvec);
 		v = guVecDotProduct(&rayD, &qvec);
 
 		/* hit check */
@@ -66,7 +66,6 @@ f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
 		if (t < sdist || hit == 0) {
 			sdist = t;
 			hit = 1;
-			printf("HIT %f\n", t);
 		}
 
 next:
