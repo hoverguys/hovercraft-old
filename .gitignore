@@ -9,4 +9,3 @@ tools/Emulator
 *.elf
 *.log
 /tools/obj2bin_src/obj2bin/obj2bin.vcxproj.user
-/hovercraft.vcxproj.user
