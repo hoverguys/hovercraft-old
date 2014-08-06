@@ -3,6 +3,6 @@
 
 #include "object.h"
 
-f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin);
+u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut);
 
 #endif

@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-#define EPSILON 0.00001f
+#define EPSILON 0.0f
 
-f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
+u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
 	//Init data
 	model_t * const mesh = object->mesh;
 	guVector *point0, *point1, *point2;
@@ -12,11 +12,13 @@ f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
 	Mtx InverseObjMtx;
 	guVector rayO, rayD;
 
+	OBJECT_flush(object);
+
 	//Get the raycast into object space
 	guMtxInverse(object->transform.matrix, InverseObjMtx);
+
 	guVecMultiply(InverseObjMtx, rayorigin, &rayO);
 	guVecMultiplySR(InverseObjMtx, raydir, &rayD);
-	guVecNormalize(&rayD);
 
 	//Temps
 	guVector edge1, edge2;
@@ -48,11 +50,13 @@ f32 Raycast(object_t* object, guVector* raydir, guVector* rayorigin) {
 		guVecSub(&rayO, point0, &tvec);
 		u = guVecDotProduct(&tvec, &pvec);
 
+		//printf("u %f", u);
+
 		if (u < 0.0f || u > det) {
 			goto next;
 		}
 
-		guVecCross(&tvec, &edge2, &qvec);
+		guVecCross(&tvec, &edge1, &qvec);
 		v = guVecDotProduct(&rayD, &qvec);
 
 		/* hit check */
@@ -74,8 +78,9 @@ next:
 	}
 
 	if (hit == 1) {
-		return sdist;
+		*distanceOut = sdist;
+		return 1;
 	}
 
-	return -1.0f;
+	return 0;
 }

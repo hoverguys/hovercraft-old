@@ -35,6 +35,9 @@ object_t* OBJECT_createEx(model_t*     mesh,
 	object->transform.rotation = rotation;
 	object->transform.scale = scale;
 	object->transform.dirty = TRUE;
+
+	_MakeMatrix(object);
+
 	return object;
 }
 
@@ -42,12 +45,17 @@ void OBJECT_destroy(object_t* object) {
 	free(object);
 }
 
+void OBJECT_flush(object_t* object) {
+	if (object->transform.dirty == TRUE) {
+		_MakeMatrix(object);
+	}
+}
+
 void OBJECT_render(object_t* object, Mtx viewMtx) {
 	if (object->mesh == NULL) return;
 
 	/* Check dirty flag */
-	if (object->transform.dirty == TRUE)
-		_MakeMatrix(object);
+	OBJECT_flush(object);
 
 	Mtx modelviewMtx;
 	ps_guMtxConcat(viewMtx, object->transform.matrix, modelviewMtx);

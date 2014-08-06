@@ -76,11 +76,10 @@ int main(int argc, char **argv) {
 	MODEL_setTexture(modelPlane, &waterTexObj);
 
 	objectTerrain = OBJECT_create(modelTerrain);
-	OBJECT_moveTo(objectTerrain, 0, -6.0f, 0);
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
 
 	objectHover = OBJECT_create(modelHover);
-	OBJECT_moveTo(objectHover, 50, 0, 0);
+	OBJECT_moveTo(objectHover, 100, 26, 100);
 
 	objectPlane = OBJECT_create(modelPlane);
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
@@ -112,16 +111,20 @@ int main(int argc, char **argv) {
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
 		guVector raydir = { 0, -1, 0 };
-		guVector raypos = { 0, 2000, 0};
+		guVector raypos = { 0, 10, 0};
 		guVector rayhit;
 		guVecAdd(&objectHover->transform.position, &raypos, &raypos);
-		f32 dist = Raycast(objectTerrain, &raydir, &raypos);
+		f32 dist = 0;
 
-		if (dist >= 0.0f) {
-			printf("HIT dist %f\n", dist);
+		if (Raycast(objectTerrain, &raydir, &raypos, &dist)) {
+			guVecScale(&raydir, &rayhit, dist);
+			guVecAdd(&rayhit, &raypos, &rayhit);
+			//OBJECT_moveTo(objectHover, rayhit.x, rayhit.y-1, rayhit.z);
+			printf("HIT dist %f\n", rayhit.y);
 		}
-
-
+		else {
+			printf("NO HIT \n");
+		}
 		/* Render time */
 		GX_SetNumChans(1);
 
@@ -226,11 +229,12 @@ void followCamera(transform_t* target, float distance) {
 		target->position.y - target->forward.y * distance + distance * .5f,
 		target->position.z - target->forward.z * distance };
 	float t = 1.f / 10.f;
+	guVector up = { 0, 1, 0 };
 	guVector cam = { oldcam.x + t * (targetPos.x - oldcam.x),
 					 oldcam.y + t * (targetPos.y - oldcam.y),
 					 oldcam.z + t * (targetPos.z - oldcam.z) };
 
-	guLookAt(viewMtx, &cam, &target->up, &target->position);
+	guLookAt(viewMtx, &cam, &up, &target->position);
 	f32 w = rmode->viWidth;
 	f32 h = rmode->viHeight;
 	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1F, 300.0F);

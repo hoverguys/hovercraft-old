@@ -42,6 +42,8 @@ object_t* OBJECT_createEx(model_t*     mesh,
 						  const guQuaternion rotation,
 						  const guVector     scale);
 
+void OBJECT_flush(object_t* object);
+
 /*! \brief Render the object
  *  \param object  Object to render
  *  \param viewMtx Camera's view matrix
