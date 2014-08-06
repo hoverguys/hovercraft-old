@@ -9,16 +9,22 @@
 #include <gccore.h>
 
 typedef struct {
-	unsigned int vcount;  /*< Vertex count         */
-	unsigned int ncount;  /*< Normal count         */
-	unsigned int vtcount; /*< UV Coordinate count  */
-	unsigned int fcount;  /*< Face/Index count     */
+	unsigned int vcount;  /*< Vertex count			*/
+	unsigned int ncount;  /*< Normal count			*/
+	unsigned int vtcount; /*< UV Coordinate count	*/
+	unsigned int fcount;  /*< Face/Index count		*/
 } binheader_t;
 
 typedef struct {
-	GXTexObj* textureObject; /*< Texture Object                */
-	void*     modelList;     /*< Storage for the display lists */
-	u32       modelListSize; /*< Real display list sizes       */
+	GXTexObj*	textureObject; /*< Texture Object				*/
+	void*		modelList;     /*< Storage for the display lists*/
+	u32			modelListSize; /*< Real display list sizes		*/
+
+	u32			modelFaceCount;/*< Amount of triangles			*/
+	f32*		modelPositions;
+	f32*		modelNormals;
+	f32*		modelTexcoords;
+	u16*		modelIndices;
 } model_t;
 
 /*! \brief Create a new model from mesh data

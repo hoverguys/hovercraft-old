@@ -22,6 +22,7 @@
 #include "input.h"
 #include "model.h"
 #include "object.h"
+#include "raycast.h"
 #include "mathutil.h"
 
 /* Music variable */
@@ -75,7 +76,7 @@ int main(int argc, char **argv) {
 	MODEL_setTexture(modelPlane, &waterTexObj);
 
 	objectTerrain = OBJECT_create(modelTerrain);
-	OBJECT_moveTo(objectTerrain, 0, -6.f, 0);
+	OBJECT_moveTo(objectTerrain, 0, -6.0f, 0);
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
 
 	objectHover = OBJECT_create(modelHover);
@@ -93,6 +94,7 @@ int main(int argc, char **argv) {
 	while (1) {
 		INPUT_update();
 
+		/* Move hovercraft */
 		f32 rot = INPUT_AnalogX(0) * .033f;
 		OBJECT_rotate(objectHover, 0, rot, 0);
 		f32 accel = INPUT_TriggerR(0) * .02f;
@@ -109,6 +111,18 @@ int main(int argc, char **argv) {
 		}
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
+		guVector raydir = { 0, -1, 0 };
+		guVector raypos = { 0, 2000, 0};
+		guVector rayhit;
+		guVecAdd(&objectHover->transform.position, &raypos, &raypos);
+		f32 dist = Raycast(objectTerrain, &raydir, &raypos);
+
+		if (dist >= 0.0f) {
+			printf("HIT dist %f\n", dist);
+		}
+
+
+		/* Render time */
 		GX_SetNumChans(1);
 
 		if (firstFrame) {
@@ -125,7 +139,7 @@ int main(int argc, char **argv) {
 		/* Draw models */
 		OBJECT_render(objectTerrain, viewMtx);
 		OBJECT_render(objectHover, viewMtx);
-		OBJECT_render(objectPlane, viewMtx);
+		//OBJECT_render(objectPlane, viewMtx);
 
 		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
