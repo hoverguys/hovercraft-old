@@ -27,7 +27,7 @@ u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanc
 	f32 det, u, v, t;
 
 	//TODO: Replace with better number
-	u8 hit = 0;
+	BOOL hit = TRUE;
 	f32 sdist = 100000;
 	
 	//Iterate over very triangle
@@ -70,7 +70,7 @@ u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanc
 		// We have a hit, check if the data needs updating
 		if (t < sdist || hit == 0) {
 			sdist = t;
-			hit = 1;
+			hit = TRUE;
 		}
 
 next:
@@ -78,12 +78,12 @@ next:
 		indices += 3;
 	}
 
-	if (hit == 1) {
+	if (hit == TRUE) {
 		*distanceOut = sdist;
-		return 1;
+		return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
 u8 Raycast2(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
