@@ -111,12 +111,12 @@ int main(int argc, char **argv) {
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
 		guVector raydir = { 0, -1, 0 };
-		guVector raypos = { 0, 10, 0};
+		guVector raypos = { 100, 10, 100};
 		guVector rayhit;
-		guVecAdd(&objectHover->transform.position, &raypos, &raypos);
+		//guVecAdd(&objectHover->transform.position, &raypos, &raypos);
 		f32 dist = 0;
 
-		if (Raycast(objectTerrain, &raydir, &raypos, &dist)) {
+		if (Raycast2(objectTerrain, &raydir, &raypos, &dist)) {
 			guVecScale(&raydir, &rayhit, dist);
 			guVecAdd(&rayhit, &raypos, &rayhit);
 			//OBJECT_moveTo(objectHover, rayhit.x, rayhit.y-1, rayhit.z);
@@ -245,7 +245,7 @@ void followCamera(transform_t* target, float distance) {
 void playMod() {
 	MODPlay_Init(&play);
 	MODPlay_SetMOD(&play, menumusic_mod);
-	MODPlay_Start(&play);
+	//MODPlay_Start(&play);
 }
 
 void setupTexture() {
