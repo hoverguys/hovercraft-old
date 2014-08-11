@@ -60,6 +60,7 @@
     <ClCompile Include="src\model.c" />
     <ClCompile Include="src\object.c" />
     <ClCompile Include="src\raycast.c" />
+    <ClCompile Include="src\scene.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -73,6 +74,7 @@
     <ClInclude Include="include\model.h" />
     <ClInclude Include="include\object.h" />
     <ClInclude Include="include\raycast.h" />
+    <ClInclude Include="include\scene.h" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="models\hovercraft.obj" />

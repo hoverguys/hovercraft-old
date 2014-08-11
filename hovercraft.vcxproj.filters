@@ -45,6 +45,9 @@
     <ClCompile Include="src\raycast.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scene.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -67,6 +70,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\raycast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
