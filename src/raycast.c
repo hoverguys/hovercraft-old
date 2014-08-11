@@ -5,7 +5,7 @@
 
 #define EPSILON 0.000001f
 
-u8 Raycast2(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
+u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
 	//Init data
 	model_t * const mesh = object->mesh;
 	guVector *point0, *point1, *point2;
