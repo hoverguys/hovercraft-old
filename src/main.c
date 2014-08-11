@@ -79,12 +79,11 @@ int main(int argc, char **argv) {
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
 
 	objectHover = OBJECT_create(modelHover);
-	OBJECT_moveTo(objectHover, 100, 26, 100);
+	OBJECT_moveTo(objectHover, 1, 0.6f, 1);
 
 	objectPlane = OBJECT_create(modelPlane);
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
-	OBJECT_moveTo(objectPlane, -500, .05f, -500);
-	OBJECT_render(objectHover, viewMtx);
+	OBJECT_moveTo(objectPlane, -500, .5f, -500);
 
 	oldcam.x = oldcam.y = oldcam.z = 0;
 	BOOL firstFrame = TRUE;
@@ -111,19 +110,22 @@ int main(int argc, char **argv) {
 		OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
 
 		guVector raydir = { 0, -1, 0 };
-		guVector raypos = { 100, 10, 100};
+		guVector raypos = { 0, 200, 0};
 		guVector rayhit;
-		//guVecAdd(&objectHover->transform.position, &raypos, &raypos);
+		guVecAdd(&raypos, &objectHover->transform.position, &raypos);
 		f32 dist = 0;
+		f32 minHeight = objectPlane->transform.position.y;
 
 		if (Raycast2(objectTerrain, &raydir, &raypos, &dist)) {
 			guVecScale(&raydir, &rayhit, dist);
 			guVecAdd(&rayhit, &raypos, &rayhit);
-			//OBJECT_moveTo(objectHover, rayhit.x, rayhit.y-1, rayhit.z);
-			printf("HIT dist %f\n", rayhit.y);
+			f32 h = rayhit.y + 0.1f;
+			if (h > 0.5f) {
+				OBJECT_moveTo(objectHover, rayhit.x, rayhit.y + 0.1f, rayhit.z);
+			}
 		}
 		else {
-			printf("NO HIT \n");
+			//printf("Out of bounds \n");
 		}
 		/* Render time */
 		GX_SetNumChans(1);
@@ -142,7 +144,7 @@ int main(int argc, char **argv) {
 		/* Draw models */
 		OBJECT_render(objectTerrain, viewMtx);
 		OBJECT_render(objectHover, viewMtx);
-		//OBJECT_render(objectPlane, viewMtx);
+		OBJECT_render(objectPlane, viewMtx);
 
 		/* Finish up */
 		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -245,7 +247,7 @@ void followCamera(transform_t* target, float distance) {
 void playMod() {
 	MODPlay_Init(&play);
 	MODPlay_SetMOD(&play, menumusic_mod);
-	//MODPlay_Start(&play);
+	MODPlay_Start(&play);
 }
 
 void setupTexture() {
