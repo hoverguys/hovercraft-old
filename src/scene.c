@@ -1,12 +1,11 @@
 /* System and SDK libraries */
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ogcsys.h>
+#include <malloc.h>
 #include <gccore.h>
+#include <ogcsys.h>
 #include <aesndlib.h>  /*  Audio  */
 #include <gcmodplay.h> /* Modplay */
-#include <math.h>
 
 /* Generated assets headers */
 #include "menumusic_mod.h"
@@ -21,8 +20,8 @@
 #include "input.h"
 #include "model.h"
 #include "object.h"
-#include "raycast.h"
 #include "mathutil.h"
+#include "game.h"
 
 /* Music variable */
 static MODPlay play;
@@ -40,7 +39,7 @@ Mtx44 perspectiveMtx;
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane;
-object_t *players[playerId].hovercraftobjectHover, *objectTerrain, *objectPlane;
+object_t *objectTerrain, *objectPlane;
 
 /* Texture vars */
 GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
@@ -53,7 +52,6 @@ static GXColor lightColor[] = {
 		{ 0xff, 0xff, 0xff, 0xff }  // Mat color
 };
 
-guVector oldcam;
 BOOL firstFrame = TRUE;
 guVector speedVec;
 
@@ -83,11 +81,14 @@ void SCENE_load() {
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
 	OBJECT_moveTo(objectPlane, -500, .5f, -500);
 
-	oldcam.x = oldcam.y = oldcam.z = 0;
+	GAME_init(objectTerrain, objectPlane);
+	GAME_createPlayer(0, modelHover);
 }
 
 void SCENE_render() {
 	INPUT_update();
+
+	GAME_updatePlayer(0);
 
 	/* Render time */
 	GX_SetNumChans(1);
@@ -97,16 +98,15 @@ void SCENE_render() {
 		VIDEO_SetBlack(FALSE);
 	}
 
-	/* Follow hovercraft */
-	followCamera(&objectHover->transform, 5.f);
-
 	/* Enable Light */
 	SetLight(viewMtx);
 
-	/* Draw models */
+	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
-	OBJECT_render(objectHover, viewMtx);
 	OBJECT_render(objectPlane, viewMtx);
+
+	/* Follow hovercraft */
+	GAME_renderPlayer(0, viewMtx);
 
 	/* Finish up */
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -180,24 +180,6 @@ void initialise() {
 	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
 }
 
-void followCamera(transform_t* target, float distance) {
-	/* Setup camera view and perspective */
-	guVector targetPos = { target->position.x - target->forward.x * distance,
-		target->position.y - target->forward.y * distance + distance * .5f,
-		target->position.z - target->forward.z * distance };
-	float t = 1.f / 10.f;
-	guVector up = { 0, 1, 0 };
-	guVector cam = { oldcam.x + t * (targetPos.x - oldcam.x),
-		oldcam.y + t * (targetPos.y - oldcam.y),
-		oldcam.z + t * (targetPos.z - oldcam.z) };
-
-	guLookAt(viewMtx, &cam, &up, &target->position);
-	f32 w = rmode->viWidth;
-	f32 h = rmode->viHeight;
-	guPerspective(perspectiveMtx, 60, (f32) w / h, 0.1f, 300.0f);
-	GX_LoadProjectionMtx(perspectiveMtx, GX_PERSPECTIVE);
-	oldcam = cam;
-}
 
 void playMod() {
 	MODPlay_Init(&play);
