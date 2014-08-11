@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 #include <ogcsys.h>
 #include <gccore.h>
 #include <aesndlib.h>  /*  Audio  */
@@ -41,7 +40,7 @@ Mtx44 perspectiveMtx;
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane;
-object_t *objectHover, *objectTerrain, *objectPlane;
+object_t *players[playerId].hovercraftobjectHover, *objectTerrain, *objectPlane;
 
 /* Texture vars */
 GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
@@ -80,9 +79,6 @@ void SCENE_load() {
 	objectTerrain = OBJECT_create(modelTerrain);
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
 
-	objectHover = OBJECT_create(modelHover);
-	OBJECT_moveTo(objectHover, 1, 0.6f, 1);
-
 	objectPlane = OBJECT_create(modelPlane);
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
 	OBJECT_moveTo(objectPlane, -500, .5f, -500);
@@ -93,40 +89,6 @@ void SCENE_load() {
 void SCENE_render() {
 	INPUT_update();
 
-	/* Move hovercraft */
-	f32 rot = INPUT_AnalogX(0) * .033f;
-	OBJECT_rotate(objectHover, 0, rot, 0);
-	f32 accel = INPUT_TriggerR(0) * .02f;
-	f32 decel = .02f + INPUT_TriggerL(0) * .033f;
-	const f32 maxspeed = .3f;
-	guVector momem, decelVec;
-	guVecScale(&objectHover->transform.forward, &momem, accel);
-	guVecScale(&speedVec, &decelVec, decel);
-	guVecSub(&speedVec, &decelVec, &speedVec);
-	guVecAdd(&speedVec, &momem, &speedVec);
-	if (sqrtf(speedVec.x*speedVec.x + speedVec.y*speedVec.y + speedVec.z*speedVec.z) > maxspeed) {
-		guVecNormalize(&speedVec);
-		guVecScale(&speedVec, &speedVec, maxspeed);
-	}
-	OBJECT_move(objectHover, speedVec.x, speedVec.y, speedVec.z);
-
-	guVector raydir = { 0, -1, 0 };
-	guVector raypos = { 0, 200, 0 };
-	guVector rayhit;
-	guVecAdd(&raypos, &objectHover->transform.position, &raypos);
-	f32 dist = 0;
-	f32 minHeight = objectPlane->transform.position.y;
-
-	if (Raycast(objectTerrain, &raydir, &raypos, &dist)) {
-		guVecScale(&raydir, &rayhit, dist);
-		guVecAdd(&rayhit, &raypos, &rayhit);
-		f32 h = rayhit.y + .1f;
-		if (h > .5f) {
-			OBJECT_moveTo(objectHover, rayhit.x, rayhit.y + .1f, rayhit.z);
-		}
-	} else {
-		//printf("Out of bounds \n");
-	}
 	/* Render time */
 	GX_SetNumChans(1);
 
