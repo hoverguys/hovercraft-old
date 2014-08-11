@@ -5,7 +5,7 @@
 
 #define EPSILON 0.000001f
 
-u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
+BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
 	//Init data
 	model_t * const mesh = object->mesh;
 	guVector *point0, *point1, *point2;
@@ -30,7 +30,7 @@ u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanc
 	float det, inv_det, u, v;
 	float t;
 
-	u8 hit = 0;
+	BOOL hit = FALSE;
 	f32 sdist = 0;
 	u16 *indices = 0;
 
@@ -82,15 +82,15 @@ u8 Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanc
 		if (t > EPSILON) { //ray intersection
 			if (t < sdist || hit == 0) {
 				sdist = t;
-				hit = 1;
+				hit = TRUE;
 			}
 		}
 	}
 
-	if (hit == 1) {
+	if (hit == TRUE) {
 		*distanceOut = sdist / rayScale;
-		return 1;
+		return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
