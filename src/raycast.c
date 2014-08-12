@@ -5,12 +5,13 @@
 
 #define EPSILON 0.000001f
 
-BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut) {
+BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut, guVector* normalOut) {
 	/* Init data */
 	model_t * const mesh = object->mesh;
 	guVector *point0, *point1, *point2;
 	u16 *baseindices = mesh->modelIndices;
 	guVector *vertices = (guVector*)mesh->modelPositions;
+	guVector *normals = (guVector*)mesh->modelNormals;
 	Mtx InverseObjMtx;
 	guVector rayO, rayD;
 
@@ -33,6 +34,7 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 	BOOL hit = FALSE;
 	f32 sdist = 0;
 	u16 *indices = 0;
+	guVector *normal = 0;
 
 	/* Iterate over every triangle */
 	u32 f = 0;
@@ -82,6 +84,7 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 		if (t > EPSILON) { /* Got a ray intersection! */
 			if (t < sdist || hit == 0) {
 				sdist = t;
+				normal = &normals[indices[0]]; // TODO Interpolate 3 normals to get the positional one?
 				hit = TRUE;
 			}
 		}
@@ -89,6 +92,7 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 
 	if (hit == TRUE) {
 		*distanceOut = sdist / rayScale;
+		*normalOut = *normal;
 	}
 
 	return hit;

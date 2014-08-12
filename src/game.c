@@ -1,8 +1,10 @@
 #include "game.h"
 
+#include <stdio.h>
 #include <malloc.h>
 #include <math.h>
 
+#include "mathutil.h"
 #include "raycast.h"
 #include "input.h"
 
@@ -12,6 +14,10 @@ object_t* mapPlane;
 const int MAX_PLAYERS = 4;
 player_t* players;
 
+/* Game settings */
+const f32 maxSpeed = 0.3f;
+guVector gravity = { 0, -.3f / 60.f, 0 };
+
 void GAME_init(object_t* terrain, object_t* plane) {
 	mapTerrain = terrain;
 	mapPlane = plane;
@@ -20,6 +26,7 @@ void GAME_init(object_t* terrain, object_t* plane) {
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		players[i].isPlaying = FALSE;
+		players[i].isGrounded = FALSE;
 	}
 }
 
@@ -43,40 +50,83 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 }
 
 void GAME_updatePlayer(u8 playerId) {
-	/* Move hovercraft */
-	f32 rot = INPUT_AnalogX(0) * .033f;
-	OBJECT_rotate(players[playerId].hovercraft, 0, rot, 0);
-	f32 accel = INPUT_TriggerR(0) * .02f;
-	f32 decel = .02f + INPUT_TriggerL(0) * .033f;
-	const f32 maxspeed = .3f;
-	guVector momem, decelVec;
-	guVector *speedVec = &players[playerId].speed;
-	guVecScale(&players[playerId].hovercraft->transform.forward, &momem, accel);
-	guVecScale(speedVec, &decelVec, decel);
-	guVecSub(speedVec, &decelVec, speedVec);
-	guVecAdd(speedVec, &momem, speedVec);
-	if (sqrtf(speedVec->x*speedVec->x + speedVec->y*speedVec->y + speedVec->z*speedVec->z) > maxspeed) {
-		guVecNormalize(speedVec);
-		guVecScale(speedVec, speedVec, maxspeed);
-	}
-	OBJECT_move(players[playerId].hovercraft, speedVec->x, speedVec->y, speedVec->z);
+	/* Data */
+	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
+	guVector *velocity = &players[playerId].velocity;
+	guVector *position = &players[playerId].hovercraft->transform.position;
+	guVector *forward = &players[playerId].hovercraft->transform.forward;
 
+	/* Get input */
+	f32 rot = INPUT_AnalogX(0) * .033f;
+	f32 accel = INPUT_TriggerR(0) * .02f;
+	f32 decel = INPUT_TriggerL(0) * .033f;
+
+	/* Apply rotation */
+	OBJECT_rotate(players[playerId].hovercraft, 0, rot, 0);
+
+	/* Calculate physics */
+	if (players[playerId].isGrounded) {
+		guVecScale(forward, &acceleration, accel);
+		guVecScale(forward, &deacceleration, -decel);
+	}
+	/* Apply physics */
+	guVecScale(velocity, velocity, 0.95f);
+	guVecAdd(velocity, &acceleration, velocity);
+	guVecAdd(velocity, &deacceleration, velocity);
+	guVecAdd(velocity, &gravity, velocity);
+
+	/* Limit speed */
+	/*if (guVecDotProduct(velocity, velocity) > (maxSpeed*maxSpeed)) {
+		guVecNormalize(velocity);
+		guVecScale(velocity, velocity, maxSpeed);
+	}*/
+
+	//printf("velocity %f %f %f\n", velocity->x, velocity->y, velocity->z);
+
+	/* Move Player */
+	OBJECT_move(players[playerId].hovercraft, velocity->x, velocity->y, velocity->z);
+
+	/* Collision check*/
+	const f32 rayoffset = 200;
 	guVector raydir = { 0, -1, 0 };
-	guVector raypos = { 0, 200, 0 };
-	guVector rayhit;
-	guVecAdd(&raypos, &players[playerId].hovercraft->transform.position, &raypos);
+	guVector raypos = { 0, rayoffset, 0 };
+	guVector rayhit, normalhit;
+	guVecAdd(&raypos, position, &raypos);
 	f32 dist = 0;
 	f32 minHeight = mapPlane->transform.position.y;
 
-	if (Raycast(mapTerrain, &raydir, &raypos, &dist)) {
+	/* Raycast track */
+	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
+		/* Get hit position */
 		guVecScale(&raydir, &rayhit, dist);
 		guVecAdd(&rayhit, &raypos, &rayhit);
-		f32 h = rayhit.y + .1f;
-		if (h > .5f) {
-			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, rayhit.y + .1f, rayhit.z);
+		f32 height = rayhit.y;
+
+		if (dist < rayoffset) {
+			/* Moved into the terrain, snap */
+			guQuaternion rotation;
+			printf("n %f %f %f\n", normalhit.x, normalhit.y, normalhit.z);
+			printf("f %f %f %f\n", forward->x, forward->y, forward->z);
+			QUAT_lookat(forward, &normalhit, &rotation);
+			OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
+			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
+
+			/* Since we hit the ground, reset the gravity*/
+			players[playerId].isGrounded = TRUE;
+			velocity->y = 0.0f;
+		} else {
+			/* We didnt move into the terrain */
+			players[playerId].isGrounded = FALSE;
 		}
 	} else {
-		//printf("Out of bounds \n");
+		/* This should be avoided somehow */
+	}
+
+	/* Make sure we do not move underwater */
+	if (position->y < minHeight) {
+		players[playerId].isGrounded = TRUE;
+		velocity->y = 0.0f;
+		OBJECT_moveTo(players[playerId].hovercraft, position->x, minHeight, position->z);
 	}
 }
 

@@ -39,6 +39,8 @@ inline void ps_float2Mul(f32* opA, f32* opB, f32* result);
  */
 inline void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
 
+void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out);
+
 #endif
 
 

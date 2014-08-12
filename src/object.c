@@ -119,6 +119,12 @@ void OBJECT_rotateTo(object_t* object, const f32 rX, const f32 rY, const f32 rZ)
 	t->dirty = TRUE;
 }
 
+void OBJECT_rotateSet(object_t* object, guQuaternion *rotation) {
+	transform_t* t = &object->transform;
+	t->rotation = *rotation;
+	t->dirty = TRUE;
+}
+
 void OBJECT_rotate(object_t* object, const f32 rX, const f32 rY, const f32 rZ) {
 	transform_t* t = &object->transform;
 	guQuaternion deltaq;

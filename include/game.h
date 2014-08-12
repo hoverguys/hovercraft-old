@@ -9,10 +9,11 @@
 #include "scene.h"
 
 typedef struct {
-	BOOL      isPlaying;
-	object_t* hovercraft;
-	guVector  speed;
-	camera_t* camera;
+	BOOL		isPlaying;
+	BOOL		isGrounded;
+	object_t	*hovercraft;
+	guVector	velocity;
+	camera_t	*camera;
 } player_t;
 
 void GAME_init(object_t* terrain, object_t* plane);

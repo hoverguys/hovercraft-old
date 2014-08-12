@@ -80,6 +80,12 @@ void OBJECT_move(object_t* object, const f32 tX, const f32 tY, const f32 tZ);
  */
 void OBJECT_rotateTo(object_t* object, const f32 rX, const f32 rY, const f32 rZ);
 
+/*! \brief Set a specific rotation an object
+*  \param object Object to rotate
+*  \param rotation Rotation to set
+*/
+void OBJECT_rotateSet(object_t* object, guQuaternion *rotation);
+
 /*! \brief Rotate an object of a certain rotation (RELATIVE)
  *  \param object Object to rotate
  *  \param rX     X coordinate

@@ -14,6 +14,6 @@
  *  \param[out] distanceOut Ray length (distance to hitpoint)
  *  \return TRUE if the ray hit somewhere, FALSE otherwise
  */
-BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut);
+BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut, guVector* normalOut);
 
 #endif

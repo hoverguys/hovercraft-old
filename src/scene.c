@@ -63,7 +63,7 @@ void followCamera(transform_t* target, float distance);
 
 void SCENE_load() {
 	initialise();
-	playMod();
+	//playMod();
 	loadTextures();
 
 	modelHover = MODEL_setup(hovercraft_bmb);
