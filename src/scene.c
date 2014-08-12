@@ -38,7 +38,6 @@ BOOL firstFrame = TRUE;
 guVector speedVec;
 
 void playMod();
-void SetLight(Mtx view);
 void followCamera(transform_t* target, float distance);
 
 void SCENE_load() {
@@ -88,7 +87,7 @@ void SCENE_render(Mtx viewMtx) {
 	}
 
 	/* Enable Light */
-	SetLight(viewMtx);
+	GXU_setLight(viewMtx, lightColor);
 
 	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
@@ -113,22 +112,4 @@ void playMod() {
 	MODPlay_Start(&play);
 }*/
 
-void SetLight(Mtx view) {
-	guVector lpos;
-	GXLightObj lobj;
 
-	lpos.x = 0.0f;	lpos.y = -1.0f; lpos.z = -0.3f;
-	guVecNormalize(&lpos);
-	guVecMultiplySR(view, &lpos, &lpos);
-
-	GX_InitSpecularDirv(&lobj, &lpos);
-	GX_InitLightColor(&lobj, lightColor[0]);
-	GX_LoadLightObj(&lobj, GX_LIGHT0);
-
-	// set number of rasterized color channels
-	GX_SetNumChans(1);
-	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
-	GX_SetChanAmbColor(GX_COLOR0A0, lightColor[1]);
-	GX_SetChanMatColor(GX_COLOR0A0, lightColor[2]);
-	GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
-}
