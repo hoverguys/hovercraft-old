@@ -51,6 +51,8 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 }
 
 void GAME_updatePlayer(u8 playerId) {
+	INPUT_update();
+
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
@@ -153,7 +155,7 @@ void GAME_updatePlayer(u8 playerId) {
 	OBJECT_flush(players[playerId].hovercraft);
 }
 
-void GAME_renderPlayer(u8 playerId, Mtx viewMtx) {
+void GAME_renderPlayerView(u8 playerId) {
 	/* Setup camera view and perspective */
 	transform_t* target = &players[playerId].hovercraft->transform;
 	camera_t* camera = players[playerId].camera;
@@ -190,15 +192,17 @@ void GAME_renderPlayer(u8 playerId, Mtx viewMtx) {
 	}
 
 	/* Create camera matrix */
+	Mtx viewMtx;
 	guLookAt(viewMtx, &camPos, &up, &target->position);
 
 	GX_LoadProjectionMtx(camera->perspectiveMtx, GX_PERSPECTIVE);
 	camera->position = camPos;
 
 	/* Render the player's hovercraft */
-	OBJECT_render(players[playerId].hovercraft, viewMtx);
+	
+	SCENE_render(viewMtx);
 }
 
-void followCamera(transform_t* target, float distance, Mtx viewMtx) {
-
+player_t* GAME_getPlayerData(u8 playerId) {
+	return &players[playerId];
 }
