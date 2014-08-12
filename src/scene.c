@@ -14,11 +14,6 @@
 #include "game.h"
 #include "gxutils.h"
 
-
-/* Matrices */
-Mtx viewMtx;
-Mtx44 perspectiveMtx;
-
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane;
 object_t *objectTerrain, *objectPlane;
@@ -111,5 +106,3 @@ void playMod() {
 	MODPlay_SetMOD(&play, menumusic_mod);
 	MODPlay_Start(&play);
 }*/
-
-

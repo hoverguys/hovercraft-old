@@ -9,7 +9,6 @@
 #include "input.h"
 
 int main(int argc, char **argv) {
-	VIDEO_Init();
 	AESND_Init(NULL);
 	SCENE_load();
 
