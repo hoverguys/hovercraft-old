@@ -65,7 +65,7 @@ void SCENE_update() {
 	u8 i;
 	for (i = 0; i < 4; i++) {
 		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying) {
+		if (player->isPlaying == TRUE) {
 			GAME_updatePlayer(i);
 			GAME_renderPlayerView(i);
 		}
@@ -91,7 +91,7 @@ void SCENE_render(Mtx viewMtx) {
 	u8 i;
 	for (i = 0; i < 4; i++) {
 		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying)
+		if (player->isPlaying == TRUE)
 			OBJECT_render(player->hovercraft, viewMtx);
 	}
 

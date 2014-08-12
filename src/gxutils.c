@@ -39,6 +39,7 @@ void GXU_init() {
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
+	/* Enable USBGecko debugging */
 	CON_EnableGecko(1, FALSE);
 
 	/* Swap frames */
@@ -51,7 +52,7 @@ void GXU_init() {
 	GXColor background = { 0xa0, 0xe0, 0xf0, 0xff };
 	GX_SetCopyClear(background, 0x00ffffff);
 
-	/* Fullscreen viewport setup */
+	/* Fullscreen viewport setup (replace with per-player viewport */
 	GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
 	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);

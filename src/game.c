@@ -62,9 +62,9 @@ void GAME_updatePlayer(u8 playerId) {
 	guVector forward, worldUp = {0,1,0};
 
 	/* Get input */
-	f32 rot = INPUT_AnalogX(0) * .033f;
-	f32 accel = INPUT_TriggerR(0) * .02f;
-	f32 decel = INPUT_TriggerL(0) * .033f;
+	f32 rot = INPUT_AnalogX(playerId) * .033f;
+	f32 accel = INPUT_TriggerR(playerId) * .02f;
+	f32 decel = INPUT_TriggerL(playerId) * .033f;
 
 	/* Apply rotation */
 	OBJECT_rotateAxis(players[playerId].hovercraft, &worldUp, rot);
@@ -126,7 +126,7 @@ void GAME_updatePlayer(u8 playerId) {
 			players[playerId].isGrounded = TRUE;
 			velocity->y = 0.0f;
 		} else {
-			/* We didnt move into the terrain */
+			/* We didn't move into the terrain */
 			players[playerId].isGrounded = FALSE;
 
 			/* Rotate back to level*/
