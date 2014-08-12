@@ -16,7 +16,7 @@ player_t* players;
 
 /* Game settings */
 const f32 maxSpeed = 0.3f;
-guVector gravity = { 0, -.3f / 60.f, 0 };
+guVector gravity = { 0, -.8f / 60.f, 0 };
 
 void GAME_init(object_t* terrain, object_t* plane) {
 	mapTerrain = terrain;
@@ -55,8 +55,8 @@ void GAME_updatePlayer(u8 playerId) {
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
 	guVector *velocity = &players[playerId].velocity;
 	guVector *position = &players[playerId].hovercraft->transform.position;
-	guVector *forward = &players[playerId].hovercraft->transform.forward;
-	guVector worldUp = {0,1,0};
+	guVector *right = &players[playerId].hovercraft->transform.right;
+	guVector forward, worldUp = {0,1,0};
 
 	/* Get input */
 	f32 rot = INPUT_AnalogX(0) * .033f;
@@ -68,10 +68,13 @@ void GAME_updatePlayer(u8 playerId) {
 	OBJECT_rotateAxis(players[playerId].hovercraft, &worldUp, rot);
 	OBJECT_flush(players[playerId].hovercraft);
 
+	/* calculate forward */
+	guVecCross(right, &worldUp, &forward);
+
 	/* Calculate physics */
 	//if (players[playerId].isGrounded) {
-		guVecScale(forward, &acceleration, accel);
-		guVecScale(forward, &deacceleration, -decel);
+		guVecScale(&forward, &acceleration, accel);
+		guVecScale(&forward, &deacceleration, -decel);
 	//}
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
@@ -109,7 +112,7 @@ void GAME_updatePlayer(u8 playerId) {
 		if (dist < rayoffset) {
 			/* Moved into the terrain, snap */
 			guQuaternion rotation;
-			QUAT_lookat(forward, &normalhit, &rotation);
+			QUAT_lookat(&forward, &normalhit, &rotation);
 			OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
 
