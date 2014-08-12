@@ -20,7 +20,12 @@ typedef struct {
 /*! Loads the game scene and models */
 void SCENE_load();
 
-/*! Renders the scene */
-void SCENE_render();
+/*! Updates the scene and all the players inside it */
+void SCENE_update();
+
+/*! \brief Renders the scene 
+ *  \param viewMtx View matrix to use for rendering
+ */
+void SCENE_render(Mtx viewMtx);
 
 #endif

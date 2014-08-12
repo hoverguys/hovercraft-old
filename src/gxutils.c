@@ -84,7 +84,6 @@ void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
 }
 
 void GXU_done() {
-
 	/* Finish up rendering */
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
