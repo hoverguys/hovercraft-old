@@ -52,7 +52,7 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 }
 
 void GAME_updatePlayer(u8 playerId) {
-	INPUT_update();
+	
 
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
@@ -200,7 +200,6 @@ void GAME_renderPlayerView(u8 playerId) {
 	camera->position = camPos;
 
 	/* Render the player's hovercraft */
-	
 	SCENE_render(viewMtx);
 }
 

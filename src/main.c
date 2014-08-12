@@ -10,9 +10,11 @@
 
 int main(int argc, char **argv) {
 	//AESND_Init(NULL);
+	INPUT_init();
 	SCENE_load();
 
 	while (1) {
+		INPUT_update();
 		SCENE_update();
 	}
 

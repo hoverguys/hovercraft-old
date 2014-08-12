@@ -58,6 +58,7 @@ void SCENE_load() {
 }
 
 void SCENE_update() {
+
 	u8 i;
 	for (i = 0; i < 4; i++) {
 		player_t* player = GAME_getPlayerData(i);
@@ -69,6 +70,7 @@ void SCENE_update() {
 }
 
 void SCENE_render(Mtx viewMtx) {
+
 	/* Render time */
 	GX_SetNumChans(1);
 
@@ -83,12 +85,13 @@ void SCENE_render(Mtx viewMtx) {
 	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
 	OBJECT_render(objectPlane, viewMtx);
-
+	
 	u8 i;
 	for (i = 0; i < 4; i++) {
 		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE)
+		if (player->isPlaying == TRUE) {
 			OBJECT_render(player->hovercraft, viewMtx);
+		}
 	}
 
 	/* Finish up */
