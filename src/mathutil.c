@@ -26,9 +26,10 @@ void AxisAngleToQuaternion(guQuaternion* q, guVector rAxis, const f32 rAngle) {
 	q->w = c;
 }
 
+
 void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out) {
 	Mtx tmpMatrix;
 	guVector zero = { 0, 0, 0 };
-	guLookAt(tmpMatrix, &zero, up, forward);
+	guLookAt(tmpMatrix, forward, up, &zero);
 	c_guQuatMtx(out, tmpMatrix);
 }

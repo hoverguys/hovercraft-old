@@ -64,6 +64,10 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 	MODEL_render(object->mesh);
 }
 
+guVector worldUp = {0,1,0};
+guVector worldForward = { 0, 0, 1 };
+guVector worldRight = { 1, 0, 0 };
+
 inline void _MakeMatrix(object_t* object) {
 	/* Reset matrix to identity */
 	transform_t* t = &object->transform;
@@ -77,17 +81,13 @@ inline void _MakeMatrix(object_t* object) {
 	guMtxTransApply(matrix, matrix, t->position.x, t->position.y, t->position.z);
 
 	/* Calculate forward/up/left vectors */
-	t->forward.x = matrix[0][2];
-	t->forward.y = matrix[1][2];
-	t->forward.z = matrix[2][2];
+	guVecMultiplySR(matrix, &worldUp, &t->up);
+	guVecMultiplySR(matrix, &worldForward, &t->forward);
+	guVecMultiplySR(matrix, &worldRight, &t->right);
 
-	t->up.x = matrix[0][1];
-	t->up.y = matrix[1][1];
-	t->up.z = matrix[2][1];
-
-	t->right.x = matrix[0][0];
-	t->right.y = matrix[1][0];
-	t->right.z = matrix[2][0];
+	guVecNormalize(&t->up);
+	guVecNormalize(&t->forward);
+	guVecNormalize(&t->right);
 
 	object->transform.dirty = FALSE;
 }
@@ -125,11 +125,21 @@ void OBJECT_rotateSet(object_t* object, guQuaternion *rotation) {
 	t->dirty = TRUE;
 }
 
+void OBJECT_rotateAxis(object_t* object, guVector* axis, const f32 angle) {
+	transform_t* t = &object->transform;
+	Mtx angleaxis;
+	guQuaternion deltaq;
+	guMtxRotAxisRad(angleaxis, axis, angle);
+	c_guQuatMtx(&deltaq, angleaxis);
+	guQuatMultiply(&deltaq, &t->rotation, &t->rotation);
+	t->dirty = TRUE;
+}
+
 void OBJECT_rotate(object_t* object, const f32 rX, const f32 rY, const f32 rZ) {
 	transform_t* t = &object->transform;
 	guQuaternion deltaq;
 	EulerToQuaternion(&deltaq, rX, rY, rZ);
-	guQuatMultiply(&t->rotation, &deltaq, &t->rotation);
+	guQuatMultiply(&deltaq, &t->rotation, &t->rotation);
 	t->dirty = TRUE;
 }
 

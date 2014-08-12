@@ -173,7 +173,6 @@ void initialise() {
 	GX_CopyDisp(xfb[fbi], GX_TRUE);
 	GX_SetDispCopyGamma(GX_GM_1_0);
 
-
 	f32 w = rmode->viWidth;
 	f32 h = rmode->viHeight;
 	guPerspective(perspectiveMtx, 60.f, (f32) w / h, .1f, 300.f);
