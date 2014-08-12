@@ -55,6 +55,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\game.c" />
+    <ClCompile Include="src\gxutils.c" />
     <ClCompile Include="src\input.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\mathutil.c" />
@@ -71,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\gxutils.h" />
     <ClInclude Include="include\input.h" />
     <ClInclude Include="include\mathutil.h" />
     <ClInclude Include="include\model.h" />
