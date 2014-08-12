@@ -133,6 +133,9 @@ void GAME_updatePlayer(u8 playerId) {
 			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
 		}
 	} else {
+		/* Ray misses, we're up really high or on water, code below will make use*/
+		players[playerId].isGrounded = FALSE;
+
 		/* This should be avoided somehow */
 		QUAT_lookat(&forward, &worldUp, &rotation);
 		QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
