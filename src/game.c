@@ -53,6 +53,7 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 void GAME_updatePlayer(u8 playerId) {
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
+	guVector jump = { 0, 0.3f, 0 };
 	guVector *velocity = &players[playerId].velocity;
 	guVector *position = &players[playerId].hovercraft->transform.position;
 	guVector *right = &players[playerId].hovercraft->transform.right;
@@ -82,6 +83,9 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecAdd(velocity, &acceleration, velocity);
 	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
+	if (players[playerId].isGrounded && PAD_ButtonsDown(playerId) & PAD_BUTTON_X) {
+		guVecAdd(velocity, &jump, velocity);
+	}
 
 	/* Limit speed */
 	/*if (guVecDotProduct(velocity, velocity) > (maxSpeed*maxSpeed)) {
@@ -102,6 +106,7 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecAdd(&raypos, position, &raypos);
 	f32 dist = 0;
 	f32 minHeight = mapPlane->transform.position.y;
+	guQuaternion rotation;
 
 	/* Raycast track */
 	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
@@ -109,11 +114,11 @@ void GAME_updatePlayer(u8 playerId) {
 		guVecScale(&raydir, &rayhit, dist);
 		guVecAdd(&rayhit, &raypos, &rayhit);
 		f32 height = rayhit.y;
-		guQuaternion rotation;
 
 		if (dist < rayoffset) {
 			/* Moved into the terrain, snap */
 			QUAT_lookat(&forward, &normalhit, &rotation);
+			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
 			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
 
 			/* Since we hit the ground, reset the gravity*/
@@ -127,11 +132,14 @@ void GAME_updatePlayer(u8 playerId) {
 			QUAT_lookat(&forward, &worldUp, &rotation);
 			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
 		}
-
-		OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 	} else {
 		/* This should be avoided somehow */
+		QUAT_lookat(&forward, &worldUp, &rotation);
+		QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
 	}
+
+	/* Rotate player again */
+	OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 
 	/* Make sure we do not move underwater */
 	if (position->y < minHeight) {
