@@ -8,6 +8,7 @@
 #include <ogc/gu.h>
 #include "model.h"
 
+/* Transform data */
 typedef struct {
 	guVector     position; /*< World position                       */
 	guQuaternion rotation; /*< Rotation                             */
@@ -19,6 +20,7 @@ typedef struct {
 	guVector     right;    /*< Right vector       (AUTO-GENERATED)  */
 } transform_t;
 
+/* Object structure */
 typedef struct {
 	model_t* mesh;         /*< Model                                    */
 	transform_t transform; /*< Transform data (Position, Rotation, etc) */
@@ -42,6 +44,9 @@ object_t* OBJECT_createEx(model_t*     mesh,
 						  const guQuaternion rotation,
 						  const guVector     scale);
 
+/*! \brief Force Matrix regeneration on object 
+ *  \param object Object to process
+ */
 void OBJECT_flush(object_t* object);
 
 /*! \brief Render the object
