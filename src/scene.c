@@ -20,7 +20,6 @@ object_t *objectTerrain, *objectPlane;
 
 /* Texture vars */
 GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
-TPLFile TPLfile;
 
 /* Light */
 static GXColor lightColor[] = {
@@ -31,9 +30,6 @@ static GXColor lightColor[] = {
 
 BOOL firstFrame = TRUE;
 guVector speedVec;
-
-void playMod();
-void followCamera(transform_t* target, float distance);
 
 void SCENE_load() {
 	GXU_init();

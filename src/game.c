@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <math.h>
 
+#include "gxutils.h"
 #include "mathutil.h"
 #include "raycast.h"
 #include "input.h"

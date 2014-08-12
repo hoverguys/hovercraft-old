@@ -9,7 +9,7 @@
 #include "input.h"
 
 int main(int argc, char **argv) {
-	AESND_Init(NULL);
+	//AESND_Init(NULL);
 	SCENE_load();
 
 	while (1) {
