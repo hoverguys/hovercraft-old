@@ -180,7 +180,7 @@ void GAME_renderPlayer(u8 playerId, Mtx viewMtx) {
 	guVector raydir = { 0, -1, 0 };
 	guVector raypos = { 0, rayoffset, 0 };
 	guVecAdd(&raypos, &camPos, &raypos);
-	guVector rayhit, normalhit;
+	guVector normalhit;
 	f32 dist = 0;
 	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
 		if (dist < (rayoffset + cameraHeight)) {
