@@ -65,7 +65,6 @@ void GAME_updatePlayer(u8 playerId) {
 	f32 decel = INPUT_TriggerL(0) * .033f;
 
 	/* Apply rotation */
-	//OBJECT_rotate(players[playerId].hovercraft, 0, rot, 0);
 	OBJECT_rotateAxis(players[playerId].hovercraft, &worldUp, rot);
 	OBJECT_flush(players[playerId].hovercraft);
 
@@ -74,10 +73,9 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecNormalize(&forward);
 
 	/* Calculate physics */
-	//if (players[playerId].isGrounded) {
-		guVecScale(&forward, &acceleration, accel);
-		guVecScale(&forward, &deacceleration, -decel);
-	//}
+	guVecScale(&forward, &acceleration, accel);
+	guVecScale(&forward, &deacceleration, -decel);
+
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
 	guVecAdd(velocity, &acceleration, velocity);
@@ -92,8 +90,6 @@ void GAME_updatePlayer(u8 playerId) {
 		guVecNormalize(velocity);
 		guVecScale(velocity, velocity, maxSpeed);
 	}*/
-
-	//printf("velocity %f %f %f\n", velocity->x, velocity->y, velocity->z);
 
 	/* Move Player */
 	OBJECT_move(players[playerId].hovercraft, velocity->x, velocity->y, velocity->z);
@@ -117,7 +113,10 @@ void GAME_updatePlayer(u8 playerId) {
 
 		if (dist < rayoffset) {
 			/* Moved into the terrain, snap */
-			QUAT_lookat(&forward, &normalhit, &rotation);
+			guVector f;
+			guVecCross(right, &normalhit, &f);
+			guVecNormalize(&f);
+			QUAT_lookat(&f, &normalhit, &rotation);
 			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
 			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
 
