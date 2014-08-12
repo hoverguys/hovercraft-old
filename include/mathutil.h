@@ -41,6 +41,10 @@ inline void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
 
 void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out);
 
+f32 QUAT_dotProduct(guQuaternion *a, guQuaternion *b);
+
+void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion* out);
+
 #endif
 
 

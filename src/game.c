@@ -70,6 +70,7 @@ void GAME_updatePlayer(u8 playerId) {
 
 	/* calculate forward */
 	guVecCross(right, &worldUp, &forward);
+	guVecNormalize(&forward);
 
 	/* Calculate physics */
 	//if (players[playerId].isGrounded) {
@@ -108,12 +109,11 @@ void GAME_updatePlayer(u8 playerId) {
 		guVecScale(&raydir, &rayhit, dist);
 		guVecAdd(&rayhit, &raypos, &rayhit);
 		f32 height = rayhit.y;
+		guQuaternion rotation;
 
 		if (dist < rayoffset) {
 			/* Moved into the terrain, snap */
-			guQuaternion rotation;
 			QUAT_lookat(&forward, &normalhit, &rotation);
-			OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
 
 			/* Since we hit the ground, reset the gravity*/
@@ -122,7 +122,13 @@ void GAME_updatePlayer(u8 playerId) {
 		} else {
 			/* We didnt move into the terrain */
 			players[playerId].isGrounded = FALSE;
+
+			/* Rotate back to level*/
+			QUAT_lookat(&forward, &worldUp, &rotation);
+			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
 		}
+
+		OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 	} else {
 		/* This should be avoided somehow */
 	}

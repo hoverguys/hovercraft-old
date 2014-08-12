@@ -33,3 +33,50 @@ void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out) {
 	guLookAt(tmpMatrix, forward, up, &zero);
 	c_guQuatMtx(out, tmpMatrix);
 }
+
+f32 QUAT_dotProduct(guQuaternion *a, guQuaternion *b) {
+	return a->w*b->w + a->x*b->x + a->y*b->y + a->z*b->z;
+}
+
+void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion* out) {
+	if (t <= 0.0f) {
+		*out = *q0;
+		return;
+	}
+	else if (t >= 1.0f) {
+		*out = *q1;
+		return;
+	}
+
+	f32 cosOmega = QUAT_dotProduct(q0, q1);
+	f32 q1w = q1->w;
+	f32 q1x = q1->x;
+	f32 q1y = q1->y;
+	f32 q1z = q1->z;
+	if (cosOmega < 0.0f) {
+		q1w = -q1w;
+		q1x = -q1x;
+		q1y = -q1y;
+		q1z = -q1z;
+		cosOmega = -cosOmega;
+	}
+
+	f32 k0, k1;
+	if (cosOmega > 0.9999f) {
+		k0 = 1.0f - t;
+		k1 = t;
+	} else {
+		f32 sinOmega = sqrt(1.0f - cosOmega*cosOmega);
+		f32 omega = atan2(sinOmega, cosOmega);
+		f32 oneOverSinOmega = 1.0f / sinOmega;
+
+		k0 = sin((1.0f - t) * omega) * oneOverSinOmega;
+		k1 = sin(t * omega) * oneOverSinOmega;
+	}
+
+	out->x = k0*q0->x + k1*q1x;
+	out->y = k0*q0->y + k1*q1y;
+	out->z = k0*q0->z + k1*q1z;
+	out->w = k0*q0->w + k1*q1w;
+	return;
+}
