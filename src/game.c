@@ -33,7 +33,8 @@ void GAME_init(object_t* terrain, object_t* plane) {
 void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 	/* Create player hovercraft object and position it */
 	players[playerId].hovercraft = OBJECT_create(hovercraftModel);
-	OBJECT_moveTo(players[playerId].hovercraft, 1, 0.6f, 1);
+	OBJECT_moveTo(players[playerId].hovercraft, 100, 50.f, 100);
+	OBJECT_flush(players[playerId].hovercraft);
 
 	/* Setup player's camera */
 	camera_t* camera = malloc(sizeof(camera_t));
@@ -55,6 +56,7 @@ void GAME_updatePlayer(u8 playerId) {
 	guVector *velocity = &players[playerId].velocity;
 	guVector *position = &players[playerId].hovercraft->transform.position;
 	guVector *forward = &players[playerId].hovercraft->transform.forward;
+	guVector worldUp = {0,1,0};
 
 	/* Get input */
 	f32 rot = INPUT_AnalogX(0) * .033f;
@@ -62,13 +64,15 @@ void GAME_updatePlayer(u8 playerId) {
 	f32 decel = INPUT_TriggerL(0) * .033f;
 
 	/* Apply rotation */
-	OBJECT_rotate(players[playerId].hovercraft, 0, rot, 0);
+	//OBJECT_rotate(players[playerId].hovercraft, 0, rot, 0);
+	OBJECT_rotateAxis(players[playerId].hovercraft, &worldUp, rot);
+	OBJECT_flush(players[playerId].hovercraft);
 
 	/* Calculate physics */
-	if (players[playerId].isGrounded) {
+	//if (players[playerId].isGrounded) {
 		guVecScale(forward, &acceleration, accel);
 		guVecScale(forward, &deacceleration, -decel);
-	}
+	//}
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
 	guVecAdd(velocity, &acceleration, velocity);
@@ -105,8 +109,6 @@ void GAME_updatePlayer(u8 playerId) {
 		if (dist < rayoffset) {
 			/* Moved into the terrain, snap */
 			guQuaternion rotation;
-			printf("n %f %f %f\n", normalhit.x, normalhit.y, normalhit.z);
-			printf("f %f %f %f\n", forward->x, forward->y, forward->z);
 			QUAT_lookat(forward, &normalhit, &rotation);
 			OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
@@ -128,6 +130,8 @@ void GAME_updatePlayer(u8 playerId) {
 		velocity->y = 0.0f;
 		OBJECT_moveTo(players[playerId].hovercraft, position->x, minHeight, position->z);
 	}
+
+	OBJECT_flush(players[playerId].hovercraft);
 }
 
 void GAME_renderPlayer(u8 playerId, Mtx viewMtx) {

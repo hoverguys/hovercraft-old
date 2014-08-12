@@ -86,6 +86,8 @@ void OBJECT_rotateTo(object_t* object, const f32 rX, const f32 rY, const f32 rZ)
 */
 void OBJECT_rotateSet(object_t* object, guQuaternion *rotation);
 
+void OBJECT_rotateAxis(object_t* object, guVector* axis, const f32 angle);
+
 /*! \brief Rotate an object of a certain rotation (RELATIVE)
  *  \param object Object to rotate
  *  \param rX     X coordinate
