@@ -105,8 +105,8 @@ void GAME_updatePlayer(u8 playerId) {
 		if (dist < rayoffset) {
 			/* Moved into the terrain, snap */
 			guQuaternion rotation;
-			printf("n %f %f %f\n", normalhit.x, normalhit.y, normalhit.z);
-			printf("f %f %f %f\n", forward->x, forward->y, forward->z);
+			//printf("n %f %f %f\n", normalhit.x, normalhit.y, normalhit.z);
+			//printf("f %f %f %f\n", forward->x, forward->y, forward->z);
 			QUAT_lookat(forward, &normalhit, &rotation);
 			OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
 			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
