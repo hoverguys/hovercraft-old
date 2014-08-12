@@ -157,20 +157,43 @@ void GAME_renderPlayer(u8 playerId, Mtx viewMtx) {
 	/* Setup camera view and perspective */
 	transform_t* target = &players[playerId].hovercraft->transform;
 	camera_t* camera = players[playerId].camera;
-	const float distance = 5.f;
-	guVector targetPos = { target->position.x - target->forward.x * distance,
-		target->position.y - target->forward.y * distance + distance * .5f,
-		target->position.z - target->forward.z * distance };
-	float t = 1.f / 10.f;
-	guVector up = { 0, 1, 0 };
-	guVector cam = { camera->position.x + t * (targetPos.x - camera->position.x),
-		camera->position.y + t * (targetPos.y - camera->position.y),
-		camera->position.z + t * (targetPos.z - camera->position.z) };
 
-	guLookAt(viewMtx, &cam, &up, &target->position);
+	/* Settings */
+	const float cameraHeight = 2.5;
+	const float cameraDistance = -5.f;
+	const float t = 1.f / 10.f;
+
+	/* Calculate camera position*/
+	guVector posTemp, targetCameraPos = { 0, cameraHeight, 0 };
+	guVecScale(&target->forward, &posTemp, cameraDistance);
+	guVecAdd(&targetCameraPos, &posTemp, &targetCameraPos);
+	guVecAdd(&target->position, &targetCameraPos, &targetCameraPos);
+
+	/* Lerp between old camera position and target */
+	guVector camPos, up = { 0, 1, 0 };
+	guVecSub(&targetCameraPos, &camera->position, &camPos);
+	guVecScale(&camPos, &camPos, t);
+	guVecAdd(&camera->position, &camPos, &camPos);
+
+	/* make sure the camera does not enter the ground*/
+	const f32 rayoffset = 400;
+	guVector raydir = { 0, -1, 0 };
+	guVector raypos = { 0, rayoffset, 0 };
+	guVecAdd(&raypos, &camPos, &raypos);
+	guVector rayhit, normalhit;
+	f32 dist = 0;
+	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
+		if (dist < (rayoffset + cameraHeight)) {
+			/* the camera is lower then it should be, move up*/
+			camPos.y += (rayoffset + cameraHeight) - dist;
+		}
+	}
+
+	/* Create camera matrix */
+	guLookAt(viewMtx, &camPos, &up, &target->position);
 
 	GX_LoadProjectionMtx(camera->perspectiveMtx, GX_PERSPECTIVE);
-	camera->position = cam;
+	camera->position = camPos;
 
 	/* Render the player's hovercraft */
 	OBJECT_render(players[playerId].hovercraft, viewMtx);
