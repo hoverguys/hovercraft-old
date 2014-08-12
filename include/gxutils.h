@@ -10,6 +10,7 @@
 void GXU_init();
 void GXU_loadTexture(s32 texId, GXTexObj* texObj);
 void GXU_setLight(Mtx view, GXColor lightColor[]);
+GXRModeObj* GXU_getMode();
 void GXU_done();
 
 #endif

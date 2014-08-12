@@ -19,6 +19,8 @@ void *gpfifo = NULL;
 TPLFile TPLfile;
 
 void GXU_init() {
+	VIDEO_Init();
+
 	/* Get render mode */
 	rmode = VIDEO_GetPreferredMode(NULL);
 
@@ -116,4 +118,8 @@ void GXU_setLight(Mtx view, GXColor lightColor[]) {
 	GX_SetChanAmbColor(GX_COLOR0A0, lightColor[1]);
 	GX_SetChanMatColor(GX_COLOR0A0, lightColor[2]);
 	GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
+}
+
+GXRModeObj* GXU_getMode() {
+	return rmode;
 }

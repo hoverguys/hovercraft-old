@@ -39,7 +39,7 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 	/* Setup player's camera */
 	camera_t* camera = malloc(sizeof(camera_t));
 	//TODO PROPER SPLITSCREEN
-	GXRModeObj* rmode = VIDEO_GetPreferredMode(NULL);
+	GXRModeObj* rmode = GXU_getMode();
 	camera->width = rmode->viWidth;
 	camera->height = rmode->viHeight;
 	camera->offsetTop = camera->offsetLeft = 0;
