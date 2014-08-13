@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
+#include <string.h>
 
 #include "gxutils.h"
 #include "mathutil.h"
@@ -200,7 +201,7 @@ void GAME_renderPlayerView(u8 playerId) {
 	camera->position = camPos;
 
 	/* Render the player's hovercraft */
-	SCENE_render(viewMtx);
+	SCENE_renderPlayer(viewMtx);
 }
 
 player_t* GAME_getPlayerData(u8 playerId) {

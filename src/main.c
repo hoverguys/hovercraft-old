@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
 	while (1) {
 		INPUT_update();
-		SCENE_update();
+		SCENE_render();
 	}
 
 	return 0;
