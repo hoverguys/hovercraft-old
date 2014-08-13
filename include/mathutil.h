@@ -47,11 +47,11 @@ inline void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
 void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out);
 
 /*! \brief Quaternion dot product
- *  \param[in]  a First quaternion
- *  \param[in]  b Second quaternion
- *  \return Dot product of the two quaternions
+ *  \param[in]  p   First quaternion
+ *  \param[in]  q   Second quaternion
+ *  \param[out] res Dot product of the two quaternions
  */
-f32 QUAT_dotProduct(guQuaternion *a, guQuaternion *b);
+void QUAT_dotProduct(guQuaternion *p, guQuaternion *q, f32* res);
 
 /*! \brief Spherical linear interpolation between quaternions
  *  \param[in]  q0  From Quaternion

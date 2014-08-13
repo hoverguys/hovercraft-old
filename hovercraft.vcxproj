@@ -54,6 +54,7 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\audioutil.c" />
     <ClCompile Include="src\game.c" />
     <ClCompile Include="src\gxutils.c" />
     <ClCompile Include="src\input.c" />
@@ -71,6 +72,7 @@
     <None Include="textures\textures.scf" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\audioutil.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\gxutils.h" />
     <ClInclude Include="include\input.h" />
