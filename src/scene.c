@@ -58,18 +58,20 @@ void SCENE_load() {
 
 	/* Check all players and find out how to split screen*/
 	INPUT_update();
+	
 	u8 i, split = 0;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
-			split |= i;
+			split++;
 			GAME_createPlayer(i, modelHover);
 		}
 	}
 
 	/* We went through all players, so we know how to split the screen */
-	for (i = 0; i < 4; i++) {
+	u8 splitCur = 0;
+	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
-			GXU_setupCamera(GAME_getPlayerData(i)->camera, i, split);
+			GXU_setupCamera(GAME_getPlayerData(i)->camera, split, ++splitCur);
 		}
 	}
 }
@@ -84,7 +86,7 @@ void SCENE_render() {
 	}
 
 	u8 i;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < MAX_PLAYERS; i++) {
 		player_t* player = GAME_getPlayerData(i);
 		if (player->isPlaying == TRUE) {
 			GAME_updatePlayer(i);
@@ -97,7 +99,6 @@ void SCENE_render() {
 }
 
 void SCENE_renderPlayer(Mtx viewMtx) {
-
 	/* Enable Light */
 	GXU_setLight(viewMtx, lightColor);
 
@@ -106,7 +107,7 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	OBJECT_render(objectPlane, viewMtx);
 
 	u8 i;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < MAX_PLAYERS; i++) {
 		player_t* player = GAME_getPlayerData(i);
 		if (player->isPlaying == TRUE) {
 			OBJECT_render(player->hovercraft, viewMtx);
