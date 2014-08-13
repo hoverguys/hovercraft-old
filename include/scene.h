@@ -14,7 +14,7 @@ typedef struct {
 				height,			/*< Viewport height    */
 				offsetTop,		/*< Viewport Y         */
 				offsetLeft;		/*< Viewport X         */
-	Mtx			perspectiveMtx; /*< Perspective Matrix */
+	Mtx44		perspectiveMtx; /*< Perspective Matrix */
 } camera_t;
 
 /*! Loads the game scene and models */

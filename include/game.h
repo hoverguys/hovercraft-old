@@ -15,7 +15,7 @@ typedef struct {
 	BOOL		isGrounded;
 	object_t*	hovercraft;
 	guVector	velocity;
-	camera_t*	camera;
+	camera_t	camera;
 } player_t;
 
 void GAME_init(object_t* terrain, object_t* plane);

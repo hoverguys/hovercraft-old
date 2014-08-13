@@ -71,7 +71,7 @@ void SCENE_load() {
 	u8 splitCur = 0;
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
-			GXU_setupCamera(GAME_getPlayerData(i)->camera, split, ++splitCur);
+			GXU_setupCamera(&GAME_getPlayerData(i)->camera, split, ++splitCur);
 		}
 	}
 }

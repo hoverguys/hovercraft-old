@@ -37,16 +37,12 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 	OBJECT_moveTo(player->hovercraft, 100, 50.f, 100);
 	OBJECT_flush(player->hovercraft);
 
-	/* Setup player's camera */
-	player->camera = malloc(sizeof(camera_t));
-
 	/* Set player as playing */
 	player->isPlaying = TRUE;
 }
 
 void GAME_removePlayer(u8 playerId) {
 	player_t* player = GAME_getPlayerData(playerId);
-	free(player->camera);
 	OBJECT_destroy(player->hovercraft);
 }
 
@@ -159,7 +155,7 @@ void GAME_renderPlayerView(u8 playerId) {
 	/* Setup camera view and perspective */
 	player_t* player = GAME_getPlayerData(playerId);
 	transform_t target = player->hovercraft->transform;
-	camera_t* camera = player->camera;
+	camera_t* camera = &player->camera;
 
 	/* Settings */
 	const float cameraHeight = 2.5;
