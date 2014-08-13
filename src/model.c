@@ -70,7 +70,6 @@ model_t* MODEL_setup(const u8* model_bmb) {
 
 	/* Return model info */
 	model_t* model = malloc(sizeof(model_t));
-	memset(model, 0, sizeof(model_t));
 	model->modelList = modelList;
 	model->modelListSize = modelListSize;
 

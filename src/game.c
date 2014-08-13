@@ -38,7 +38,6 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 
 	/* Setup player's camera */
 	players[playerId].camera = malloc(sizeof(camera_t));
-	memset(players[playerId].camera, 0, sizeof(camera_t));
 
 	/* Set player as playing */
 	players[playerId].isPlaying = TRUE;

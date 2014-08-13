@@ -26,7 +26,6 @@ object_t* OBJECT_createEx(model_t*     mesh,
 						  const guQuaternion rotation,
 						  const guVector     scale) {
 	object_t* object = malloc(sizeof(object_t));
-	memset(object, 0, sizeof(object_t));
 	object->mesh = mesh;
 
 	object->transform.position = position;
