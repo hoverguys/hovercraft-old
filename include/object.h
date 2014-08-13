@@ -8,7 +8,7 @@
 #include <ogc/gu.h>
 #include "model.h"
 
-/* Transform data */
+/*! Transform data */
 typedef struct {
 	guVector     position; /*< World position                       */
 	guQuaternion rotation; /*< Rotation                             */
@@ -20,7 +20,7 @@ typedef struct {
 	guVector     right;    /*< Right vector       (AUTO-GENERATED)  */
 } transform_t;
 
-/* Object structure */
+/*! Object structure */
 typedef struct {
 	model_t*	mesh;      /*< Model                                    */
 	transform_t transform; /*< Transform data (Position, Rotation, etc) */
@@ -86,11 +86,16 @@ void OBJECT_move(object_t* object, const f32 tX, const f32 tY, const f32 tZ);
 void OBJECT_rotateTo(object_t* object, const f32 rX, const f32 rY, const f32 rZ);
 
 /*! \brief Set a specific rotation an object
-*  \param object Object to rotate
-*  \param rotation Rotation to set
-*/
+ *  \param object   Object to rotate
+ *  \param rotation Rotation to set
+ */
 void OBJECT_rotateSet(object_t* object, guQuaternion *rotation);
 
+/*! \brief Set rotation by axis angle
+ *  \param object Object to rotate
+ *  \param axis   Axis to rotate
+ *  \param angle  Angle
+ */
 void OBJECT_rotateAxis(object_t* object, guVector* axis, const f32 angle);
 
 /*! \brief Rotate an object of a certain rotation (RELATIVE)

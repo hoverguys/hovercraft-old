@@ -1,4 +1,4 @@
-/*! \file object.h
+/*! \file input.h
 *  \brief Input management and detection
 */
 
