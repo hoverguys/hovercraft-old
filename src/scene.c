@@ -2,7 +2,6 @@
 #include <ogcsys.h>
 
 /* Generated assets headers */
-#include "menumusic_mod.h"
 #include "hovercraft_bmb.h"
 #include "plane_bmb.h"
 #include "terrain_bmb.h"
@@ -10,7 +9,6 @@
 
 #include "model.h"
 #include "object.h"
-#include "mathutil.h"
 #include "game.h"
 #include "gxutils.h"
 #include "input.h"
@@ -52,7 +50,7 @@ void SCENE_load() {
 
 	objectPlane = OBJECT_create(modelPlane);
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
-	OBJECT_moveTo(objectPlane, -500, .5f, -500);
+	OBJECT_moveTo(objectPlane, -500, 6.1f, -500);
 
 	GAME_init(objectTerrain, objectPlane);
 
@@ -115,11 +113,3 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	}
 
 }
-
-/* TO MOVE IN audioutils
-static MODPlay play;
-void playMod() {
-MODPlay_Init(&play);
-MODPlay_SetMOD(&play, menumusic_mod);
-MODPlay_Start(&play);
-}*/

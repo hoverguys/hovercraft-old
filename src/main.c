@@ -1,17 +1,19 @@
 /* SDK Libraries */
 #include <gccore.h>
-#include <aesndlib.h>  /*  Audio       */
-#include <gcmodplay.h> /* Mod playback */
 
 /* Internal libraries */
 #include "scene.h"
-#include "game.h"
 #include "input.h"
+#include "audioutil.h"
+
+#include "menumusic_mod.h"
 
 int main(int argc, char **argv) {
-	//AESND_Init(NULL);
+	
 	INPUT_init();
 	SCENE_load();
+	AU_init();
+	AU_playMusic(menumusic_mod);
 
 	while (1) {
 		INPUT_update();

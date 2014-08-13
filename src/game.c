@@ -1,8 +1,6 @@
 #include "game.h"
 
 #include <malloc.h>
-#include <math.h>
-#include <string.h>
 
 #include "gxutils.h"
 #include "mathutil.h"

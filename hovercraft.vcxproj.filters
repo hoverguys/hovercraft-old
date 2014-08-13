@@ -54,6 +54,9 @@
     <ClCompile Include="src\gxutils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\audioutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -85,6 +88,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\gxutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\audioutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
