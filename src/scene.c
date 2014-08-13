@@ -13,6 +13,7 @@
 #include "mathutil.h"
 #include "game.h"
 #include "gxutils.h"
+#include "input.h"
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane;
@@ -54,7 +55,23 @@ void SCENE_load() {
 	OBJECT_moveTo(objectPlane, -500, .5f, -500);
 
 	GAME_init(objectTerrain, objectPlane);
-	GAME_createPlayer(0, modelHover);
+
+	/* Check all players and find out how to split screen*/
+	INPUT_update();
+	u8 i, split = 0;
+	for (i = 0; i < 4; i++) {
+		if (INPUT_isConnected(i) == TRUE) {
+			split |= i;
+			GAME_createPlayer(i, modelHover);
+		}
+	}
+
+	/* We went through all players, so we know how to split the screen */
+	for (i = 0; i < 4; i++) {
+		if (INPUT_isConnected(i) == TRUE) {
+			GXU_setupCamera(GAME_getPlayerData(i)->camera, i, split);
+		}
+	}
 }
 
 void SCENE_render() {
@@ -87,7 +104,7 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
 	OBJECT_render(objectPlane, viewMtx);
-	
+
 	u8 i;
 	for (i = 0; i < 4; i++) {
 		player_t* player = GAME_getPlayerData(i);
@@ -101,7 +118,7 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 /* TO MOVE IN audioutils
 static MODPlay play;
 void playMod() {
-	MODPlay_Init(&play);
-	MODPlay_SetMOD(&play, menumusic_mod);
-	MODPlay_Start(&play);
+MODPlay_Init(&play);
+MODPlay_SetMOD(&play, menumusic_mod);
+MODPlay_Start(&play);
 }*/

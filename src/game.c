@@ -1,6 +1,5 @@
 #include "game.h"
 
-#include <stdio.h>
 #include <malloc.h>
 #include <math.h>
 #include <string.h>
@@ -41,7 +40,6 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 	/* Setup player's camera */
 	players[playerId].camera = malloc(sizeof(camera_t));
 	memset(players[playerId].camera, 0, sizeof(camera_t));
-	GXU_setupCamera(players[playerId].camera, playerId);
 
 	/* Set player as playing */
 	players[playerId].isPlaying = TRUE;
@@ -53,8 +51,6 @@ void GAME_removePlayer(u8 playerId) {
 }
 
 void GAME_updatePlayer(u8 playerId) {
-	
-
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
@@ -199,6 +195,9 @@ void GAME_renderPlayerView(u8 playerId) {
 
 	GX_LoadProjectionMtx(camera->perspectiveMtx, GX_PERSPECTIVE);
 	camera->position = camPos;
+
+	/* Viewport setup */
+	GX_SetViewport(camera->offsetLeft, camera->offsetTop, camera->width, camera->height, 0, 1);
 
 	/* Render the player's hovercraft */
 	SCENE_renderPlayer(viewMtx);
