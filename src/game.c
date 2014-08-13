@@ -12,7 +12,7 @@
 object_t* mapTerrain;
 object_t* mapPlane;
 
-player_t* players;
+player_t players[MAX_PLAYERS];
 
 /* Game settings */
 const f32 maxSpeed = 0.3f;
@@ -22,39 +22,43 @@ void GAME_init(object_t* terrain, object_t* plane) {
 	mapTerrain = terrain;
 	mapPlane = plane;
 
-	players = calloc(MAX_PLAYERS, sizeof(player_t));
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
-		players[i].isPlaying = FALSE;
-		players[i].isGrounded = FALSE;
+		player_t* player = GAME_getPlayerData(i);
+		player->isPlaying = FALSE;
+		player->isGrounded = FALSE;
 	}
 }
 
 void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 	/* Create player hovercraft object and position it */
-	players[playerId].hovercraft = OBJECT_create(hovercraftModel);
-	OBJECT_moveTo(players[playerId].hovercraft, 100, 50.f, 100);
-	OBJECT_flush(players[playerId].hovercraft);
+	player_t* player = GAME_getPlayerData(playerId);
+	player->hovercraft = OBJECT_create(hovercraftModel);
+	OBJECT_moveTo(player->hovercraft, 100, 50.f, 100);
+	OBJECT_flush(player->hovercraft);
 
 	/* Setup player's camera */
-	players[playerId].camera = malloc(sizeof(camera_t));
+	player->camera = malloc(sizeof(camera_t));
 
 	/* Set player as playing */
-	players[playerId].isPlaying = TRUE;
+	player->isPlaying = TRUE;
 }
 
 void GAME_removePlayer(u8 playerId) {
-	free(players[playerId].camera);
-	OBJECT_destroy(players[playerId].hovercraft);
+	player_t* player = GAME_getPlayerData(playerId);
+	free(player->camera);
+	OBJECT_destroy(player->hovercraft);
 }
 
 void GAME_updatePlayer(u8 playerId) {
+	player_t* player = GAME_getPlayerData(playerId);
+
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
-	guVector *velocity = &players[playerId].velocity;
-	guVector *position = &players[playerId].hovercraft->transform.position;
-	guVector *right = &players[playerId].hovercraft->transform.right;
+	guVector *velocity = &player->velocity;
+	guVector *position = &player->hovercraft->transform.position;
+	guVector *right = &player->hovercraft->transform.right;
 	guVector forward, worldUp = {0,1,0};
 
 	/* Get input */
@@ -63,8 +67,8 @@ void GAME_updatePlayer(u8 playerId) {
 	f32 decel = INPUT_TriggerL(playerId) * .033f;
 
 	/* Apply rotation */
-	OBJECT_rotateAxis(players[playerId].hovercraft, &worldUp, rot);
-	OBJECT_flush(players[playerId].hovercraft);
+	OBJECT_rotateAxis(player->hovercraft, &worldUp, rot);
+	OBJECT_flush(player->hovercraft);
 
 	/* calculate forward */
 	guVecCross(right, &worldUp, &forward);
@@ -79,7 +83,7 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecAdd(velocity, &acceleration, velocity);
 	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
-	if (players[playerId].isGrounded && PAD_ButtonsDown(playerId) & PAD_BUTTON_X) {
+	if (player->isGrounded && PAD_ButtonsDown(playerId) & PAD_BUTTON_X) {
 		guVecAdd(velocity, &jump, velocity);
 	}
 
@@ -90,7 +94,7 @@ void GAME_updatePlayer(u8 playerId) {
 	}*/
 
 	/* Move Player */
-	OBJECT_move(players[playerId].hovercraft, velocity->x, velocity->y, velocity->z);
+	OBJECT_move(player->hovercraft, velocity->x, velocity->y, velocity->z);
 
 	/* Collision check*/
 	const f32 rayoffset = 200;
@@ -115,46 +119,47 @@ void GAME_updatePlayer(u8 playerId) {
 			guVecCross(right, &normalhit, &f);
 			guVecNormalize(&f);
 			QUAT_lookat(&f, &normalhit, &rotation);
-			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
-			OBJECT_moveTo(players[playerId].hovercraft, rayhit.x, height, rayhit.z);
+			QUAT_slerp(&rotation, &player->hovercraft->transform.rotation, .9f, &rotation);
+			OBJECT_moveTo(player->hovercraft, rayhit.x, height, rayhit.z);
 
 			/* Since we hit the ground, reset the gravity*/
-			players[playerId].isGrounded = TRUE;
+			player->isGrounded = TRUE;
 			velocity->y = 0.0f;
 		} else {
 			/* We didn't move into the terrain */
-			players[playerId].isGrounded = FALSE;
+			player->isGrounded = FALSE;
 
 			/* Rotate back to level*/
 			QUAT_lookat(&forward, &worldUp, &rotation);
-			QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
+			QUAT_slerp(&rotation, &player->hovercraft->transform.rotation, .9f, &rotation);
 		}
 	} else {
 		/* Ray misses, we're up really high or on water, code below will make use*/
-		players[playerId].isGrounded = FALSE;
+		player->isGrounded = FALSE;
 
 		/* This should be avoided somehow */
 		QUAT_lookat(&forward, &worldUp, &rotation);
-		QUAT_slerp(&rotation, &players[playerId].hovercraft->transform.rotation, .9f, &rotation);
+		QUAT_slerp(&rotation, &player->hovercraft->transform.rotation, .9f, &rotation);
 	}
 
 	/* Rotate player again */
-	OBJECT_rotateSet(players[playerId].hovercraft, &rotation);
+	OBJECT_rotateSet(player->hovercraft, &rotation);
 
 	/* Make sure we do not move underwater */
 	if (position->y < minHeight) {
-		players[playerId].isGrounded = TRUE;
+		player->isGrounded = TRUE;
 		velocity->y = 0.0f;
-		OBJECT_moveTo(players[playerId].hovercraft, position->x, minHeight, position->z);
+		OBJECT_moveTo(player->hovercraft, position->x, minHeight, position->z);
 	}
 
-	OBJECT_flush(players[playerId].hovercraft);
+	OBJECT_flush(player->hovercraft);
 }
 
 void GAME_renderPlayerView(u8 playerId) {
 	/* Setup camera view and perspective */
-	transform_t* target = &players[playerId].hovercraft->transform;
-	camera_t* camera = players[playerId].camera;
+	player_t* player = GAME_getPlayerData(playerId);
+	transform_t target = player->hovercraft->transform;
+	camera_t* camera = player->camera;
 
 	/* Settings */
 	const float cameraHeight = 2.5;
@@ -163,9 +168,9 @@ void GAME_renderPlayerView(u8 playerId) {
 
 	/* Calculate camera position*/
 	guVector posTemp, targetCameraPos = { 0, cameraHeight, 0 };
-	guVecScale(&target->forward, &posTemp, cameraDistance);
+	guVecScale(&target.forward, &posTemp, cameraDistance);
 	guVecAdd(&targetCameraPos, &posTemp, &targetCameraPos);
-	guVecAdd(&target->position, &targetCameraPos, &targetCameraPos);
+	guVecAdd(&target.position, &targetCameraPos, &targetCameraPos);
 
 	/* Lerp between old camera position and target */
 	guVector camPos, up = { 0, 1, 0 };
@@ -189,7 +194,7 @@ void GAME_renderPlayerView(u8 playerId) {
 
 	/* Create camera matrix */
 	Mtx viewMtx;
-	guLookAt(viewMtx, &camPos, &up, &target->position);
+	guLookAt(viewMtx, &camPos, &up, &target.position);
 
 	GX_LoadProjectionMtx(camera->perspectiveMtx, GX_PERSPECTIVE);
 	camera->position = camPos;
