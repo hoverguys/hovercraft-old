@@ -2,7 +2,6 @@
 
 #include <malloc.h>
 #include <string.h>
-#include <stdio.h>
 #include "mathutil.h"
 
 /* Rebuild matrix on translate rather than setting dirty flag     *

@@ -1,6 +1,5 @@
 #include "raycast.h"
 
-#include <stdio.h>
 #include <math.h>
 
 #define EPSILON 0.000001f
