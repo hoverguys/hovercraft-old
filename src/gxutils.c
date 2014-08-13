@@ -52,8 +52,6 @@ void GXU_init() {
 	GXColor background = { 0xa0, 0xe0, 0xf0, 0xff };
 	GX_SetCopyClear(background, 0x00ffffff);
 
-	/* Fullscreen viewport setup (replace with per-player viewport */
-	GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
 	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0, 0, rmode->fbWidth, rmode->efbHeight);
@@ -125,9 +123,11 @@ GXRModeObj* GXU_getMode() {
 	return rmode;
 }
 
-void GXU_setupCamera(camera_t* camera, u8 playerId) {
-	camera->width = rmode->viWidth;
-	camera->height = rmode->viHeight;
-	camera->offsetTop = camera->offsetLeft = 0;
+void GXU_setupCamera(camera_t* camera, u8 playerId, u8 splitType) {
+	const u8 splitX = 2, splitY = 1;
+	camera->width = (splitType & splitX) ? rmode->viWidth / 2 : rmode->viWidth;
+	camera->height = (splitType & splitY) ? rmode->viHeight / 2 : rmode->viHeight;
+	camera->offsetLeft = (playerId & splitX) ? rmode->viWidth / 2 : 0;
+	camera->offsetTop = (playerId & splitY) ? rmode->viHeight / 2: 0;
 	guPerspective(camera->perspectiveMtx, 60, (f32) camera->width / camera->height, 0.1f, 300.0f);
 }

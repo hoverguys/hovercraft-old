@@ -13,6 +13,6 @@ void GXU_loadTexture(s32 texId, GXTexObj* texObj);
 void GXU_setLight(Mtx view, GXColor lightColor[]);
 GXRModeObj* GXU_getMode();
 void GXU_done();
-void GXU_setupCamera(camera_t* camera, u8 playerId);
+void GXU_setupCamera(camera_t* camera, u8 playerId, u8 splitType);
 
 #endif
