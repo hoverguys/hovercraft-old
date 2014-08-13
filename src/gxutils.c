@@ -124,3 +124,11 @@ void GXU_setLight(Mtx view, GXColor lightColor[]) {
 GXRModeObj* GXU_getMode() {
 	return rmode;
 }
+
+void GXU_setupCamera(camera_t* camera, u8 playerId) {
+	camera->width = rmode->viWidth;
+	camera->height = rmode->viHeight;
+	camera->offsetTop = camera->offsetLeft = 0;
+	guPerspective(camera->perspectiveMtx, 60, (f32) camera->width / camera->height, 0.1f, 300.0f);
+	players[playerId].camera = camera;
+}

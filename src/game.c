@@ -38,17 +38,17 @@ void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
 	OBJECT_flush(players[playerId].hovercraft);
 
 	/* Setup player's camera */
-	camera_t* camera = malloc(sizeof(camera_t));
-	//TODO PROPER SPLITSCREEN
-	GXRModeObj* rmode = GXU_getMode();
-	camera->width = rmode->viWidth;
-	camera->height = rmode->viHeight;
-	camera->offsetTop = camera->offsetLeft = 0;
-	guPerspective(camera->perspectiveMtx, 60, (f32) camera->width / camera->height, 0.1f, 300.0f);
-	players[playerId].camera = camera;
+	players[playerId].camera = malloc(sizeof(camera_t));
+	memset(players[playerId].camera, 0, sizeof(camera_t));
+	GXU_setupCamera(players[playerId].camera, playerId);
 
 	/* Set player as playing */
 	players[playerId].isPlaying = TRUE;
+}
+
+void GAME_removePlayer(u8 playerId) {
+	free(players[playerId].camera);
+	OBJECT_destroy(players[playerId].hovercraft);
 }
 
 void GAME_updatePlayer(u8 playerId) {

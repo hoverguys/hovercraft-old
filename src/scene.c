@@ -57,7 +57,14 @@ void SCENE_load() {
 	GAME_createPlayer(0, modelHover);
 }
 
-void SCENE_update() {
+void SCENE_render() {
+	/* Render time */
+	GX_SetNumChans(1);
+
+	if (firstFrame) {
+		firstFrame = FALSE;
+		VIDEO_SetBlack(FALSE);
+	}
 
 	u8 i;
 	for (i = 0; i < 4; i++) {
@@ -67,17 +74,12 @@ void SCENE_update() {
 			GAME_renderPlayerView(i);
 		}
 	}
+
+	/* Flip framebuffer */
+	GXU_done();
 }
 
-void SCENE_render(Mtx viewMtx) {
-
-	/* Render time */
-	GX_SetNumChans(1);
-
-	if (firstFrame) {
-		firstFrame = FALSE;
-		VIDEO_SetBlack(FALSE);
-	}
+void SCENE_renderPlayer(Mtx viewMtx) {
 
 	/* Enable Light */
 	GXU_setLight(viewMtx, lightColor);
@@ -94,8 +96,6 @@ void SCENE_render(Mtx viewMtx) {
 		}
 	}
 
-	/* Finish up */
-	GXU_done();
 }
 
 /* TO MOVE IN audioutils

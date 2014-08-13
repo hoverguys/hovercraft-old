@@ -18,6 +18,7 @@ typedef struct {
 
 void GAME_init(object_t* terrain, object_t* plane);
 void GAME_createPlayer(u8 playerId, model_t* hovercraftModel);
+void GAME_removePlayer(u8 playerId);
 void GAME_updatePlayer(u8 playerId);
 void GAME_renderPlayerView(u8 playerId);
 player_t* GAME_getPlayerData(u8 playerId);
