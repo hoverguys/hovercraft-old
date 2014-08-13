@@ -62,7 +62,7 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 	MODEL_render(object->mesh);
 }
 
-guVector worldUp = {0,1,0};
+guVector worldUp = { 0, 1, 0 };
 guVector worldForward = { 0, 0, 1 };
 guVector worldRight = { 1, 0, 0 };
 

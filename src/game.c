@@ -12,7 +12,6 @@
 object_t* mapTerrain;
 object_t* mapPlane;
 
-const int MAX_PLAYERS = 4;
 player_t* players;
 
 /* Game settings */

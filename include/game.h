@@ -8,12 +8,14 @@
 #include "object.h"
 #include "scene.h"
 
+#define MAX_PLAYERS 4
+
 typedef struct {
 	BOOL		isPlaying;
 	BOOL		isGrounded;
-	object_t	*hovercraft;
+	object_t*	hovercraft;
 	guVector	velocity;
-	camera_t	*camera;
+	camera_t*	camera;
 } player_t;
 
 void GAME_init(object_t* terrain, object_t* plane);
