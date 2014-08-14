@@ -30,4 +30,4 @@ clean:
 # main targets
 #---------------------------------------------------------------------------------
 $(TARGET): $(OFILES)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(OUTPUT) $(CPPFILES)
+	$(CXX) $(CXXFLAGS) -o $(OUTPUT) $(CPPFILES) $(LDFLAGS)
