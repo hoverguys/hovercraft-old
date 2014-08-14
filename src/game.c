@@ -77,7 +77,7 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecAdd(velocity, &acceleration, velocity);
 	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
-	if (player->isGrounded && PAD_ButtonsDown(playerId) & PAD_BUTTON_X) {
+	if (player->isGrounded && INPUT_getButton(playerId, INPUT_BTN_JUMP) == TRUE) {
 		guVecAdd(velocity, &jump, velocity);
 	}
 

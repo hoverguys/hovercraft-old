@@ -11,6 +11,12 @@
 #define INPUT_STICK_THRESHOLD 70
 #define INPUT_TRIGGER_THRESHOLD 250
 
+#ifdef WII
+#define INPUT_BTN_JUMP WPAD_BUTTONB
+#else
+#define INPUT_BTN_JUMP PAD_BUTTON_X
+#endif
+
 /*! \brief Initialize input
  */
 void INPUT_init();
@@ -56,9 +62,16 @@ f32 INPUT_CStickY(const u8 id);
 f32 INPUT_TriggerL(const u8 id);
 
 /*! \brief Get R trigger analog value
-*  \param id Gamepad slot
-*  \return Current analog value, normalized from -1 to 1
-*/
+ *  \param id Gamepad slot
+ *  \return Current analog value, normalized from -1 to 1
+ */
 f32 INPUT_TriggerR(const u8 id);
+
+/*! \brief Get button status 
+ *  \param padId    Gamepad slot
+ *  \param buttonId Button id
+ *  \return TRUE if the button has been pressed, FALSE otherwise
+ */
+BOOL INPUT_getButton(const u8 padId, const u16 buttonId);
 
 #endif
