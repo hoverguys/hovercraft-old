@@ -7,10 +7,11 @@
 *.exe
 *.dSYM
 *.o
+*.swp
+*.vcxproj.user
 
 /obj
 /exe
 /docs
 /tools/Emulator
-/tools/obj2bin_src/obj2bin/obj2bin.vcxproj.user
 /tools/obj2bin
