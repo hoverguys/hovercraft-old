@@ -9,9 +9,10 @@
 #include "menumusic_mod.h"
 
 int main(int argc, char **argv) {
-	
+
 	INPUT_init();
 	SCENE_load();
+
 	AU_init();
 	AU_playMusic(menumusic_mod);
 

@@ -1,4 +1,5 @@
 #include "input.h"
+#include <ogc/video.h>
 #include <math.h>
 
 u32 _Connected;
@@ -67,6 +68,14 @@ BOOL INPUT_getButton(const u8 padId, const u16 buttonId) {
 #else
 	return PAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
 #endif
+}
+
+void INPUT_waitForControllers() {
+	while (_Connected == 0) {
+		INPUT_update();
+		VIDEO_WaitVSync();
+	}
+	return;
 }
 
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal) {

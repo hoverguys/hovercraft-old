@@ -80,4 +80,8 @@ f32 INPUT_TriggerR(const u8 id);
  */
 BOOL INPUT_getButton(const u8 padId, const u16 buttonId);
 
+/*! \brief Block until at least one controller is found
+ */
+void INPUT_waitForControllers();
+
 #endif

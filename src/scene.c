@@ -54,9 +54,9 @@ void SCENE_load() {
 
 	GAME_init(objectTerrain, objectPlane);
 
-	/* Check all players and find out how to split screen*/
-	INPUT_update();
-	
+	/* Wait for controllers */
+	INPUT_waitForControllers();
+
 	u8 i, split = 0;
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
@@ -77,11 +77,6 @@ void SCENE_load() {
 void SCENE_render() {
 	/* Render time */
 	GX_SetNumChans(1);
-
-	if (firstFrame) {
-		firstFrame = FALSE;
-		VIDEO_SetBlack(FALSE);
-	}
 
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
