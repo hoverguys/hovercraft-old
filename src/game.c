@@ -28,11 +28,11 @@ void GAME_init(object_t* terrain, object_t* plane) {
 	}
 }
 
-void GAME_createPlayer(u8 playerId, model_t* hovercraftModel) {
+void GAME_createPlayer(u8 playerId, model_t* hovercraftModel, guVector startPosition) {
 	/* Create player hovercraft object and position it */
 	player_t* player = GAME_getPlayerData(playerId);
 	player->hovercraft = OBJECT_create(hovercraftModel);
-	OBJECT_moveTo(player->hovercraft, 100, 50.f, 100);
+	OBJECT_moveTo(player->hovercraft, startPosition.x, startPosition.y, startPosition.z);
 	OBJECT_flush(player->hovercraft);
 
 	/* Set player as playing */

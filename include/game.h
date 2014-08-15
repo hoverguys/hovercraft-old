@@ -29,8 +29,9 @@ void GAME_init(object_t* terrain, object_t* plane);
 /*! \brief Create a player
  *  \param playerId        Player Id
  *  \param hovercraftModel Hovercraft model
+ *  \param startPosition   Starting position
  */
-void GAME_createPlayer(u8 playerId, model_t* hovercraftModel);
+void GAME_createPlayer(u8 playerId, model_t* hovercraftModel, guVector startPosition);
 
 /*! \brief Create a player
  *  \param playerId Player Id

@@ -61,7 +61,8 @@ void SCENE_load() {
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
 			split++;
-			GAME_createPlayer(i, modelHover);
+			guVector position = { rand() % 200, 30.f, rand() % 200 };
+			GAME_createPlayer(i, modelHover, position);
 		}
 	}
 
