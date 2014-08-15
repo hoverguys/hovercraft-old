@@ -5,7 +5,7 @@ u32 _Connected;
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
 
 void INPUT_update() {
-#ifdef WII
+#ifdef USE_WIIMOTE
 	_Connected = WPAD_ScanPads();
 #else
 	_Connected = PAD_ScanPads();
@@ -13,7 +13,7 @@ void INPUT_update() {
 }
 
 void INPUT_init() {
-#ifdef WII
+#ifdef USE_WIIMOTE
 	WPAD_Init();
 #else
 	PAD_Init();
@@ -62,7 +62,7 @@ f32 INPUT_TriggerR(const u8 id) {
 }
 
 BOOL INPUT_getButton(const u8 padId, const u16 buttonId) {
-#ifdef WII
+#ifdef USE_WIIMOTE
 	return WPAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
 #else
 	return PAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;

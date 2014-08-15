@@ -4,10 +4,12 @@
     <LocalDebuggerCommand>tools\Emulator\Dolphin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>/d /b /e $(SolutionDir)hovercraft.elf</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>ManagedOnly</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Wii|Win32'">
     <LocalDebuggerCommand>tools\Emulator\Dolphin.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>/d /b /e $(SolutionDir)hovercraft.wii.elf</LocalDebuggerCommandArguments>
+    <LocalDebuggerDebuggerType>ManagedOnly</LocalDebuggerDebuggerType>
   </PropertyGroup>
 </Project>

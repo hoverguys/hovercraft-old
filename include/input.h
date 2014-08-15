@@ -7,7 +7,7 @@
 
 #include <gctypes.h>
 
-#ifdef WII
+#ifdef USE_WIIMOTE
 #include <wiiuse/wpad.h>
 #else
 #include <ogc/pad.h>
@@ -17,7 +17,7 @@
 #define INPUT_STICK_THRESHOLD 70
 #define INPUT_TRIGGER_THRESHOLD 250
 
-#ifdef WII
+#ifdef USE_WIIMOTE
 #define INPUT_BTN_JUMP WPAD_BUTTON_B
 #else
 #define INPUT_BTN_JUMP PAD_BUTTON_X
