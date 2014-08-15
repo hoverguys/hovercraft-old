@@ -8,7 +8,6 @@
 *.dSYM
 *.o
 *.swp
-*.vcxproj.user
 
 /obj
 /exe
