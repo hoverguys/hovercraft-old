@@ -91,12 +91,12 @@ void GXU_done() {
 	GX_CopyDisp(xfb[fbi], GX_TRUE);
 
 	GX_DrawDone();
+	fbi ^= 1;
 
 	/* Flush and swap buffers */
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
-	fbi ^= 1;
 }
 
 void GXU_setLight(Mtx view, GXColor lightColor[]) {
