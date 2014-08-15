@@ -76,6 +76,15 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecScale(&forward, &acceleration, accel);
 	guVecScale(&forward, &deacceleration, -decel);
 
+	/* Apply physics */
+	guVecScale(velocity, velocity, 0.95f);
+	guVecAdd(velocity, &acceleration, velocity);
+	guVecAdd(velocity, &deacceleration, velocity);
+	guVecAdd(velocity, &gravity, velocity);
+	if (player->isGrounded && INPUT_getButton(playerId, INPUT_BTN_JUMP) == TRUE) {
+		guVecAdd(velocity, &jump, velocity);
+	}
+
 	/* Calculate collisions */
 	u8 otherPlayerId;
 	for (otherPlayerId = playerId + 1; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
@@ -84,15 +93,6 @@ void GAME_updatePlayer(u8 playerId) {
 
 		/* Check for collision between current player and other*/
 		CalculateBounce(player, target);
-	}
-
-	/* Apply physics */
-	guVecScale(velocity, velocity, 0.95f);
-	guVecAdd(velocity, &acceleration, velocity);
-	guVecAdd(velocity, &deacceleration, velocity);
-	guVecAdd(velocity, &gravity, velocity);
-	if (player->isGrounded && INPUT_getButton(playerId, INPUT_BTN_JUMP) == TRUE) {
-		guVecAdd(velocity, &jump, velocity);
 	}
 
 	/* Limit speed */
