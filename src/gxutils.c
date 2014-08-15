@@ -13,6 +13,7 @@
 static void *xfb[2] = { NULL, NULL };
 static u32 fbi = 0;
 static GXRModeObj *rmode = NULL;
+BOOL first_frame = FALSE;
 void *gpfifo = NULL;
 
 /* Texture file */
@@ -71,6 +72,8 @@ void GXU_init() {
 
 	/* Open TPL file from memory (statically linked in) */
 	TPL_OpenTPLFromMemory(&TPLfile, (void *) textures_tpl, textures_tpl_size);
+
+	first_frame = TRUE;
 }
 
 /* Why do we have this? Is this even used?! */
@@ -91,12 +94,17 @@ void GXU_done() {
 	GX_CopyDisp(xfb[fbi], GX_TRUE);
 
 	GX_DrawDone();
-	fbi ^= 1;
 
 	/* Flush and swap buffers */
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
+	if (first_frame) {
+		first_frame = 0;
+		VIDEO_SetBlack(FALSE);
+	}
+
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
+	fbi ^= 1;
 }
 
 void GXU_setLight(Mtx view, GXColor lightColor[]) {
