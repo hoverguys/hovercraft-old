@@ -7,10 +7,9 @@
 BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut, guVector* normalOut) {
 	/* Init data */
 	model_t * const mesh = object->mesh;
-	guVector *point0, *point1, *point2;
 	u16 *baseindices = mesh->modelIndices;
-	guVector *vertices = (guVector*)mesh->modelPositions;
-	guVector *normals = (guVector*)mesh->modelNormals;
+	guVector *vertices = (guVector*) mesh->modelPositions;
+	guVector *normals = (guVector*) mesh->modelNormals;
 	Mtx InverseObjMtx;
 	guVector rayO, rayD;
 
@@ -27,30 +26,30 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 	/* Temporary variables */
 	guVector e1, e2;
 	guVector P, Q, T;
-	float det, inv_det, u, v;
+	float inv_det, u, v;
 	float t;
 
 	BOOL hit = FALSE;
 	f32 sdist = 0;
-	u16 *indices = 0;
+	
 	guVector *normal = 0;
 
 	/* Iterate over every triangle */
 	u32 f = 0;
 	for (; f < mesh->modelFaceCount; ++f) {
-		indices = baseindices + (f * 3);
+		u16 *indices = baseindices + (f * 3);
 
 		/* Get data */
-		point0 = &vertices[indices[0]];
-		point1 = &vertices[indices[1]];
-		point2 = &vertices[indices[2]];
+		guVector *point0 = &vertices[indices[0]],
+				 *point1 = &vertices[indices[1]],
+				 *point2 = &vertices[indices[2]];
 
 		guVecSub(point1, point0, &e1);
 		guVecSub(point2, point0, &e2);
 
 		guVecCross(&rayD, &e2, &P);
 
-		det = guVecDotProduct(&e1, &P);
+		float det = guVecDotProduct(&e1, &P);
 
 		/* NOT CULLING */
 		if (det > -EPSILON && det < EPSILON) {
