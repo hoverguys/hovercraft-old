@@ -30,7 +30,7 @@ TEXTURES	:=	textures
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS		= -g -O2 -Wall $(MACHDEP) $(INCLUDE) -DGEKKO
+CFLAGS		= -g -O2 -Wall -Wextra $(MACHDEP) $(INCLUDE) -DGEKKO
 CXXFLAGS	= $(CFLAGS)
 
 LDFLAGS		= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
