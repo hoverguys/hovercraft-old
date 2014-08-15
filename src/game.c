@@ -52,7 +52,7 @@ void GAME_updateWorld() {
 		if (player->isPlaying != TRUE) continue;
 
 		for (j = i + 1; j < MAX_PLAYERS; j++) {
-			player_t* target = GAME_getPlayerData(i);
+			player_t* target = GAME_getPlayerData(j);
 			if (target->isPlaying != TRUE) continue;
 
 			/* Check for collision between player I and J*/
