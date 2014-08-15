@@ -4,8 +4,6 @@
 #ifndef _AUDIOUTIL_H
 #define _AUDIOUTIL_H
 
-#include <ogcsys.h>
-
 /*! \brief Initialize audio subsystem
  */
 void AU_init();

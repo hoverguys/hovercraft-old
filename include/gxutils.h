@@ -5,7 +5,7 @@
 #ifndef _GXUTILS_H 
 #define _GXUTILS_H
 
-#include <ogcsys.h>
+#include <gccore.h>
 #include "scene.h"
 
 /*! \brief Initialize the GX subsystem

@@ -1,5 +1,5 @@
 /* System and SDK libraries */
-#include <ogcsys.h>
+#include <gccore.h>
 
 /* Generated assets headers */
 #include "hovercraft_bmb.h"
