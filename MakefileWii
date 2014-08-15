@@ -30,7 +30,7 @@ TEXTURES	:=	textures
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS		= -g -O2 -Wall $(MACHDEP) $(INCLUDE) -DGEKKO -DWII
+CFLAGS		= -g -O2 -Wall $(MACHDEP) $(INCLUDE) -DWII
 CXXFLAGS	= $(CFLAGS)
 
 LDFLAGS		= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -38,7 +38,7 @@ LDFLAGS		= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lmodplay -laesnd -lwiiuse -lbte -logc -lm
+LIBS	:=	-lwiiuse -logc -lmodplay -laesnd -lbte -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -110,7 +110,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 #---------------------------------------------------------------------------------
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/MakefileWii
 
 #---------------------------------------------------------------------------------
 clean:
