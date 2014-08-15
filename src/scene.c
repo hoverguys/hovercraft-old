@@ -1,5 +1,6 @@
 /* System and SDK libraries */
 #include <gccore.h>
+#include <stdlib.h>
 
 /* Generated assets headers */
 #include "hovercraft_bmb.h"
@@ -78,6 +79,8 @@ void SCENE_load() {
 void SCENE_render() {
 	/* Render time */
 	GX_SetNumChans(1);
+
+	GAME_updateWorld();
 
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {

@@ -43,6 +43,10 @@ void GAME_removePlayer(u8 playerId);
  */
 void GAME_updatePlayer(u8 playerId);
 
+/*! \brief Update global/world state (physics/logic)
+*/
+void GAME_updateWorld();
+
 /*! \brief Render a player's view
  *  \param playerId Player Id
  */

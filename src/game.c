@@ -44,6 +44,23 @@ void GAME_removePlayer(u8 playerId) {
 	OBJECT_destroy(player->hovercraft);
 }
 
+void GAME_updateWorld() {
+	/* Manage player-player interactions */
+	u8 i, j;
+	for (i = 0; i < MAX_PLAYERS; i++) {
+		player_t* player = GAME_getPlayerData(i);
+		if (player->isPlaying != TRUE) continue;
+
+		for (j = i + 1; j < MAX_PLAYERS; j++) {
+			player_t* target = GAME_getPlayerData(i);
+			if (target->isPlaying != TRUE) continue;
+
+			/* Check for collision between player I and J*/
+			CalculateBounce(player, target);
+		}
+	}
+}
+
 void GAME_updatePlayer(u8 playerId) {
 	player_t* player = GAME_getPlayerData(playerId);
 
