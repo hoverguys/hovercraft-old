@@ -7,7 +7,8 @@ inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
 
 void INPUT_update() {
 #ifdef USE_WIIMOTE
-	_Connected = WPAD_ScanPads();
+	WPAD_ScanPads();
+	//todo Wiimote detection
 #else
 	_Connected = PAD_ScanPads();
 #endif

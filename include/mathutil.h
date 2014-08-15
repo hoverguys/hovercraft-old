@@ -6,6 +6,7 @@
 #define _MATHUTIL_H
 
 #include <ogc/gu.h>
+#include "game.h"
 
 /*! \brief Convert Euler angles to a quaternion
  *  \param[out] q Result quaternion
@@ -60,6 +61,32 @@ void QUAT_dotProduct(guQuaternion *p, guQuaternion *q, f32* res);
  *  \param[out] out Interpolated quaternion
  */
 void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion* out);
+
+/*! \brief Vector magnitude 
+ *  \param vec Vector to calculate magnitude of
+ *  \return Magnitude as a f32
+ */
+f32 guVecMag(guVector* vec);
+
+/*! \brief Squared vector magnitude
+ *  \param vec Vector to calculate squared magnitude of
+ *  \return Squared magnitude as a f32
+ */
+f32 guVecSquareMag(guVector* vec);
+
+/*! \brief Get distance between two 3d points
+ *  \param point1 First 3d point
+ *  \param point2 Second 3d point
+ *  \return Distance between point1 and point2
+ */
+f32 vecDistance(guVector* point1, guVector* point2);
+
+/*! \brief Make players bounce if they touch
+*  \param a First player in the collision
+*  \param b Second player in the collision
+*  \return TRUE if the players collided, FALSE otherwise
+*/
+BOOL CalculateBounce(player_t* a, player_t* b);
 
 #endif
 

@@ -38,8 +38,7 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 	if (t <= 0.0f) {
 		*out = *q0;
 		return;
-	}
-	else if (t >= 1.0f) {
+	} else if (t >= 1.0f) {
 		*out = *q1;
 		return;
 	}
@@ -76,4 +75,44 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 	out->z = k0*q0->z + k1*q1z;
 	out->w = k0*q0->w + k1*q1w;
 	return;
+}
+
+/* These should be in gu.h or something */
+
+inline f32 guVecMag(guVector* vec) {
+	return sqrt(guVecDotProduct(vec, vec));
+}
+
+inline f32 vecDistance(guVector* point1, guVector* point2) {
+	guVector sub;
+	guVecSub(point2, point1, &sub);
+	return guVecMag(&sub);
+}
+
+// How big is the player's collision sphere?
+#define RADIUS 2
+
+BOOL CalculateBounce(player_t* a, player_t* b) {
+	guVector collision;
+	guVecSub(&b->hovercraft->transform.position,
+			 &a->hovercraft->transform.position,
+			 &collision);
+	f32 distance = guVecMag(&collision);
+
+	if (distance == 0) distance = 1;
+	if (distance > RADIUS) return FALSE;
+
+	guVecScale(&collision, &collision, 1 / distance);
+	f32 dota = guVecDotProduct(&a->velocity, &collision);
+	f32 dotb = guVecDotProduct(&b->velocity, &collision);
+	f32 scaleFac = dotb - dota;
+
+	guVector deltaA, deltaB;
+	guVecScale(&collision, &deltaA, scaleFac);
+	guVecScale(&collision, &deltaB, -scaleFac);
+
+	guVecAdd(&a->velocity, &deltaA, &a->velocity);
+	guVecAdd(&b->velocity, &deltaB, &b->velocity);
+
+	return TRUE;
 }
