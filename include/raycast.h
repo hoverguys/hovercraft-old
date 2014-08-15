@@ -12,6 +12,7 @@
  *  \param[in]  raydir      Ray Direction vector (euler angles)
  *  \param[in]  rayorigin   Ray Origin (World space)
  *  \param[out] distanceOut Ray length (distance to hitpoint)
+ *  \param[out] normalOut   Normal of the surface hit
  *  \return TRUE if the ray hit somewhere, FALSE otherwise
  */
 BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut, guVector* normalOut);

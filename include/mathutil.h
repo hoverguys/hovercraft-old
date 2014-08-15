@@ -39,10 +39,26 @@ inline void ps_float2Mul(f32* opA, f32* opB, f32* result);
  */
 inline void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
 
+/*! \brief Quaternion lookAt
+ *  \param[in]  forward Forward vector (Direction)
+ *  \param[in]  up      Up vector (Orientation)
+ *  \param[out] out     Out quaternion
+ */
 void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out);
 
-f32 QUAT_dotProduct(guQuaternion *a, guQuaternion *b);
+/*! \brief Quaternion dot product
+ *  \param[in]  p   First quaternion
+ *  \param[in]  q   Second quaternion
+ *  \param[out] res Dot product of the two quaternions
+ */
+void QUAT_dotProduct(guQuaternion *p, guQuaternion *q, f32* res);
 
+/*! \brief Spherical linear interpolation between quaternions
+ *  \param[in]  q0  From Quaternion
+ *  \param[in]  q1  To Quaternion
+ *  \param[in]  t   Interpolation parameter
+ *  \param[out] out Interpolated quaternion
+ */
 void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion* out);
 
 #endif

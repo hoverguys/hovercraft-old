@@ -64,6 +64,7 @@
     <None Include="textures\textures.scf">
       <Filter>Resource Files\textures</Filter>
     </None>
+    <None Include="MakefileWii" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\input.h">

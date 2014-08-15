@@ -126,8 +126,7 @@ bool saveBinfile(string file) {
 	binHeaderEndian.fcount = EndianFixInt(binHeader.fcount);
 
 	// Dump file
-	FILE *outFile = NULL;
-	fopen_s(&outFile, file.c_str(), "wb");
+	FILE *outFile = fopen(file.c_str(), "wb");
 
 	if (outFile == NULL) {
 		cout << "Error, unable to open output file\n";

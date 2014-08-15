@@ -1,5 +1,6 @@
 #include "mathutil.h"
 #include <math.h>
+#include <ogc/gu.h>
 
 void EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ) {
 	guVector vec;
@@ -26,16 +27,11 @@ void AxisAngleToQuaternion(guQuaternion* q, guVector rAxis, const f32 rAngle) {
 	q->w = c;
 }
 
-
 void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out) {
 	Mtx tmpMatrix;
 	guVector zero = { 0, 0, 0 };
 	guLookAt(tmpMatrix, forward, up, &zero);
 	c_guQuatMtx(out, tmpMatrix);
-}
-
-f32 QUAT_dotProduct(guQuaternion *a, guQuaternion *b) {
-	return a->w*b->w + a->x*b->x + a->y*b->y + a->z*b->z;
 }
 
 void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion* out) {
@@ -48,7 +44,8 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 		return;
 	}
 
-	f32 cosOmega = QUAT_dotProduct(q0, q1);
+	f32 cosOmega;
+	QUAT_dotProduct(q0, q1, &cosOmega);
 	f32 q1w = q1->w;
 	f32 q1x = q1->x;
 	f32 q1y = q1->y;
