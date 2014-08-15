@@ -45,20 +45,7 @@ void GAME_removePlayer(u8 playerId) {
 }
 
 void GAME_updateWorld() {
-	/* Manage player-player interactions */
-	u8 i, j;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying != TRUE) continue;
-
-		for (j = i + 1; j < MAX_PLAYERS; j++) {
-			player_t* target = GAME_getPlayerData(j);
-			if (target->isPlaying != TRUE) continue;
-
-			/* Check for collision between player I and J*/
-			CalculateBounce(player, target);
-		}
-	}
+	//todo Checkpoint logic here
 }
 
 void GAME_updatePlayer(u8 playerId) {
@@ -88,6 +75,16 @@ void GAME_updatePlayer(u8 playerId) {
 	/* Calculate physics */
 	guVecScale(&forward, &acceleration, accel);
 	guVecScale(&forward, &deacceleration, -decel);
+
+	/* Calculate collisions */
+	u8 otherPlayerId;
+	for (otherPlayerId = playerId + 1; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
+		player_t* target = GAME_getPlayerData(otherPlayerId);
+		if (target->isPlaying != TRUE) continue;
+
+		/* Check for collision between current player and other*/
+		CalculateBounce(player, target);
+	}
 
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
