@@ -1,10 +1,4 @@
 #include "input.h"
-
-#ifdef WII
-#include <wiiuse/wpad.h>
-#else
-#include <ogc/pad.h>
-#endif
 #include <math.h>
 
 u32 _Connected;
