@@ -45,15 +45,20 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 
 	f32 cosOmega;
 	QUAT_dotProduct(q0, q1, &cosOmega);
-	f32 q1w = q1->w;
-	f32 q1x = q1->x;
-	f32 q1y = q1->y;
-	f32 q1z = q1->z;
+	guQuaternion q0c, q1c;
+	q0c.x = q0->x;
+	q0c.y = q0->y;
+	q0c.z = q0->z;
+	q0c.w = q0->w;
+
+	q1c.x = q1->x;
+	q1c.y = q1->y;
+	q1c.z = q1->z;
+	q1c.w = q1->w;
+	
 	if (cosOmega < 0.0f) {
-		q1w = -q1w;
-		q1x = -q1x;
-		q1y = -q1y;
-		q1z = -q1z;
+		f32 invert = -1.f;
+		QUAT_scale(&q1c, &q1c, &invert);
 		cosOmega = -cosOmega;
 	}
 
@@ -69,11 +74,10 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 		k0 = sin((1.0f - t) * omega) * oneOverSinOmega;
 		k1 = sin(t * omega) * oneOverSinOmega;
 	}
-
-	out->x = k0*q0->x + k1*q1x;
-	out->y = k0*q0->y + k1*q1y;
-	out->z = k0*q0->z + k1*q1z;
-	out->w = k0*q0->w + k1*q1w;
+	
+	QUAT_scale(&q0c, &q0c, &k0);
+	QUAT_scale(&q1c, &q1c, &k1);
+	guQuatAdd(&q0c, &q1c, out);
 	return;
 }
 
