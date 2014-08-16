@@ -76,13 +76,6 @@ void GXU_init() {
 	first_frame = TRUE;
 }
 
-/* Why do we have this? Is this even used?! */
-/*void setupTexture() {
-	GX_SetNumTexGens(1);
-	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-	}*/
-
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
 	TPL_GetTexture(&TPLfile, texId, texObj);
 }
@@ -108,10 +101,9 @@ void GXU_done() {
 }
 
 void GXU_setLight(Mtx view, GXColor lightColor[]) {
-	guVector lpos;
+	guVector lpos = { 0, -1, -0.3f };
 	GXLightObj lobj;
 
-	lpos.x = 0.0f;	lpos.y = -1.0f; lpos.z = -0.3f;
 	guVecNormalize(&lpos);
 	guVecMultiplySR(view, &lpos, &lpos);
 

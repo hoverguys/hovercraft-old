@@ -81,7 +81,7 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 	return;
 }
 
-/* These should be in gu.h or something */
+/* This should be in gu.h or something */
 
 inline f32 guVecMag(guVector* vec) {
 	return sqrt(guVecDotProduct(vec, vec));

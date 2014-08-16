@@ -11,9 +11,7 @@
 void _MakeMatrix(object_t* object);
 
 object_t* OBJECT_create(model_t* mesh) {
-	guVector position, scale;
-	position.x = position.y = position.z = 0;
-	scale.x = scale.y = scale.z = 1;
+	guVector position = { 0, 0, 0 }, scale = { 1, 1, 1 };
 	guQuaternion rotation;
 	EulerToQuaternion(&rotation, 0, 0, 0);
 
