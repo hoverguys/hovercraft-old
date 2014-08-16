@@ -54,6 +54,13 @@ void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out);
  */
 void QUAT_dotProduct(guQuaternion *p, guQuaternion *q, f32* res);
 
+/*! \brief Quaternion scalar multiplication 
+ *  \param[in]  q     Input quaternion
+ *  \param[out] r     Output quaternion
+ *  \param[in]  scale Scale
+ */
+void QUAT_scale(guQuaternion* q, guQuaternion* r, f32* scale);
+
 /*! \brief Spherical linear interpolation between quaternions
  *  \param[in]  q0  From Quaternion
  *  \param[in]  q1  To Quaternion

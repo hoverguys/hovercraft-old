@@ -56,3 +56,15 @@ QUAT_dotProduct:
 	ps_sum0		fr1,fr1,fr1,fr1
 	psq_st      fr1, 0(r5), 1, 0
 	blr
+
+	.globl QUAT_scale // FROM LIBOGC's gu_psasm.S
+	//r3 = q, r4 = r, r5 = scale
+QUAT_scale:
+	psq_l		fr4,0(r3),0,0
+	psq_l		fr5,8(r3),0,0
+	psq_l       fr1,0(r5),1,0
+	ps_muls0	fr4,fr4,fr1
+	psq_st		fr4,0(r4),0,0
+	ps_muls0	fr5,fr5,fr1
+	psq_st		fr5,8(r4),0,0
+	blr
