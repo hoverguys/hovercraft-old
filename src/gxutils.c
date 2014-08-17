@@ -82,6 +82,13 @@ void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
 	TPL_GetTexture(&TPLfile, texId, texObj);
 }
 
+/* ZERO PLS LOOKATTHIS */
+void setupTexture() {
+	GX_SetNumTexGens(1);
+	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+}
+
 void GXU_done() {
 	/* Finish up rendering */
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
