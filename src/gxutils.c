@@ -67,6 +67,8 @@ void GXU_init() {
 	GX_CopyDisp(xfb[fbi], GX_TRUE);
 	GX_SetDispCopyGamma(GX_GM_1_0);
 
+	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+
 	/* Clear texture cache */
 	GX_InvalidateTexAll();
 

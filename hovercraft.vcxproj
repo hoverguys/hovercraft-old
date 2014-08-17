@@ -92,10 +92,12 @@
   <ItemGroup>
     <Object Include="models\hovercraft.obj" />
     <Object Include="models\plane.obj" />
+    <Object Include="models\ray.obj" />
     <Object Include="models\terrain.obj" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\hovercraft.png" />
+    <Image Include="textures\ray.png" />
     <Image Include="textures\terrain.png" />
     <Image Include="textures\water.png" />
   </ItemGroup>

@@ -1,3 +1,4 @@
 <filepath="hovercraft.png" id="hovercraftTex" colfmt=5 />
 <filepath="terrain.png" id="terrainTex" colfmt=14 />
 <filepath="water.png" id="waterTex" colfmt=14 />
+<filepath="ray.png" id="rayTex" colfmt=6 />

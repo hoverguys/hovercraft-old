@@ -6,6 +6,7 @@
 #include "hovercraft_bmb.h"
 #include "plane_bmb.h"
 #include "terrain_bmb.h"
+#include "ray_bmb.h"
 #include "textures.h"
 
 #include "model.h"
@@ -15,11 +16,11 @@
 #include "input.h"
 
 /* Model info */
-model_t *modelHover, *modelTerrain, *modelPlane;
-object_t *objectTerrain, *objectPlane;
+model_t *modelHover, *modelTerrain, *modelPlane, *modelRay;
+object_t *objectTerrain, *objectPlane, *planeRay;
 
 /* Texture vars */
-GXTexObj hoverTexObj, terrainTexObj, waterTexObj;
+GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
@@ -37,14 +38,17 @@ void SCENE_load() {
 	GXU_loadTexture(hovercraftTex, &hoverTexObj);
 	GXU_loadTexture(terrainTex, &terrainTexObj);
 	GXU_loadTexture(waterTex, &waterTexObj);
+	GXU_loadTexture(rayTex, &rayTexObj);
 
 	modelHover = MODEL_setup(hovercraft_bmb);
 	modelTerrain = MODEL_setup(terrain_bmb);
 	modelPlane = MODEL_setup(plane_bmb);
+	modelRay = MODEL_setup(ray_bmb);
 
 	MODEL_setTexture(modelHover, &hoverTexObj);
 	MODEL_setTexture(modelTerrain, &terrainTexObj);
 	MODEL_setTexture(modelPlane, &waterTexObj);
+	MODEL_setTexture(modelRay, &rayTexObj);
 
 	objectTerrain = OBJECT_create(modelTerrain);
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
@@ -52,6 +56,9 @@ void SCENE_load() {
 	objectPlane = OBJECT_create(modelPlane);
 	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
 	OBJECT_moveTo(objectPlane, -500, 6.1f, -500);
+
+	planeRay = OBJECT_create(modelRay);
+	OBJECT_scaleTo(planeRay, 1.5f, 4, 1.5f);
 
 	GAME_init(objectTerrain, objectPlane);
 
@@ -62,7 +69,8 @@ void SCENE_load() {
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
 			split++;
-			guVector position = { rand() % 200, 30.f, rand() % 200 };
+			//guVector position = { rand() % 200, 30.f, rand() % 200 };
+			guVector position = { -5, 30.f, -5 };
 			GAME_createPlayer(i, modelHover, position);
 		}
 	}
@@ -102,6 +110,8 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
 	OBJECT_render(objectPlane, viewMtx);
+
+	OBJECT_render(planeRay, viewMtx);
 
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
