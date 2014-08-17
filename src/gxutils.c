@@ -115,7 +115,7 @@ void GXU_setLight(Mtx view, GXColor lightColor[]) {
 	GX_InitLightColor(&lobj, lightColor[0]);
 	GX_LoadLightObj(&lobj, GX_LIGHT0);
 
-	// set number of rasterized color channels
+	/* Set number of rasterized color channels */
 	GX_SetNumChans(1);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 	GX_SetChanAmbColor(GX_COLOR0A0, lightColor[1]);

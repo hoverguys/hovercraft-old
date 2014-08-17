@@ -24,9 +24,9 @@ GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
-		{ 0x4f, 0x4f, 0x4f, 0xff }, // Light color
-		{ 0x0f, 0x0f, 0x0f, 0xff }, // Ambient color
-		{ 0xff, 0xff, 0xff, 0xff }  // Mat color
+		{ 0x4f, 0x4f, 0x4f, 0xff }, /* Light color   */
+		{ 0x0f, 0x0f, 0x0f, 0xff }, /* Ambient color */
+		{ 0xff, 0xff, 0xff, 0xff }  /* Mat color     */
 };
 
 BOOL firstFrame = TRUE;
@@ -69,8 +69,7 @@ void SCENE_load() {
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
 			split++;
-			//guVector position = { rand() % 200, 30.f, rand() % 200 };
-			guVector position = { -5, 30.f, -5 };
+			guVector position = { rand() % 200, 30.f, rand() % 200 };
 			GAME_createPlayer(i, modelHover, position);
 		}
 	}
@@ -114,7 +113,7 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	GXU_setLight(viewMtx, lightColor);
 
 	/* Draw terrain */
-	/* Lighting on*/
+	/* Lighting on */
 	GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 	OBJECT_render(objectTerrain, viewMtx);
@@ -131,7 +130,7 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	/* Draw ray */
 	/* Disable Zbuf */
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-	/* Lighting off*/
+	/* Lighting off */
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 	/* Special blend mode */

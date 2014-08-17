@@ -85,7 +85,7 @@ inline f32 vecDistance(guVector* point1, guVector* point2) {
 	return guVecMag(&sub);
 }
 
-// How big is the player's collision sphere?
+/* How big is the player's collision sphere? */
 #define RADIUS 2
 
 BOOL CalculateBounce(player_t* a, player_t* b) {

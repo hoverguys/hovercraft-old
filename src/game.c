@@ -68,7 +68,7 @@ void GAME_updatePlayer(u8 playerId) {
 	OBJECT_rotateAxis(player->hovercraft, &worldUp, rot);
 	OBJECT_flush(player->hovercraft);
 
-	/* calculate forward */
+	/* Calculate forward */
 	guVecCross(right, &worldUp, &forward);
 	guVecNormalize(&forward);
 
@@ -91,7 +91,7 @@ void GAME_updatePlayer(u8 playerId) {
 		player_t* target = GAME_getPlayerData(otherPlayerId);
 		if (target->isPlaying != TRUE) continue;
 
-		/* Check for collision between current player and other*/
+		/* Check for collision between current player and other */
 		CalculateBounce(player, target);
 	}
 
@@ -130,7 +130,7 @@ void GAME_updatePlayer(u8 playerId) {
 			QUAT_slerp(&rotation, &player->hovercraft->transform.rotation, .9f, &rotation);
 			OBJECT_moveTo(player->hovercraft, rayhit.x, height, rayhit.z);
 
-			/* Since we hit the ground, reset the gravity*/
+			/* Since we hit the ground, reset the gravity */
 			player->isGrounded = TRUE;
 			velocity->y = 0.0f;
 		} else {
@@ -174,7 +174,7 @@ void GAME_renderPlayerView(u8 playerId) {
 	const float cameraDistance = -5.f;
 	const float t = 1.f / 10.f;
 
-	/* Calculate camera position*/
+	/* Calculate camera position */
 	guVector posTemp, targetCameraPos = { 0, cameraHeight, 0 };
 	guVecScale(&target.forward, &posTemp, cameraDistance);
 	guVecAdd(&targetCameraPos, &posTemp, &targetCameraPos);
@@ -186,7 +186,7 @@ void GAME_renderPlayerView(u8 playerId) {
 	guVecScale(&camPos, &camPos, t);
 	guVecAdd(&camera->position, &camPos, &camPos);
 
-	/* make sure the camera does not enter the ground*/
+	/* Make sure the camera does not enter the ground */
 	const f32 rayoffset = 400;
 	guVector raydir = { 0, -1, 0 };
 	guVector raypos = { 0, rayoffset, 0 };
@@ -195,7 +195,7 @@ void GAME_renderPlayerView(u8 playerId) {
 	f32 dist = 0;
 	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
 		if (dist < (rayoffset + cameraHeight)) {
-			/* the camera is lower then it should be, move up*/
+			/* the camera is lower then it should be, move up */
 			camPos.y += (rayoffset + cameraHeight) - dist;
 		}
 	}

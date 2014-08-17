@@ -20,11 +20,9 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	/* Calculate cost */
 	const u32 indicesCount = header->fcount * 3;
 	const u32 indicesSize = indicesCount * 3 * sizeof(u16); /* 3 indices per vertex index (p,n,t) that are u16 in size */
-	//printf("indicesSize is %u\n", indicesSize);
 	const u32 callSize = 89; /* Size of setup var */
 	/* Round up to nearest 32 multiplication */
 	const u32 dispSize = (((indicesSize + callSize + 63) >> 5) + 1) << 5;
-	//printf("guessed size is %u\n", dispSize);
 
 	/* Build display list */
 	/* Allocate and clear */
@@ -65,8 +63,6 @@ model_t* MODEL_setup(const u8* model_bmb) {
 		printf("Error: Display list not big enough [%u]\n", dispSize);
 		return NULL;
 	}
-
-	//printf("modelListSize is %u\n", modelListSize);
 
 	/* Return model info */
 	model_t* model = malloc(sizeof(model_t));

@@ -82,7 +82,7 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 		if (t > EPSILON) { /* Got a ray intersection! */
 			if (t < sdist || hit == 0) {
 				sdist = t;
-				normal = &normals[indices[0]]; // TODO Interpolate 3 normals to get the positional one?
+				normal = &normals[indices[0]]; //TODO Interpolate 3 normals to get the positional one?
 				hit = TRUE;
 			}
 		}
