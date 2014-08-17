@@ -45,16 +45,8 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 
 	f32 cosOmega;
 	QUAT_dotProduct(q0, q1, &cosOmega);
-	guQuaternion q0c, q1c;
-	q0c.x = q0->x;
-	q0c.y = q0->y;
-	q0c.z = q0->z;
-	q0c.w = q0->w;
-
-	q1c.x = q1->x;
-	q1c.y = q1->y;
-	q1c.z = q1->z;
-	q1c.w = q1->w;
+	guQuaternion q0c = *q0, 
+				 q1c = *q1;
 	
 	if (cosOmega < 0.0f) {
 		f32 invert = -1.f;
