@@ -104,6 +104,12 @@ void SCENE_render() {
 }
 
 void SCENE_renderPlayer(Mtx viewMtx) {
+	/* Set default blend mode*/
+	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+
+	/* Enable Zbuf */
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+
 	/* Enable Light */
 	GXU_setLight(viewMtx, lightColor);
 
@@ -123,9 +129,12 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	}
 
 	/* Draw ray */
+	/* Disable Zbuf */
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	/* Lighting off*/
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+	/* Special blend mode */
+	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 	OBJECT_render(planeRay, viewMtx);
-
 }

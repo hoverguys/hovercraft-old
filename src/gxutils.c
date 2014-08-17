@@ -67,27 +67,21 @@ void GXU_init() {
 	GX_CopyDisp(xfb[fbi], GX_TRUE);
 	GX_SetDispCopyGamma(GX_GM_1_0);
 
-	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-
 	/* Clear texture cache */
 	GX_InvalidateTexAll();
 
 	/* Open TPL file from memory (statically linked in) */
-	setupTexture();
 	TPL_OpenTPLFromMemory(&TPLfile, (void *) textures_tpl, textures_tpl_size);
+
+	GX_SetNumTexGens(1);
+	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
 	first_frame = TRUE;
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
 	TPL_GetTexture(&TPLfile, texId, texObj);
-}
-
-/* ZERO PLS LOOKATTHIS */
-void setupTexture() {
-	GX_SetNumTexGens(1);
-	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
 
 void GXU_done() {
