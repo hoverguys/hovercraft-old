@@ -2,3 +2,4 @@
 <filepath="terrain.png" id="terrainTex" colfmt=14 />
 <filepath="water.png" id="waterTex" colfmt=14 />
 <filepath="ray.png" id="rayTex" colfmt=6 />
+<filepath="ring.png" id="ringTex" colfmt=6 />

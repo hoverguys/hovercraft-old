@@ -7,6 +7,7 @@
 #include "plane_bmb.h"
 #include "terrain_bmb.h"
 #include "ray_bmb.h"
+#include "ring_bmb.h"
 #include "textures.h"
 
 #include "model.h"
@@ -16,11 +17,11 @@
 #include "input.h"
 
 /* Model info */
-model_t *modelHover, *modelTerrain, *modelPlane, *modelRay;
-object_t *objectTerrain, *objectPlane, *planeRay;
+model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing;
+object_t *objectTerrain, *objectPlane, *planeRay, *firstRing, *secondRing;
 
 /* Texture vars */
-GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj;
+GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
@@ -39,16 +40,19 @@ void SCENE_load() {
 	GXU_loadTexture(terrainTex, &terrainTexObj);
 	GXU_loadTexture(waterTex, &waterTexObj);
 	GXU_loadTexture(rayTex, &rayTexObj);
+	GXU_loadTexture(ringTex, &ringTexObj);
 
 	modelHover = MODEL_setup(hovercraft_bmb);
 	modelTerrain = MODEL_setup(terrain_bmb);
 	modelPlane = MODEL_setup(plane_bmb);
 	modelRay = MODEL_setup(ray_bmb);
+	modelRing = MODEL_setup(ring_bmb);
 
 	MODEL_setTexture(modelHover, &hoverTexObj);
 	MODEL_setTexture(modelTerrain, &terrainTexObj);
 	MODEL_setTexture(modelPlane, &waterTexObj);
 	MODEL_setTexture(modelRay, &rayTexObj);
+	MODEL_setTexture(modelRing, &ringTexObj);
 
 	objectTerrain = OBJECT_create(modelTerrain);
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
@@ -58,7 +62,15 @@ void SCENE_load() {
 	OBJECT_moveTo(objectPlane, -500, 6.1f, -500);
 
 	planeRay = OBJECT_create(modelRay);
+	OBJECT_moveTo(planeRay, 0, 6.1f, 0);
 	OBJECT_scaleTo(planeRay, 1.5f, 4, 1.5f);
+
+	firstRing = OBJECT_create(modelRing);
+	secondRing = OBJECT_create(modelRing);
+	OBJECT_moveTo(firstRing, 0, 6.1f, 0);
+	OBJECT_moveTo(secondRing, 0, 6.1f, 0);
+	OBJECT_scaleTo(firstRing, 1.4f, 1, 1.4f);
+	OBJECT_scaleTo(secondRing, 1.7f, 0.7f, 1.7f);
 
 	GAME_init(objectTerrain, objectPlane);
 
@@ -136,4 +148,8 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	/* Special blend mode */
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 	OBJECT_render(planeRay, viewMtx);
+	OBJECT_rotate(firstRing, 0, 0.3f/60.f, 0);
+	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
+	OBJECT_render(firstRing, viewMtx);
+	OBJECT_render(secondRing, viewMtx);
 }

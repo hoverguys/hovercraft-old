@@ -108,6 +108,9 @@
     <Object Include="models\ray.obj">
       <Filter>Resource Files\models</Filter>
     </Object>
+    <Object Include="models\ring.obj">
+      <Filter>Resource Files\models</Filter>
+    </Object>
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\hovercraft.png">
@@ -120,6 +123,9 @@
       <Filter>Resource Files\textures</Filter>
     </Image>
     <Image Include="textures\ray.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\ring.png">
       <Filter>Resource Files\textures</Filter>
     </Image>
   </ItemGroup>
