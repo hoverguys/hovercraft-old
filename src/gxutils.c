@@ -73,6 +73,7 @@ void GXU_init() {
 	GX_InvalidateTexAll();
 
 	/* Open TPL file from memory (statically linked in) */
+	setupTexture();
 	TPL_OpenTPLFromMemory(&TPLfile, (void *) textures_tpl, textures_tpl_size);
 
 	first_frame = TRUE;

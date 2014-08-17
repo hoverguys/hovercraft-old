@@ -40,4 +40,6 @@ void GXU_done();
  */
 void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer);
 
+void setupTexture();
+
 #endif
