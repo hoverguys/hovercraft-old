@@ -57,6 +57,7 @@ void GAME_updatePlayer(u8 playerId) {
 	guVector *velocity = &player->velocity;
 	guVector *position = &player->hovercraft->transform.position;
 	guVector *right = &player->hovercraft->transform.right;
+	guVector *playerForward = &player->hovercraft->transform.forward;
 	guVector forward, worldUp = {0,1,0};
 
 	/* Get input */
@@ -73,8 +74,8 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecNormalize(&forward);
 
 	/* Calculate physics */
-	guVecScale(&forward, &acceleration, accel);
-	guVecScale(&forward, &deacceleration, -decel);
+	guVecScale(playerForward, &acceleration, accel);
+	guVecScale(playerForward, &deacceleration, -decel);
 
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
