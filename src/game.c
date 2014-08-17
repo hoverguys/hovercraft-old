@@ -171,9 +171,20 @@ void GAME_renderPlayerView(u8 playerId) {
 	camera_t* camera = &player->camera;
 
 	/* Settings */
-	const float cameraHeight = 2.5;
-	const float cameraDistance = -5.f;
-	const float t = 1.f / 10.f;
+	const float targetHeight = 1.6f;
+	const float cameraHeight = 2.0f;
+	const float cameraMinHeight = 0.1f;
+	const float cameraDistance = -5.0f;
+	const float t = 1.f / 5.f;
+	guVector up = { 0, 1, 0 };
+
+	/* Calculate forward vector*/
+	/*
+	guVector forward, right, up = { 0, 1, 0 };
+	guVecCross(&target.forward, &up, &right);
+	guVecCross(&up, &right, &forward);
+	guVecNormalize(&forward);
+	*/
 
 	/* Calculate camera position */
 	guVector posTemp, targetCameraPos = { 0, cameraHeight, 0 };
@@ -181,8 +192,13 @@ void GAME_renderPlayerView(u8 playerId) {
 	guVecAdd(&targetCameraPos, &posTemp, &targetCameraPos);
 	guVecAdd(&target.position, &targetCameraPos, &targetCameraPos);
 
+	/* Calculate camera target */
+	guVector targetPos;
+	guVecScale(&target.up, &targetPos, targetHeight);
+	guVecAdd(&targetPos, &target.position, &targetPos);
+
 	/* Lerp between old camera position and target */
-	guVector camPos, up = { 0, 1, 0 };
+	guVector camPos;
 	guVecSub(&targetCameraPos, &camera->position, &camPos);
 	guVecScale(&camPos, &camPos, t);
 	guVecAdd(&camera->position, &camPos, &camPos);
@@ -195,15 +211,20 @@ void GAME_renderPlayerView(u8 playerId) {
 	guVector normalhit;
 	f32 dist = 0;
 	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
-		if (dist < (rayoffset + cameraHeight)) {
+		if (dist < (rayoffset + cameraMinHeight)) {
 			/* the camera is lower then it should be, move up */
-			camPos.y += (rayoffset + cameraHeight) - dist;
+			camPos.y += (rayoffset + cameraMinHeight) - dist;
+		}
+	} else {
+		if (camPos.y < cameraMinHeight) {
+			camPos.y = cameraMinHeight;
 		}
 	}
 
+
 	/* Create camera matrix */
 	Mtx viewMtx;
-	guLookAt(viewMtx, &camPos, &up, &target.position);
+	guLookAt(viewMtx, &camPos, &up, &targetPos);
 
 	GX_LoadProjectionMtx(camera->perspectiveMtx, GX_PERSPECTIVE);
 	camera->position = camPos;
