@@ -108,14 +108,13 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 
 	/* Enable Zbuf */
-	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
 	/* Enable Light */
 	GXU_setLight(viewMtx, lightColor);
 
 	/* Draw terrain */
 	/* Lighting on*/
-	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 	OBJECT_render(objectTerrain, viewMtx);
@@ -133,7 +132,6 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	/* Disable Zbuf */
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	/* Lighting off*/
-	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 	/* Special blend mode */
