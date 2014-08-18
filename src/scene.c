@@ -25,9 +25,9 @@ GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
-		{ 0x4f, 0x4f, 0x4f, 0xff }, /* Light color   */
-		{ 0x0f, 0x0f, 0x0f, 0xff }, /* Ambient color */
-		{ 0xff, 0xff, 0xff, 0xff }  /* Mat color     */
+	{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
+	{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
+	{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
 };
 
 BOOL firstFrame = TRUE;
@@ -125,12 +125,9 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	GXU_setLight(viewMtx, lightColor);
 
 	/* Draw terrain */
-	/* Lighting on */
-	GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
-	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
 	OBJECT_render(objectTerrain, viewMtx);
-	OBJECT_render(objectPlane, viewMtx);
 
+	/* Draw players */
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		player_t* player = GAME_getPlayerData(i);
@@ -139,17 +136,22 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 		}
 	}
 
+
 	/* Draw ray */
-	/* Disable Zbuf */
-	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	/* Lighting off */
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+
+	/* Draw water */
+	OBJECT_render(objectPlane, viewMtx);
+
 	/* Special blend mode */
+	/* Disable Zbuf */
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 	OBJECT_render(planeRay, viewMtx);
-	OBJECT_rotate(firstRing, 0, 0.3f/60.f, 0);
-	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
+	OBJECT_rotate(firstRing, 0, 0.3f/30.f, 0);
+	OBJECT_rotate(secondRing, 0, -0.2f / 30.f, 0);
 	OBJECT_render(firstRing, viewMtx);
 	OBJECT_render(secondRing, viewMtx);
 }

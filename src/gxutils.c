@@ -113,14 +113,15 @@ void GXU_setLight(Mtx view, GXColor lightColor[]) {
 
 	GX_InitSpecularDirv(&lobj, &lpos);
 	GX_InitLightColor(&lobj, lightColor[0]);
+	GX_InitLightShininess(&lobj, 12.0f);
 	GX_LoadLightObj(&lobj, GX_LIGHT0);
 
 	/* Set number of rasterized color channels */
 	GX_SetNumChans(1);
-	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+	GX_SetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_SPEC);
 	GX_SetChanAmbColor(GX_COLOR0A0, lightColor[1]);
 	GX_SetChanMatColor(GX_COLOR0A0, lightColor[2]);
-	GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
+	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 }
 
 GXRModeObj* GXU_getMode() {
