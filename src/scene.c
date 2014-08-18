@@ -102,8 +102,8 @@ void SCENE_render() {
 	GAME_updateWorld();
 
 	/* Animate scene models */
-	OBJECT_rotateTo(firstRing, 0, 0.3f / 60.f, 0);
-	OBJECT_rotateTo(secondRing, 0, -0.2f / 60.f, 0);
+	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
+	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
 
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
