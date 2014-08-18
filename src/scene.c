@@ -101,6 +101,10 @@ void SCENE_render() {
 
 	GAME_updateWorld();
 
+	/* Animate scene models */
+	OBJECT_rotateTo(firstRing, 0, 0.3f / 60.f, 0);
+	OBJECT_rotateTo(secondRing, 0, -0.2f / 60.f, 0);
+
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		player_t* player = GAME_getPlayerData(i);
@@ -148,8 +152,6 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	/* Special blend mode */
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 	OBJECT_render(planeRay, viewMtx);
-	OBJECT_rotate(firstRing, 0, 0.3f/60.f, 0);
-	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
 	OBJECT_render(firstRing, viewMtx);
 	OBJECT_render(secondRing, viewMtx);
 }
