@@ -65,19 +65,18 @@ guVector worldRight = { 1, 0, 0 };
 inline void _MakeMatrix(object_t* object) {
 	/* Reset matrix to identity */
 	transform_t* t = &object->transform;
-	MtxP matrix = t->matrix;
-	guMtxIdentity(matrix);
+	guMtxIdentity(t->matrix);
 
 	/* Rotate, Scale, Translate */
 	guQuatNormalize(&t->rotation, &t->rotation);
-	c_guMtxQuat(matrix, &t->rotation);
-	guMtxScaleApply(matrix, matrix, t->scale.x, t->scale.y, t->scale.z);
-	guMtxTransApply(matrix, matrix, t->position.x, t->position.y, t->position.z);
+	c_guMtxQuat(t->matrix, &t->rotation);
+	guMtxScaleApply(t->matrix, t->matrix, t->scale.x, t->scale.y, t->scale.z);
+	guMtxTransApply(t->matrix, t->matrix, t->position.x, t->position.y, t->position.z);
 
 	/* Calculate forward/up/left vectors */
-	guVecMultiplySR(matrix, &worldUp, &t->up);
-	guVecMultiplySR(matrix, &worldForward, &t->forward);
-	guVecMultiplySR(matrix, &worldRight, &t->right);
+	guVecMultiplySR(t->matrix, &worldUp, &t->up);
+	guVecMultiplySR(t->matrix, &worldForward, &t->forward);
+	guVecMultiplySR(t->matrix, &worldRight, &t->right);
 
 	guVecNormalize(&t->up);
 	guVecNormalize(&t->forward);

@@ -44,9 +44,9 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-	GX_SetArray(GX_VA_POS, (void*)positions, 3 * sizeof(GX_F32));
-	GX_SetArray(GX_VA_NRM, (void*)normals, 3 * sizeof(GX_F32));
-	GX_SetArray(GX_VA_TEX0, (void*)texcoords, 2 * sizeof(GX_F32));
+	GX_SetArray(GX_VA_POS, (void*)positions, 3 * sizeof(f32));
+	GX_SetArray(GX_VA_NRM, (void*)normals, 3 * sizeof(f32));
+	GX_SetArray(GX_VA_TEX0, (void*)texcoords, 2 * sizeof(f32));
 
 	/* Fill the list with indices */
 	GX_Begin(GX_TRIANGLES, GX_VTXFMT0, indicesCount);
