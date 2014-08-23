@@ -57,8 +57,22 @@ inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id);
  */
 void INPUT_getExpansion(controller_t* controller);
 
+/*! \brief Get steering value from controller 
+ *  \param controller Controller to get data from
+ *  \return from -1 to 1, how much to steer in which direction
+ */
 f32 INPUT_steering(controller_t* controller);
+
+/*! \brief Get acceleration value from controller
+*  \param controller Controller to get data from
+*  \return from 0 to 1, how much to accelerate
+*/
 f32 INPUT_acceleration(controller_t* controller);
+
+/*! \brief Get jump button status
+*  \param controller Controller to get data from
+*  \return TRUE if the player is pressing the JUMP button, FALSE otherwise
+*/
 BOOL INPUT_jump(controller_t* controller);
 
 
