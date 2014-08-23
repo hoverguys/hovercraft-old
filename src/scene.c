@@ -82,7 +82,8 @@ void SCENE_load() {
 		if (INPUT_isConnected(i) == TRUE) {
 			split++;
 			guVector position = { rand() % 200, 30.f, rand() % 200 };
-			GAME_createPlayer(i, modelHover, position);
+			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i };
+			GAME_createPlayer(controller, modelHover, position);
 		}
 	}
 
@@ -110,8 +111,8 @@ void SCENE_render() {
 	playerArray_t players = GAME_getPlayersData();
 	for (i = 0; i < players.playerCount; i++) {
 		if (players.players[i].isPlaying == TRUE) {
-			GAME_updatePlayer(i);
-			GAME_renderPlayerView(i);
+			GAME_updatePlayer(&players.players[i]);
+			GAME_renderPlayerView(&players.players[i]);
 		}
 	}
 

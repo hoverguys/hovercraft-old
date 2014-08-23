@@ -22,19 +22,19 @@ void GAME_init(object_t* terrain, object_t* plane) {
 	mapPlane = plane;
 }
 
-void GAME_createPlayer(u8 playerId, model_t* hovercraftModel, guVector startPosition) {
+void GAME_createPlayer(controller_t controllerInfo, model_t* hovercraftModel, guVector startPosition) {
 	/* Create player hovercraft object and position it */
-	player_t* player = &GAME_getPlayersData().players[playerId];
+	player_t* player = &GAME_getPlayersData().players[playerCount];
 	player->hovercraft = OBJECT_create(hovercraftModel);
 	OBJECT_moveTo(player->hovercraft, startPosition.x, startPosition.y, startPosition.z);
 	OBJECT_flush(player->hovercraft);
 
 	player->isPlaying = TRUE;
+	player->controller = controllerInfo;
 	playerCount++;
 }
 
-void GAME_removePlayer(u8 playerId) {
-	player_t* player = &GAME_getPlayersData().players[playerId];
+void GAME_removePlayer(player_t* player) {
 	OBJECT_destroy(player->hovercraft);
 	playerCount--;
 }
@@ -43,9 +43,7 @@ void GAME_updateWorld() {
 	//todo Checkpoint logic here
 }
 
-void GAME_updatePlayer(u8 playerId) {
-	player_t* player = &GAME_getPlayersData().players[playerId];
-
+void GAME_updatePlayer(player_t* player) {
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
@@ -56,9 +54,9 @@ void GAME_updatePlayer(u8 playerId) {
 	guVector forward, worldUp = {0,1,0};
 
 	/* Get input */
-	f32 rot = INPUT_AnalogX(playerId) * .033f;
-	f32 accel = INPUT_TriggerR(playerId) * .02f;
-	f32 decel = INPUT_TriggerL(playerId) * .033f;
+	f32 rot = INPUT_AnalogX(player->controller.slot) * .033f;
+	f32 accel = INPUT_TriggerR(player->controller.slot) * .02f;
+	f32 decel = INPUT_TriggerL(player->controller.slot) * .033f;
 
 	/* Apply rotation */
 	OBJECT_rotateAxis(player->hovercraft, &worldUp, rot);
@@ -77,13 +75,14 @@ void GAME_updatePlayer(u8 playerId) {
 	guVecAdd(velocity, &acceleration, velocity);
 	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
-	if (player->isGrounded && INPUT_getButton(playerId, INPUT_BTN_JUMP) == TRUE) {
+	if (player->isGrounded && INPUT_getButton(player->controller.slot, INPUT_BTN_JUMP) == TRUE) {
 		guVecAdd(velocity, &jump, velocity);
 	}
 
 	/* Calculate collisions */
 	u8 otherPlayerId;
-	for (otherPlayerId = playerId + 1; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
+	//todo CHANGE THIS OMG SO HACKY
+	for (otherPlayerId = player->controller.slot; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
 		player_t* target = &GAME_getPlayersData().players[otherPlayerId];
 		if (target->isPlaying != TRUE) continue;
 
@@ -159,9 +158,8 @@ void GAME_updatePlayer(u8 playerId) {
 	OBJECT_flush(player->hovercraft);
 }
 
-void GAME_renderPlayerView(u8 playerId) {
+void GAME_renderPlayerView(player_t* player) {
 	/* Setup camera view and perspective */
-	player_t* player = &GAME_getPlayersData().players[playerId];
 	transform_t target = player->hovercraft->transform;
 	camera_t* camera = &player->camera;
 
