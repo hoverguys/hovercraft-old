@@ -7,11 +7,11 @@
 
 #include <gctypes.h>
 
-#ifdef USE_WIIMOTE
+#ifdef WII
 #include <wiiuse/wpad.h>
-#else
-#include <ogc/pad.h>
 #endif
+
+#include <ogc/pad.h>
 
 #define INPUT_DEADZONE 10
 #define INPUT_STICK_THRESHOLD 70
@@ -20,10 +20,20 @@
 #define INPUT_TRIGGER_MULTIPLIER 0.004  // 1/250
 
 #ifdef USE_WIIMOTE
-#define INPUT_BTN_JUMP WPAD_BUTTON_B
+#define INPUT_BTN_JUMP WPAD_BUTTON_A
 #else
 #define INPUT_BTN_JUMP PAD_BUTTON_X
 #endif
+
+typedef enum {
+	INPUT_CONTROLLER_GAMECUBE = 0,
+	INPUT_CONTROLLER_WIIMOTE = 1
+} Input_ControllerType;
+
+typedef struct {
+	Input_ControllerType type;
+	u8                   slot;
+} controller_t;
 
 /*! \brief Initialize input
  */
@@ -41,7 +51,7 @@ inline BOOL INPUT_isConnected(const u8 id);
 
 /*! \brief Get Analog stick's X axis value
  *  \param id Gamepad slot
- *  \return Current analog value, normalized from -1 to 1 
+ *  \return Current analog value, normalized from -1 to 1
  */
 f32 INPUT_AnalogX(const u8 id);
 
@@ -75,7 +85,7 @@ f32 INPUT_TriggerL(const u8 id);
  */
 f32 INPUT_TriggerR(const u8 id);
 
-/*! \brief Get button status 
+/*! \brief Get button status
  *  \param padId    Gamepad slot
  *  \param buttonId Button id
  *  \return TRUE if the button has been pressed, FALSE otherwise

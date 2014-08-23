@@ -7,18 +7,25 @@
 #include <ogc/gu.h>
 #include "object.h"
 #include "scene.h"
+#include "input.h"
 
 /*! Maximum number of players */
 #define MAX_PLAYERS 4
 
 /*! Player structure*/
 typedef struct {
-	BOOL		isPlaying;	/*< Is the player active/playing? */
-	BOOL		isGrounded; /*< Is is on the ground?          */
-	object_t*	hovercraft; /*< Hovercraft object             */
-	guVector	velocity;	/*< Current velocity              */
-	camera_t	camera;		/*< Player's camera               */
+	BOOL			isPlaying;  /*< Is the player... playing?     */
+	BOOL			isGrounded; /*< Is is on the ground?          */
+	object_t*		hovercraft; /*< Hovercraft object             */
+	guVector		velocity;	/*< Current velocity              */
+	camera_t		camera;		/*< Player's camera               */
+	controller_t	controller; /*< Player's controller data      */
 } player_t;
+
+typedef struct {
+	player_t* players;		/*< Player data       */
+	u8        playerCount;	/*< Number of players */
+} playerArray_t;
 
 /*! \brief Initialize In-game data
  *  \param terrain Game terrain
@@ -56,6 +63,6 @@ void GAME_renderPlayerView(u8 playerId);
  *  \param playerId Player Id
  *  \return Pointer to requested player_t struct
  */
-player_t* GAME_getPlayerData(u8 playerId);
+playerArray_t GAME_getPlayersData();
 
 #endif

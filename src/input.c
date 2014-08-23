@@ -1,30 +1,33 @@
 #include "input.h"
 #include <ogc/video.h>
 #include <math.h>
+#include <stdlib.h>
 
-u32 _Connected;
+u32 _GCConnected, _WIIStatus;
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
+void OnResetCalled();
 
 void INPUT_update() {
-#ifdef USE_WIIMOTE
-	WPAD_ScanPads();
-	//todo Wiimote detection
-#else
-	_Connected = PAD_ScanPads();
+#ifdef WII
+	_WIIStatus = WPAD_ScanPads();
 #endif
+	_GCConnected = PAD_ScanPads();
 }
 
 void INPUT_init() {
-#ifdef USE_WIIMOTE
+#ifdef WII
 	WPAD_Init();
-#else
-	PAD_Init();
 #endif
+	PAD_Init();
+
+	/* Setup reset function */
+	SYS_SetResetCallback(OnResetCalled);
 }
+
 
 inline BOOL INPUT_isConnected(const u8 id) {
 	const u8 padId = 1 << id;
-	return (_Connected & padId) == padId;
+	return (_GCConnected & padId) == padId;
 }
 
 f32 INPUT_AnalogX(const u8 id) {
@@ -72,7 +75,7 @@ BOOL INPUT_getButton(const u8 padId, const u16 buttonId) {
 }
 
 void INPUT_waitForControllers() {
-	while (_Connected == 0) {
+	while (_GCConnected == 0) {
 		INPUT_update();
 		VIDEO_WaitVSync();
 	}
@@ -81,4 +84,8 @@ void INPUT_waitForControllers() {
 
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal) {
 	return value < minVal ? minVal : value > maxVal ? maxVal : value;
+}
+
+void OnResetCalled() {
+	exit(0);
 }

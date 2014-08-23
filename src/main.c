@@ -17,7 +17,6 @@ int main(int argc, char **argv) {
 	AU_playMusic(menumusic_mod);
 
 	while (1) {
-		if (SYS_ResetButtonDown()) return 0;
 		INPUT_update();
 		SCENE_render();
 	}
