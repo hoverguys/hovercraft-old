@@ -1,24 +1,22 @@
 #include "input.h"
 #include <ogc/video.h>
 #include <math.h>
+#include <stdio.h>
 
 u32 _GCConnected, _Wiimotes;
-#ifdef WII
-WPADData* _WiimoteData[4];
-#endif
 
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
 
 void INPUT_update() {
 #ifdef WII
+	/* Read and process incoming wiimote data */
 	WPAD_ScanPads();
-	/* Probe each wiimote to see if it changed status*/
+	/* Probe each wiimote to see if it changed status */
 	u8 i;
 	_Wiimotes = 0;
 	for (i = 0; i < 4; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i)) {
 			_Wiimotes |= 1 << i;
-			_WiimoteData[i] = WPAD_Data(i);
 		}
 	}
 #endif
@@ -63,6 +61,9 @@ void INPUT_getExpansion(controller_t* controller) {
 
 f32 INPUT_steering(controller_t* controller) {
 	f32 raw;
+#ifdef WII
+	orient_t orientation;
+#endif
 	switch (controller->type) {
 	case INPUT_CONTROLLER_GAMECUBE:
 		raw = PAD_StickX(controller->slot);
@@ -70,7 +71,9 @@ f32 INPUT_steering(controller_t* controller) {
 		return _CLAMP(raw, -INPUT_GC_STICK_THRESHOLD, INPUT_GC_STICK_THRESHOLD) * INPUT_GC_STICK_MULTIPLIER;
 #ifdef WII
 	case INPUT_CONTROLLER_WIIMOTE:
-		return 0;
+		WPAD_Orientation(controller->slot, &orientation);
+		printf("P %f Y %f R %f\r\n", orientation.pitch, orientation.yaw, orientation.roll);
+		return orientation.yaw;
 #endif
 	default:
 		return 0;
@@ -115,7 +118,6 @@ BOOL INPUT_jump(controller_t* controller) {
 		return PAD_ButtonsDown(controller->slot) & INPUT_GC_BTN_JUMP ? TRUE : FALSE;
 #ifdef WII
 	case INPUT_CONTROLLER_WIIMOTE:
-
 		return WPAD_ButtonsDown(controller->slot) & INPUT_WII_BTN_JUMP ? TRUE : FALSE;
 #endif
 	default:
