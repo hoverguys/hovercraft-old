@@ -25,9 +25,9 @@ GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
-	{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
-	{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
-	{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
+		{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
+		{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
+		{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
 };
 
 BOOL firstFrame = TRUE;
@@ -77,21 +77,32 @@ void SCENE_load() {
 	/* Wait for controllers */
 	INPUT_waitForControllers();
 
-	u8 i, split = 0;
+	/* Check for Gamecube pads */
+	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
-		if (INPUT_isConnected(i) == TRUE) {
-			split++;
+		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
 			guVector position = { rand() % 200, 30.f, rand() % 200 };
-			GAME_createPlayer(i, modelHover, position);
+			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i, 0 };
+			GAME_createPlayer(controller, modelHover, position);
 		}
 	}
 
-	/* We went through all players, so we know how to split the screen */
-	u8 splitCur = 0;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		if (INPUT_isConnected(i) == TRUE) {
-			GXU_setupCamera(&GAME_getPlayerData(i)->camera, split, ++splitCur);
+#ifdef WII
+	/* Check for Wiimotes */
+	for (i = WPAD_CHAN_0; i < WPAD_MAX_WIIMOTES; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
+			guVector position = { rand() % 200, 30.f, rand() % 200 };
+			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i, 0 };
+			INPUT_getExpansion(&controller);
+			GAME_createPlayer(controller, modelHover, position);
 		}
+	}
+#endif
+
+	/* We went through all players, so we know how to split the screen */
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		GXU_setupCamera(&players.players[i].camera, players.playerCount, i+1);
 	}
 }
 
@@ -99,20 +110,20 @@ void SCENE_render() {
 	/* Render time */
 	GX_SetNumChans(1);
 
-	GAME_updateWorld();
-
 	/* Animate scene models */
 	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
 	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
 
 	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE) {
-			GAME_updatePlayer(i);
-			GAME_renderPlayerView(i);
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		if (players.players[i].isPlaying == TRUE) {
+			GAME_updatePlayer(&players.players[i]);
+			GAME_renderPlayerView(&players.players[i]);
 		}
 	}
+
+	GAME_updateWorld();
 
 	/* Flip framebuffer */
 	GXU_done();
@@ -133,10 +144,10 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 
 	/* Draw players */
 	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE) {
-			OBJECT_render(player->hovercraft, viewMtx);
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		if (players.players[i].isPlaying == TRUE) {
+			OBJECT_render(players.players[i].hovercraft, viewMtx);
 		}
 	}
 

@@ -2,77 +2,124 @@
 #include <ogc/video.h>
 #include <math.h>
 
-u32 _Connected;
+u32 _GCConnected, _Wiimotes;
+
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
 
 void INPUT_update() {
-#ifdef USE_WIIMOTE
+#ifdef WII
+	/* Read and process incoming wiimote data */
 	WPAD_ScanPads();
-	//todo Wiimote detection
-#else
-	_Connected = PAD_ScanPads();
+	/* Probe each wiimote to see if it changed status */
+	u8 i;
+	_Wiimotes = 0;
+	for (i = 0; i < 4; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i)) {
+			_Wiimotes |= 1 << i;
+		}
+	}
 #endif
+	_GCConnected = PAD_ScanPads();
 }
 
 void INPUT_init() {
-#ifdef USE_WIIMOTE
+#ifdef WII
 	WPAD_Init();
-#else
+	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC);
+#endif
 	PAD_Init();
+}
+
+
+inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id) {
+	u8 err, padId;
+	switch (type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		padId = 1 << id;
+		return (_GCConnected & padId) == padId ? TRUE : FALSE;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		err = WPAD_Probe(id, NULL);
+		return err == WPAD_ERR_NONE ? TRUE : FALSE;
 #endif
+	default:
+		return FALSE;
+	}
 }
 
-inline BOOL INPUT_isConnected(const u8 id) {
-	const u8 padId = 1 << id;
-	return (_Connected & padId) == padId;
-}
-
-f32 INPUT_AnalogX(const u8 id) {
-	const f32 raw = PAD_StickX(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_AnalogY(const u8 id) {
-	const f32 raw = PAD_StickY(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_CStickX(const u8 id) {
-	const f32 raw = PAD_SubStickX(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_CStickY(const u8 id) {
-	const f32 raw = PAD_SubStickY(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_TriggerL(const u8 id) {
-	const f32 raw = PAD_TriggerL(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, 0, INPUT_TRIGGER_THRESHOLD) * INPUT_TRIGGER_MULTIPLIER;
-}
-
-f32 INPUT_TriggerR(const u8 id) {
-	const f32 raw = PAD_TriggerR(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, 0, INPUT_TRIGGER_THRESHOLD) * INPUT_TRIGGER_MULTIPLIER;
-}
-
-BOOL INPUT_getButton(const u8 padId, const u16 buttonId) {
-#ifdef USE_WIIMOTE
-	return WPAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
-#else
-	return PAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
+void INPUT_getExpansion(controller_t* controller) {
+	switch (controller->type) {
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		WPAD_Probe(controller->slot, &controller->expansion);
+		return;
 #endif
+	default:
+		return;
+	}
+}
+
+f32 INPUT_steering(controller_t* controller) {
+	f32 raw;
+#ifdef WII
+	orient_t orientation;
+#endif
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		raw = PAD_StickX(controller->slot);
+		if (fabs(raw) < INPUT_GC_DEADZONE) return 0;
+		return _CLAMP(raw, -INPUT_GC_STICK_THRESHOLD, INPUT_GC_STICK_THRESHOLD) * INPUT_GC_STICK_MULTIPLIER;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		WPAD_Orientation(controller->slot, &orientation);
+		return _CLAMP(-orientation.pitch / 20.f, -1, 1);
+#endif
+	default:
+		return 0;
+	}
+}
+
+f32 INPUT_acceleration(controller_t* controller) {
+	f32 raw;
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		raw = PAD_TriggerR(controller->slot);
+		if (fabs(raw) < INPUT_GC_DEADZONE) return 0;
+		return _CLAMP(raw, 0, INPUT_GC_TRIGGER_THRESHOLD) * INPUT_GC_TRIGGER_MULTIPLIER;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		return WPAD_ButtonsHeld(controller->slot) & WPAD_BUTTON_A ? 1 : 0;
+#endif
+	default:
+		return 0;
+	}
+}
+
+BOOL INPUT_jump(controller_t* controller) {
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		return PAD_ButtonsDown(controller->slot) & INPUT_GC_BTN_JUMP ? TRUE : FALSE;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		return WPAD_ButtonsDown(controller->slot) & INPUT_WII_BTN_JUMP ? TRUE : FALSE;
+#endif
+	default:
+		return 0;
+	}
 }
 
 void INPUT_waitForControllers() {
-	while (_Connected == 0) {
+#ifdef WII
+	/* Wait for the WPAD subsystem to have initialized */
+	s8 status = WPAD_GetStatus();
+	while (status != WPAD_STATE_ENABLED) {
+		status = WPAD_GetStatus();
+		VIDEO_WaitVSync();
+	}
+#endif
+
+	/* Wait for at least one controller to show up */
+	while (_GCConnected == 0 && _Wiimotes == 0) {
 		INPUT_update();
 		VIDEO_WaitVSync();
 	}
