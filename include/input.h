@@ -16,8 +16,8 @@
 #define INPUT_DEADZONE 10
 #define INPUT_STICK_THRESHOLD 70
 #define INPUT_TRIGGER_THRESHOLD 250
-#define INPUT_STICK_MULTIPLIER 0.0143 // 1/70
-#define INPUT_TRIGGER_MULTIPLIER 0.004  // 1/250
+#define INPUT_STICK_MULTIPLIER 0.0143 /* 1/70 */
+#define INPUT_TRIGGER_MULTIPLIER 0.004  /* 1/250 */
 
 #ifdef USE_WIIMOTE
 #define INPUT_BTN_JUMP WPAD_BUTTON_A
@@ -26,14 +26,15 @@
 #endif
 
 typedef enum {
-	INPUT_CONTROLLER_GAMECUBE = 0,
-	INPUT_CONTROLLER_WIIMOTE = 1
+	INPUT_CONTROLLER_GAMECUBE = 0,  /*< Gamecube controller */
+	INPUT_CONTROLLER_WIIMOTE = 1    /*< Wiimote controller  */
 } Input_ControllerType;
 
+/*! Controller structure */
 typedef struct {
-	Input_ControllerType type;
-	u8                   slot;
-	u32                  expansion;
+	Input_ControllerType type;      /*< Type of controller (Gamecube pad / Wiimote) */
+	u8                   slot;      /*< Slot/Channel id                             */
+	u32                  expansion; /*< Expansion, if any (Nunchuck etc)            */
 } controller_t;
 
 /*! \brief Initialize input

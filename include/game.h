@@ -14,12 +14,12 @@
 
 /*! Player structure*/
 typedef struct {
-	BOOL         isPlaying;  /*< Is the player... playing?     */
-	BOOL         isGrounded; /*< Is is on the ground?          */
-	object_t*    hovercraft; /*< Hovercraft object             */
-	guVector     velocity;   /*< Current velocity              */
-	camera_t     camera;     /*< Player's camera               */
-	controller_t controller; /*< Player's controller data      */
+	BOOL         isPlaying;  /*< Is the player... playing? */
+	BOOL         isGrounded; /*< Is it on the ground?      */
+	object_t*    hovercraft; /*< Hovercraft object         */
+	guVector     velocity;   /*< Current velocity          */
+	camera_t     camera;     /*< Player's camera           */
+	controller_t controller; /*< Player's controller data  */
 } player_t;
 
 typedef struct {
