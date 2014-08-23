@@ -62,7 +62,8 @@ void INPUT_getExpansion(controller_t* controller) {
 f32 INPUT_steering(controller_t* controller) {
 	f32 raw;
 #ifdef WII
-	orient_t orientation;
+	u32 wiibtn;
+	vec3w_t accel;
 #endif
 	switch (controller->type) {
 	case INPUT_CONTROLLER_GAMECUBE:
@@ -71,9 +72,12 @@ f32 INPUT_steering(controller_t* controller) {
 		return _CLAMP(raw, -INPUT_GC_STICK_THRESHOLD, INPUT_GC_STICK_THRESHOLD) * INPUT_GC_STICK_MULTIPLIER;
 #ifdef WII
 	case INPUT_CONTROLLER_WIIMOTE:
-		WPAD_Orientation(controller->slot, &orientation);
-		printf("P %f Y %f R %f\r\n", orientation.pitch, orientation.yaw, orientation.roll);
-		return orientation.yaw;
+		WPAD_Accel(controller->slot, &accel);
+		printf("X %u Y %u Z %u\r\n", accel.x, accel.y, accel.z);
+		wiibtn = WPAD_ButtonsHeld(controller->slot);
+		return wiibtn & WPAD_BUTTON_DOWN ? 1
+			: wiibtn & WPAD_BUTTON_UP ? -1
+			: 0;
 #endif
 	default:
 		return 0;
