@@ -101,8 +101,6 @@ void SCENE_render() {
 	/* Render time */
 	GX_SetNumChans(1);
 
-	GAME_updateWorld();
-
 	/* Animate scene models */
 	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
 	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
@@ -115,6 +113,8 @@ void SCENE_render() {
 			GAME_renderPlayerView(&players.players[i]);
 		}
 	}
+
+	GAME_updateWorld();
 
 	/* Flip framebuffer */
 	GXU_done();

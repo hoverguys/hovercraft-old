@@ -41,17 +41,36 @@ void GAME_removePlayer(player_t* player) {
 
 void GAME_updateWorld() {
 	//todo Checkpoint logic here
+
+	/* Calculate collisions
+	 * To optimize and avoid glitches, collisions are calculated on the world loop
+	 * to both minimize physics getting in the way and assure that calculations between
+	 * different players are only evaluated once per frame
+	 */
+
+	playerArray_t players = GAME_getPlayersData();
+	u8 playerId, otherPlayerId;
+	for (playerId = 0; playerId < players.playerCount; playerId++) {
+		player_t* actor = &players.players[playerId];
+
+		for (otherPlayerId = playerId + 1; otherPlayerId < players.playerCount; otherPlayerId++) {
+			player_t* target = &players.players[otherPlayerId];
+
+			/* Check for collision between current player and other */
+			CalculateBounce(actor, target);
+		}
+	}
 }
 
 void GAME_updatePlayer(player_t* player) {
 	/* Data */
-	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
+	guVector acceleration = { 0, 0, 0 }, deacceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
 	guVector *velocity = &player->velocity;
 	guVector *position = &player->hovercraft->transform.position;
 	guVector *right = &player->hovercraft->transform.right;
 	guVector *playerForward = &player->hovercraft->transform.forward;
-	guVector forward, worldUp = {0,1,0};
+	guVector forward, worldUp = { 0, 1, 0 };
 
 	/* Get input */
 	f32 rot = INPUT_AnalogX(player->controller.slot) * .033f;
@@ -79,22 +98,11 @@ void GAME_updatePlayer(player_t* player) {
 		guVecAdd(velocity, &jump, velocity);
 	}
 
-	/* Calculate collisions */
-	u8 otherPlayerId;
-	//todo CHANGE THIS OMG SO HACKY
-	for (otherPlayerId = player->controller.slot; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
-		player_t* target = &GAME_getPlayersData().players[otherPlayerId];
-		if (target->isPlaying != TRUE) continue;
-
-		/* Check for collision between current player and other */
-		CalculateBounce(player, target);
-	}
-
 	/* Limit speed */
 	/*if (guVecDotProduct(velocity, velocity) > (maxSpeed*maxSpeed)) {
 		guVecNormalize(velocity);
 		guVecScale(velocity, velocity, maxSpeed);
-	}*/
+		}*/
 
 	/* Move Player */
 	OBJECT_move(player->hovercraft, velocity->x, velocity->y, velocity->z);
@@ -230,5 +238,5 @@ void GAME_renderPlayerView(player_t* player) {
 }
 
 inline playerArray_t GAME_getPlayersData() {
-	return (playerArray_t){ players, playerCount };
+	return (playerArray_t) { players, playerCount };
 }
