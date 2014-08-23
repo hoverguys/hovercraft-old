@@ -12,8 +12,8 @@ void INPUT_update() {
 	WPAD_ScanPads();
 	/* Probe each wiimote to see if it changed status*/
 	u8 i;
+	_Wiimotes = 0;
 	for (i = 0; i < 4; i++) {
-		_Wiimotes = 0;
 		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i)) {
 			_Wiimotes |= 1 << i;
 		}
@@ -50,7 +50,6 @@ inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id) {
 }
 
 void INPUT_getExpansion(controller_t* controller) {
-	u8 exp;
 	switch (controller->type) {
 #ifdef WII
 	case INPUT_CONTROLLER_WIIMOTE:
@@ -116,7 +115,7 @@ void INPUT_waitForControllers() {
 	}
 #endif
 
-	/* Wait for at least one controller to show up*/
+	/* Wait for at least one controller to show up */
 	while (_GCConnected == 0 && _Wiimotes == 0) {
 		INPUT_update();
 		VIDEO_WaitVSync();
