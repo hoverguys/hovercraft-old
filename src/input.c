@@ -2,7 +2,6 @@
 #include <ogc/video.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 u32 _GCConnected, _Wiimotes;
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
@@ -47,6 +46,19 @@ inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id) {
 #endif
 	default:
 		return FALSE;
+	}
+}
+
+void INPUT_getExpansion(controller_t* controller) {
+	u8 exp;
+	switch (controller->type) {
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		WPAD_Probe(controller->slot, &controller->expansion);
+		return;
+#endif
+	default:
+		return;
 	}
 }
 

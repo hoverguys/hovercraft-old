@@ -33,7 +33,7 @@ typedef enum {
 typedef struct {
 	Input_ControllerType type;
 	u8                   slot;
-	u8                   expansion;
+	u32                  expansion;
 } controller_t;
 
 /*! \brief Initialize input
@@ -50,6 +50,11 @@ void INPUT_update();
  *  \return TRUE if connected, FALSE otherwise
  */
 inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id);
+
+/*! \brief Checks for a gamepad expansion
+ *  \param controller Controller to check expansion of
+ */
+void INPUT_getExpansion(controller_t* controller);
 
 /*! \brief Get Analog stick's X axis value
  *  \param id Gamepad slot
