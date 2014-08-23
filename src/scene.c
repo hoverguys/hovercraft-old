@@ -88,8 +88,8 @@ void SCENE_load() {
 	}
 
 #ifdef WII
-	/* Check for Gamecube pads */
-	for (i = 0; i < MAX_PLAYERS; i++) {
+	/* Check for Wiimotes */
+	for (i = WPAD_CHAN_0; i < WPAD_MAX_WIIMOTES; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
 			guVector position = { rand() % 200, 30.f, rand() % 200 };
 			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i, 0 };

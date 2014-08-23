@@ -13,17 +13,17 @@
 
 #include <ogc/pad.h>
 
-#define INPUT_DEADZONE 10
-#define INPUT_STICK_THRESHOLD 70
-#define INPUT_TRIGGER_THRESHOLD 250
-#define INPUT_STICK_MULTIPLIER 0.0143 /* 1/70 */
-#define INPUT_TRIGGER_MULTIPLIER 0.004  /* 1/250 */
+#define INPUT_GC_DEADZONE 10
+#define INPUT_GC_STICK_THRESHOLD 70
+#define INPUT_GC_TRIGGER_THRESHOLD 250
+#define INPUT_GC_STICK_MULTIPLIER 0.0143 /* 1/70 */
+#define INPUT_GC_TRIGGER_MULTIPLIER 0.004  /* 1/250 */
 
-#ifdef USE_WIIMOTE
-#define INPUT_BTN_JUMP WPAD_BUTTON_A
-#else
-#define INPUT_BTN_JUMP PAD_BUTTON_X
+#ifdef WII
+#define INPUT_WII_BTN_JUMP WPAD_BUTTON_2
 #endif
+#define INPUT_GC_BTN_JUMP PAD_BUTTON_X
+
 
 typedef enum {
 	INPUT_CONTROLLER_GAMECUBE = 0,  /*< Gamecube controller */
@@ -57,48 +57,11 @@ inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id);
  */
 void INPUT_getExpansion(controller_t* controller);
 
-/*! \brief Get Analog stick's X axis value
- *  \param id Gamepad slot
- *  \return Current analog value, normalized from -1 to 1
- */
-f32 INPUT_AnalogX(const u8 id);
+f32 INPUT_steering(controller_t* controller);
+f32 INPUT_acceleration(controller_t* controller);
+f32 INPUT_brakes(controller_t* controller);
+BOOL INPUT_jump(controller_t* controller);
 
-/*! \brief Get Analog stick's Y axis value
-*  \param id Gamepad slot
-*  \return Current analog value, normalized from -1 to 1
-*/
-f32 INPUT_AnalogY(const u8 id);
-
-/*! \brief Get C-stick's X axis value
-*  \param id Gamepad slot
-*  \return Current analog value, normalized from -1 to 1
-*/
-f32 INPUT_CStickX(const u8 id);
-
-/*! \brief Get C-stick's Y axis value
-*  \param id Gamepad slot
-*  \return Current analog value, normalized from -1 to 1
-*/
-f32 INPUT_CStickY(const u8 id);
-
-/*! \brief Get L trigger analog value
-*  \param id Gamepad slot
-*  \return Current analog value, normalized from -1 to 1
-*/
-f32 INPUT_TriggerL(const u8 id);
-
-/*! \brief Get R trigger analog value
- *  \param id Gamepad slot
- *  \return Current analog value, normalized from -1 to 1
- */
-f32 INPUT_TriggerR(const u8 id);
-
-/*! \brief Get button status
- *  \param padId    Gamepad slot
- *  \param buttonId Button id
- *  \return TRUE if the button has been pressed, FALSE otherwise
- */
-BOOL INPUT_getButton(const u8 padId, const u16 buttonId);
 
 /*! \brief Block until at least one controller is found
  */

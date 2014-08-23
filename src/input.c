@@ -3,6 +3,10 @@
 #include <math.h>
 
 u32 _GCConnected, _Wiimotes;
+#ifdef WII
+WPADData* _WiimoteData[4];
+#endif
+
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
 
 void INPUT_update() {
@@ -14,6 +18,7 @@ void INPUT_update() {
 	for (i = 0; i < 4; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i)) {
 			_Wiimotes |= 1 << i;
+			_WiimoteData[i] = WPAD_Data(i);
 		}
 	}
 #endif
@@ -56,49 +61,106 @@ void INPUT_getExpansion(controller_t* controller) {
 	}
 }
 
-f32 INPUT_AnalogX(const u8 id) {
-	const f32 raw = PAD_StickX(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_AnalogY(const u8 id) {
-	const f32 raw = PAD_StickY(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_CStickX(const u8 id) {
-	const f32 raw = PAD_SubStickX(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_CStickY(const u8 id) {
-	const f32 raw = PAD_SubStickY(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
-}
-
-f32 INPUT_TriggerL(const u8 id) {
-	const f32 raw = PAD_TriggerL(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, 0, INPUT_TRIGGER_THRESHOLD) * INPUT_TRIGGER_MULTIPLIER;
-}
-
-f32 INPUT_TriggerR(const u8 id) {
-	const f32 raw = PAD_TriggerR(id);
-	if (fabs(raw) < INPUT_DEADZONE) return 0;
-	return _CLAMP(raw, 0, INPUT_TRIGGER_THRESHOLD) * INPUT_TRIGGER_MULTIPLIER;
-}
-
-BOOL INPUT_getButton(const u8 padId, const u16 buttonId) {
-#ifdef USE_WIIMOTE
-	return WPAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
-#else
-	return PAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
+f32 INPUT_steering(controller_t* controller) {
+	f32 raw;
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		raw = PAD_StickX(controller->slot);
+		if (fabs(raw) < INPUT_GC_DEADZONE) return 0;
+		return _CLAMP(raw, -INPUT_GC_STICK_THRESHOLD, INPUT_GC_STICK_THRESHOLD) * INPUT_GC_STICK_MULTIPLIER;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		return 0;
 #endif
+	default:
+		return 0;
+	}
 }
+
+f32 INPUT_acceleration(controller_t* controller) {
+	f32 raw;
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		raw = PAD_TriggerR(controller->slot);
+		if (fabs(raw) < INPUT_GC_DEADZONE) return 0;
+		return _CLAMP(raw, 0, INPUT_GC_TRIGGER_THRESHOLD) * INPUT_GC_TRIGGER_MULTIPLIER;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		return WPAD_ButtonsHeld(controller->slot) & WPAD_BUTTON_RIGHT ? 1 : 0;
+#endif
+	default:
+		return 0;
+	}
+}
+
+f32 INPUT_brakes(controller_t* controller) {
+	f32 raw;
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		raw = PAD_TriggerL(controller->slot);
+		if (fabs(raw) < INPUT_GC_DEADZONE) return 0;
+		return _CLAMP(raw, 0, INPUT_GC_TRIGGER_THRESHOLD) * INPUT_GC_TRIGGER_MULTIPLIER;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+		return WPAD_ButtonsHeld(controller->slot) & WPAD_BUTTON_LEFT ? 1 : 0;
+#endif
+	default:
+		return 0;
+	}
+}
+
+BOOL INPUT_jump(controller_t* controller) {
+	switch (controller->type) {
+	case INPUT_CONTROLLER_GAMECUBE:
+		return PAD_ButtonsDown(controller->slot) & INPUT_GC_BTN_JUMP ? TRUE : FALSE;
+#ifdef WII
+	case INPUT_CONTROLLER_WIIMOTE:
+
+		return WPAD_ButtonsDown(controller->slot) & INPUT_WII_BTN_JUMP ? TRUE : FALSE;
+#endif
+	default:
+		return 0;
+	}
+}
+
+/*
+f32 _GC_AnalogY(const u8 id) {
+const f32 raw = PAD_StickY(id);
+if (fabs(raw) < INPUT_DEADZONE) return 0;
+return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
+}
+
+f32 _GC_CStickX(const u8 id) {
+const f32 raw = PAD_SubStickX(id);
+if (fabs(raw) < INPUT_DEADZONE) return 0;
+return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
+}
+
+f32 _GC_CStickY(const u8 id) {
+const f32 raw = PAD_SubStickY(id);
+if (fabs(raw) < INPUT_DEADZONE) return 0;
+return _CLAMP(raw, -INPUT_STICK_THRESHOLD, INPUT_STICK_THRESHOLD) * INPUT_STICK_MULTIPLIER;
+}
+
+f32 _GC_TriggerL(const u8 id) {
+const f32 raw = PAD_TriggerL(id);
+if (fabs(raw) < INPUT_DEADZONE) return 0;
+return _CLAMP(raw, 0, INPUT_TRIGGER_THRESHOLD) * INPUT_TRIGGER_MULTIPLIER;
+}
+
+f32 _GC_TriggerR(const u8 id) {
+const f32 raw = PAD_TriggerR(id);
+if (fabs(raw) < INPUT_DEADZONE) return 0;
+return _CLAMP(raw, 0, INPUT_TRIGGER_THRESHOLD) * INPUT_TRIGGER_MULTIPLIER;
+}
+
+BOOL _GC_getButton(const u8 padId, const u16 buttonId) {
+#ifdef USE_WIIMOTE
+return WPAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
+#else
+return PAD_ButtonsDown(padId) & buttonId ? TRUE : FALSE;
+#endif
+}*/
 
 void INPUT_waitForControllers() {
 #ifdef WII

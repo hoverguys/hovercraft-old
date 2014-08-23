@@ -76,9 +76,9 @@ void GAME_updatePlayer(player_t* player) {
 	guVector forward, worldUp = { 0, 1, 0 };
 
 	/* Get input */
-	f32 rot = INPUT_AnalogX(player->controller.slot) * .033f;
-	f32 accel = INPUT_TriggerR(player->controller.slot) * .02f;
-	f32 decel = INPUT_TriggerL(player->controller.slot) * .033f;
+	f32 rot = INPUT_steering(&player->controller) * .033f;
+	f32 accel = INPUT_acceleration(&player->controller) * .02f;
+	f32 decel = INPUT_brakes(&player->controller) * .033f;
 
 	/* Apply rotation */
 	OBJECT_rotateAxis(player->hovercraft, &worldUp, rot);
@@ -97,7 +97,7 @@ void GAME_updatePlayer(player_t* player) {
 	guVecAdd(velocity, &acceleration, velocity);
 	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
-	if (player->isGrounded && INPUT_getButton(player->controller.slot, INPUT_BTN_JUMP) == TRUE) {
+	if (player->isGrounded && INPUT_jump(&player->controller) == TRUE) {
 		guVecAdd(velocity, &jump, velocity);
 	}
 
