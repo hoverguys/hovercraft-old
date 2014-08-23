@@ -82,7 +82,7 @@ void SCENE_load() {
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
 			guVector position = { rand() % 200, 30.f, rand() % 200 };
-			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i };
+			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i, 0 };
 			GAME_createPlayer(controller, modelHover, position);
 		}
 	}
@@ -92,7 +92,8 @@ void SCENE_load() {
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
 			guVector position = { rand() % 200, 30.f, rand() % 200 };
-			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i };
+			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i, 0 };
+			INPUT_getExpansion(&controller);
 			GAME_createPlayer(controller, modelHover, position);
 		}
 	}
