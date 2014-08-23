@@ -67,7 +67,7 @@ void GAME_updateWorld() {
 
 void GAME_updatePlayer(player_t* player) {
 	/* Data */
-	guVector acceleration = { 0, 0, 0 }, deacceleration = { 0, 0, 0 };
+	guVector acceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
 	guVector *velocity = &player->velocity;
 	guVector *position = &player->hovercraft->transform.position;
@@ -78,7 +78,6 @@ void GAME_updatePlayer(player_t* player) {
 	/* Get input */
 	f32 rot = INPUT_steering(&player->controller) * .033f;
 	f32 accel = INPUT_acceleration(&player->controller) * .02f;
-	f32 decel = INPUT_brakes(&player->controller) * .033f;
 
 	/* Apply rotation */
 	OBJECT_rotateAxis(player->hovercraft, &worldUp, rot);
@@ -90,12 +89,10 @@ void GAME_updatePlayer(player_t* player) {
 
 	/* Calculate physics */
 	guVecScale(playerForward, &acceleration, accel);
-	guVecScale(playerForward, &deacceleration, -decel);
 
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
 	guVecAdd(velocity, &acceleration, velocity);
-	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
 	if (player->isGrounded && INPUT_jump(&player->controller) == TRUE) {
 		guVecAdd(velocity, &jump, velocity);

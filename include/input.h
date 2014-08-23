@@ -59,7 +59,6 @@ void INPUT_getExpansion(controller_t* controller);
 
 f32 INPUT_steering(controller_t* controller);
 f32 INPUT_acceleration(controller_t* controller);
-f32 INPUT_brakes(controller_t* controller);
 BOOL INPUT_jump(controller_t* controller);
 
 
