@@ -88,9 +88,10 @@ void SCENE_load() {
 
 	/* We went through all players, so we know how to split the screen */
 	u8 splitCur = 0;
-	for (i = 0; i < MAX_PLAYERS; i++) {
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
 		if (INPUT_isConnected(i) == TRUE) {
-			GXU_setupCamera(&GAME_getPlayerData(i)->camera, split, ++splitCur);
+			GXU_setupCamera(&players.players[i].camera, split, ++splitCur);
 		}
 	}
 }
@@ -106,9 +107,9 @@ void SCENE_render() {
 	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
 
 	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE) {
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		if (players.players[i].isPlaying == TRUE) {
 			GAME_updatePlayer(i);
 			GAME_renderPlayerView(i);
 		}
@@ -133,10 +134,10 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 
 	/* Draw players */
 	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE) {
-			OBJECT_render(player->hovercraft, viewMtx);
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		if (players.players[i].isPlaying == TRUE) {
+			OBJECT_render(players.players[i].hovercraft, viewMtx);
 		}
 	}
 

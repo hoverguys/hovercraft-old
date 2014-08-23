@@ -11,6 +11,7 @@ object_t* mapTerrain;
 object_t* mapPlane;
 
 player_t players[MAX_PLAYERS];
+u8 playerCount = 0;
 
 /* Game settings */
 const f32 maxSpeed = 0.3f;
@@ -19,29 +20,23 @@ guVector gravity = { 0, -.8f / 60.f, 0 };
 void GAME_init(object_t* terrain, object_t* plane) {
 	mapTerrain = terrain;
 	mapPlane = plane;
-
-	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		player->isPlaying = FALSE;
-		player->isGrounded = FALSE;
-	}
 }
 
 void GAME_createPlayer(u8 playerId, model_t* hovercraftModel, guVector startPosition) {
 	/* Create player hovercraft object and position it */
-	player_t* player = GAME_getPlayerData(playerId);
+	player_t* player = &GAME_getPlayersData().players[playerId];
 	player->hovercraft = OBJECT_create(hovercraftModel);
 	OBJECT_moveTo(player->hovercraft, startPosition.x, startPosition.y, startPosition.z);
 	OBJECT_flush(player->hovercraft);
 
-	/* Set player as playing */
 	player->isPlaying = TRUE;
+	playerCount++;
 }
 
 void GAME_removePlayer(u8 playerId) {
-	player_t* player = GAME_getPlayerData(playerId);
+	player_t* player = &GAME_getPlayersData().players[playerId];
 	OBJECT_destroy(player->hovercraft);
+	playerCount--;
 }
 
 void GAME_updateWorld() {
@@ -49,7 +44,7 @@ void GAME_updateWorld() {
 }
 
 void GAME_updatePlayer(u8 playerId) {
-	player_t* player = GAME_getPlayerData(playerId);
+	player_t* player = &GAME_getPlayersData().players[playerId];
 
 	/* Data */
 	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
@@ -89,7 +84,7 @@ void GAME_updatePlayer(u8 playerId) {
 	/* Calculate collisions */
 	u8 otherPlayerId;
 	for (otherPlayerId = playerId + 1; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
-		player_t* target = GAME_getPlayerData(otherPlayerId);
+		player_t* target = &GAME_getPlayersData().players[otherPlayerId];
 		if (target->isPlaying != TRUE) continue;
 
 		/* Check for collision between current player and other */
@@ -166,7 +161,7 @@ void GAME_updatePlayer(u8 playerId) {
 
 void GAME_renderPlayerView(u8 playerId) {
 	/* Setup camera view and perspective */
-	player_t* player = GAME_getPlayerData(playerId);
+	player_t* player = &GAME_getPlayersData().players[playerId];
 	transform_t target = player->hovercraft->transform;
 	camera_t* camera = &player->camera;
 
@@ -236,6 +231,6 @@ void GAME_renderPlayerView(u8 playerId) {
 	SCENE_renderPlayer(viewMtx);
 }
 
-player_t* GAME_getPlayerData(u8 playerId) {
-	return &players[playerId];
+inline playerArray_t GAME_getPlayersData() {
+	return (playerArray_t){ players, playerCount };
 }
