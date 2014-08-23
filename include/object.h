@@ -44,7 +44,7 @@ object_t* OBJECT_createEx(model_t*     mesh,
 						  const guQuaternion rotation,
 						  const guVector     scale);
 
-/*! \brief Force Matrix regeneration on object 
+/*! \brief Force Matrix regeneration on object
  *  \param object Object to process
  */
 void OBJECT_flush(object_t* object);

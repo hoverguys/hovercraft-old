@@ -23,7 +23,7 @@ void SCENE_load();
 /*! Updates the scene and renders all the player views inside it */
 void SCENE_render();
 
-/*! \brief Renders the scene 
+/*! \brief Renders the scene
  *  \param viewMtx View matrix to use for rendering
  */
 void SCENE_renderPlayer(Mtx viewMtx);

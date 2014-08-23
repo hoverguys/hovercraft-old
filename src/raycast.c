@@ -31,7 +31,7 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 
 	BOOL hit = FALSE;
 	f32 sdist = 0;
-	
+
 	guVector *normal = 0;
 
 	/* Iterate over every triangle */
