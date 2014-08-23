@@ -1,11 +1,9 @@
 #include "input.h"
 #include <ogc/video.h>
 #include <math.h>
-#include <stdlib.h>
 
 u32 _GCConnected, _Wiimotes;
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
-void OnResetCalled();
 
 void INPUT_update() {
 #ifdef WII
@@ -27,9 +25,6 @@ void INPUT_init() {
 	WPAD_Init();
 #endif
 	PAD_Init();
-
-	/* Setup reset function */
-	SYS_SetResetCallback(OnResetCalled);
 }
 
 
@@ -125,8 +120,4 @@ void INPUT_waitForControllers() {
 
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal) {
 	return value < minVal ? minVal : value > maxVal ? maxVal : value;
-}
-
-void OnResetCalled() {
-	exit(0);
 }
