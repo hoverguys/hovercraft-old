@@ -33,6 +33,7 @@ typedef enum {
 typedef struct {
 	Input_ControllerType type;
 	u8                   slot;
+	u8                   expansion;
 } controller_t;
 
 /*! \brief Initialize input
@@ -44,10 +45,11 @@ void INPUT_init();
 void INPUT_update();
 
 /*! \brief Check if a specific pad is connected
- *  \param id Gamepad slot
+ *  \param type Controller type
+ *  \param id Gamepad slot / Wiimote channel
  *  \return TRUE if connected, FALSE otherwise
  */
-inline BOOL INPUT_isConnected(const u8 id);
+inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id);
 
 /*! \brief Get Analog stick's X axis value
  *  \param id Gamepad slot

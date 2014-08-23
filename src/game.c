@@ -23,6 +23,9 @@ void GAME_init(object_t* terrain, object_t* plane) {
 }
 
 void GAME_createPlayer(controller_t controllerInfo, model_t* hovercraftModel, guVector startPosition) {
+	/* We should tell the parent that we didn't actually make the player */
+	if (playerCount > MAX_PLAYERS) return;
+
 	/* Create player hovercraft object and position it */
 	player_t* player = &GAME_getPlayersData().players[playerCount];
 	player->hovercraft = OBJECT_create(hovercraftModel);

@@ -77,23 +77,31 @@ void SCENE_load() {
 	/* Wait for controllers */
 	INPUT_waitForControllers();
 
-	u8 i, split = 0;
+	/* Check for Gamecube pads */
+	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
-		if (INPUT_isConnected(i) == TRUE) {
-			split++;
+		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
 			guVector position = { rand() % 200, 30.f, rand() % 200 };
 			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i };
 			GAME_createPlayer(controller, modelHover, position);
 		}
 	}
 
+#ifdef WII
+	/* Check for Gamecube pads */
+	for (i = 0; i < MAX_PLAYERS; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
+			guVector position = { rand() % 200, 30.f, rand() % 200 };
+			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i };
+			GAME_createPlayer(controller, modelHover, position);
+		}
+	}
+#endif
+
 	/* We went through all players, so we know how to split the screen */
-	u8 splitCur = 0;
 	playerArray_t players = GAME_getPlayersData();
 	for (i = 0; i < players.playerCount; i++) {
-		if (INPUT_isConnected(i) == TRUE) {
-			GXU_setupCamera(&players.players[i].camera, split, ++splitCur);
-		}
+		GXU_setupCamera(&players.players[i].camera, players.playerCount, i+1);
 	}
 }
 
