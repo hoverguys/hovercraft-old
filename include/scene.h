@@ -9,12 +9,12 @@
 
 /*! Camera structure */
 typedef struct {
-	guVector	position;		/*< Camera position    */
-	f32			width,			/*< Viewport width     */
-				height,			/*< Viewport height    */
-				offsetTop,		/*< Viewport Y         */
-				offsetLeft;		/*< Viewport X         */
-	Mtx44		perspectiveMtx; /*< Perspective Matrix */
+	guVector position;       /*< Camera position    */
+	f32      width,          /*< Viewport width     */
+	         height,         /*< Viewport height    */
+	         offsetTop,      /*< Viewport Y         */
+	         offsetLeft;     /*< Viewport X         */
+	Mtx44    perspectiveMtx; /*< Perspective Matrix */
 } camera_t;
 
 /*! Loads the game scene and models */

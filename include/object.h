@@ -22,7 +22,7 @@ typedef struct {
 
 /*! Object structure */
 typedef struct {
-	model_t*	mesh;      /*< Model                                    */
+	model_t*    mesh;      /*< Model                                    */
 	transform_t transform; /*< Transform data (Position, Rotation, etc) */
 } object_t;
 

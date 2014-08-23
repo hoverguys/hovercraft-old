@@ -14,17 +14,17 @@
 
 /*! Player structure*/
 typedef struct {
-	BOOL			isPlaying;  /*< Is the player... playing?     */
-	BOOL			isGrounded; /*< Is is on the ground?          */
-	object_t*		hovercraft; /*< Hovercraft object             */
-	guVector		velocity;	/*< Current velocity              */
-	camera_t		camera;		/*< Player's camera               */
-	controller_t	controller; /*< Player's controller data      */
+	BOOL         isPlaying;  /*< Is the player... playing?     */
+	BOOL         isGrounded; /*< Is is on the ground?          */
+	object_t*    hovercraft; /*< Hovercraft object             */
+	guVector     velocity;   /*< Current velocity              */
+	camera_t     camera;     /*< Player's camera               */
+	controller_t controller; /*< Player's controller data      */
 } player_t;
 
 typedef struct {
-	player_t* players;		/*< Player data       */
-	u8        playerCount;	/*< Number of players */
+	player_t* players;     /*< Player data       */
+	u8        playerCount; /*< Number of players */
 } playerArray_t;
 
 /*! \brief Initialize In-game data
