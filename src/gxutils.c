@@ -15,6 +15,7 @@ static u32 fbi = 0;
 static GXRModeObj *rmode = NULL;
 BOOL first_frame = FALSE;
 void *gpfifo = NULL;
+f32 aspectRatio;
 
 /* Texture file */
 TPLFile TPLfile;
@@ -78,6 +79,17 @@ void GXU_init() {
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
 	first_frame = TRUE;
+
+	/* Set aspect ratio (Wii only for now) */
+	aspectRatio = 4.f / 3;
+#ifdef WII
+	/* If 16:9 we need some hacks */
+	if (CONF_GetAspectRatio()) {
+		rmode->viWidth = 678;
+		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
+		aspectRatio = 16.f / 9;
+	}
+#endif
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
@@ -133,5 +145,6 @@ void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer) {
 	camera->height = splitType > 1 ? rmode->viHeight >> 1 : rmode->viHeight;
 	camera->offsetLeft = splitType > 2 && splitPlayer % 2 == 0 ? rmode->viWidth >> 1 : 0;
 	camera->offsetTop = splitPlayer > (splitType > 2 ? 2 : 1) ? rmode->viHeight >> 1 : 0;
-	guPerspective(camera->perspectiveMtx, 60, (f32) camera->width / camera->height, 0.1f, 300.0f);
+
+	guPerspective(camera->perspectiveMtx, 60, aspectRatio, 0.1f, 300.0f);
 }
