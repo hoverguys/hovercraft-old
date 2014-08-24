@@ -76,8 +76,9 @@ f32 INPUT_acceleration(controller_t* controller);
 BOOL INPUT_jump(controller_t* controller);
 
 
-/*! \brief Block until at least one controller is found
+/*! \brief Checks if any controller is found
+ *  \return TRUE if at least one controller is found, FALSE otherwise
  */
-void INPUT_waitForControllers();
+BOOL INPUT_checkControllers();
 
 #endif

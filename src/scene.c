@@ -30,12 +30,16 @@ static GXColor lightColor[] = {
 		{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
 };
 
+/* Spectator */
+camera_t spectatorCamera;
+Mtx spectatorView;
+
 BOOL firstFrame = TRUE;
 guVector speedVec;
 
 void SCENE_load() {
 	GXU_init();
-	//playMod();
+
 	GXU_loadTexture(hovercraftTex, &hoverTexObj);
 	GXU_loadTexture(terrainTex, &terrainTexObj);
 	GXU_loadTexture(waterTex, &waterTexObj);
@@ -74,8 +78,21 @@ void SCENE_load() {
 
 	GAME_init(objectTerrain, objectPlane);
 
+	/* Setup spectator matrix */
+	GXU_setupCamera(&spectatorCamera, 1, 0);
+	GX_SetViewport(spectatorCamera.offsetLeft, spectatorCamera.offsetTop, spectatorCamera.width, spectatorCamera.height, 0, 1);
+	guVector spectatorPos = { 0, 40, 0 };
+	guVector targetPos = { 100, 0, 100 };
+	guVector spectatorUp = { 0, 1, 0 };
+	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
+	GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
+
 	/* Wait for controllers */
-	INPUT_waitForControllers();
+	while (!INPUT_checkControllers()) {
+		GX_SetNumChans(1);
+		SCENE_renderView(spectatorView);
+		GXU_done();
+	}
 
 	/* Check for Gamecube pads */
 	u8 i;
@@ -102,7 +119,7 @@ void SCENE_load() {
 	/* We went through all players, so we know how to split the screen */
 	playerArray_t players = GAME_getPlayersData();
 	for (i = 0; i < players.playerCount; i++) {
-		GXU_setupCamera(&players.players[i].camera, players.playerCount, i+1);
+		GXU_setupCamera(&players.players[i].camera, players.playerCount, i + 1);
 	}
 }
 
@@ -129,8 +146,8 @@ void SCENE_render() {
 	GXU_done();
 }
 
-void SCENE_renderPlayer(Mtx viewMtx) {
-	/* Set default blend mode*/
+void SCENE_renderView(Mtx viewMtx) {
+	/* Set default blend mode */
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 
 	/* Enable Zbuf */
@@ -150,7 +167,6 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 			OBJECT_render(players.players[i].hovercraft, viewMtx);
 		}
 	}
-
 
 	/* Draw ray */
 	/* Lighting off */

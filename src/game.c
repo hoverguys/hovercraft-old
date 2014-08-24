@@ -234,7 +234,7 @@ void GAME_renderPlayerView(player_t* player) {
 	GX_SetViewport(camera->offsetLeft, camera->offsetTop, camera->width, camera->height, 0, 1);
 
 	/* Render the player's hovercraft */
-	SCENE_renderPlayer(viewMtx);
+	SCENE_renderView(viewMtx);
 }
 
 inline playerArray_t GAME_getPlayersData() {

@@ -26,6 +26,6 @@ void SCENE_render();
 /*! \brief Renders the scene
  *  \param viewMtx View matrix to use for rendering
  */
-void SCENE_renderPlayer(Mtx viewMtx);
+void SCENE_renderView(Mtx viewMtx);
 
 #endif

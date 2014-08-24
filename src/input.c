@@ -26,6 +26,7 @@ void INPUT_init() {
 #ifdef WII
 	WPAD_Init();
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC);
+
 #endif
 	PAD_Init();
 }
@@ -108,22 +109,16 @@ BOOL INPUT_jump(controller_t* controller) {
 	}
 }
 
-void INPUT_waitForControllers() {
+BOOL INPUT_checkControllers() {
 #ifdef WII
 	/* Wait for the WPAD subsystem to have initialized */
 	s8 status = WPAD_GetStatus();
 	while (status != WPAD_STATE_ENABLED) {
-		status = WPAD_GetStatus();
-		VIDEO_WaitVSync();
+		return FALSE;
 	}
 #endif
-
-	/* Wait for at least one controller to show up */
-	while (_GCConnected == 0 && _Wiimotes == 0) {
-		INPUT_update();
-		VIDEO_WaitVSync();
-	}
-	return;
+	INPUT_update();
+	return (_GCConnected == 0 && _Wiimotes == 0) ? FALSE : TRUE;
 }
 
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal) {
