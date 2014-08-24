@@ -11,9 +11,9 @@
 typedef struct {
 	guVector position;       /*< Camera position    */
 	f32      width,          /*< Viewport width     */
-	         height,         /*< Viewport height    */
-	         offsetTop,      /*< Viewport Y         */
-	         offsetLeft;     /*< Viewport X         */
+			 height,         /*< Viewport height    */
+			 offsetTop,      /*< Viewport Y         */
+			 offsetLeft;     /*< Viewport X         */
 	Mtx44    perspectiveMtx; /*< Perspective Matrix */
 } camera_t;
 
@@ -27,5 +27,9 @@ void SCENE_render();
  *  \param viewMtx View matrix to use for rendering
  */
 void SCENE_renderView(Mtx viewMtx);
+
+/*! \brief Create all the players
+ */
+void SCENE_createPlayers();
 
 #endif

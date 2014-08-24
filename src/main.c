@@ -7,8 +7,6 @@
 #include "input.h"
 #include "audioutil.h"
 
-#include "menumusic_mod.h"
-
 BOOL isRunning;
 void OnResetCalled();
 
@@ -21,7 +19,6 @@ int main(int argc, char **argv) {
 	SCENE_load();
 
 	AU_init();
-	AU_playMusic(menumusic_mod);
 
 	isRunning = TRUE;
 	while (isRunning) {

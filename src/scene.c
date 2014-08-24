@@ -15,6 +15,9 @@
 #include "game.h"
 #include "gxutils.h"
 #include "input.h"
+#include "audioutil.h"
+
+#include "menumusic_mod.h"
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing;
@@ -36,6 +39,7 @@ Mtx spectatorView;
 
 BOOL firstFrame = TRUE;
 guVector speedVec;
+BOOL isWaiting;
 
 void SCENE_load() {
 	GXU_init();
@@ -81,19 +85,48 @@ void SCENE_load() {
 	/* Setup spectator matrix */
 	GXU_setupCamera(&spectatorCamera, 1, 0);
 	GX_SetViewport(spectatorCamera.offsetLeft, spectatorCamera.offsetTop, spectatorCamera.width, spectatorCamera.height, 0, 1);
-	guVector spectatorPos = { 0, 40, 0 };
+	guVector spectatorPos = { -30, 40, -10 };
 	guVector targetPos = { 100, 0, 100 };
 	guVector spectatorUp = { 0, 1, 0 };
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 
+	isWaiting = TRUE;
+}
+
+void SCENE_render() {
+	/* Render time */
+	GX_SetNumChans(1);
+
+	/* Animate scene models */
+	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
+	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
+
 	/* Wait for controllers */
-	while (!INPUT_checkControllers()) {
-		GX_SetNumChans(1);
+	if (isWaiting) {
 		SCENE_renderView(spectatorView);
-		GXU_done();
+		//todo Replace with prompt and stuff
+		if (INPUT_checkControllers()) {
+			SCENE_createPlayers();
+		}
+	} else {
+		u8 i;
+		playerArray_t players = GAME_getPlayersData();
+		for (i = 0; i < players.playerCount; i++) {
+			if (players.players[i].isPlaying == TRUE) {
+				GAME_updatePlayer(&players.players[i]);
+				GAME_renderPlayerView(&players.players[i]);
+			}
+		}
 	}
 
+	GAME_updateWorld();
+
+	/* Flip framebuffer */
+	GXU_done();
+}
+
+void SCENE_createPlayers() {
 	/* Check for Gamecube pads */
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
@@ -121,29 +154,10 @@ void SCENE_load() {
 	for (i = 0; i < players.playerCount; i++) {
 		GXU_setupCamera(&players.players[i].camera, players.playerCount, i + 1);
 	}
-}
 
-void SCENE_render() {
-	/* Render time */
-	GX_SetNumChans(1);
+	isWaiting = FALSE;
 
-	/* Animate scene models */
-	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
-	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
-
-	u8 i;
-	playerArray_t players = GAME_getPlayersData();
-	for (i = 0; i < players.playerCount; i++) {
-		if (players.players[i].isPlaying == TRUE) {
-			GAME_updatePlayer(&players.players[i]);
-			GAME_renderPlayerView(&players.players[i]);
-		}
-	}
-
-	GAME_updateWorld();
-
-	/* Flip framebuffer */
-	GXU_done();
+	AU_playMusic(menumusic_mod);
 }
 
 void SCENE_renderView(Mtx viewMtx) {
