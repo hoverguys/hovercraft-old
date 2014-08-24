@@ -146,5 +146,5 @@ void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer) {
 	camera->offsetLeft = splitType > 2 && splitPlayer % 2 == 0 ? rmode->viWidth >> 1 : 0;
 	camera->offsetTop = splitPlayer > (splitType > 2 ? 2 : 1) ? rmode->viHeight >> 1 : 0;
 
-	guPerspective(camera->perspectiveMtx, 60, aspectRatio, 0.1f, 300.0f);
+	guPerspective(camera->perspectiveMtx, 60, camera->width / camera->height, 0.1f, 300.0f);
 }

@@ -113,10 +113,8 @@ void SCENE_render() {
 		u8 i;
 		playerArray_t players = GAME_getPlayersData();
 		for (i = 0; i < players.playerCount; i++) {
-			if (players.players[i].isPlaying == TRUE) {
-				GAME_updatePlayer(&players.players[i]);
-				GAME_renderPlayerView(&players.players[i]);
-			}
+			GAME_updatePlayer(&players.players[i]);
+			GAME_renderPlayerView(&players.players[i]);
 		}
 	}
 
