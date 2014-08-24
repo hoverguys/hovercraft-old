@@ -7,6 +7,7 @@ u32 _GCConnected, _Wiimotes;
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal);
 
 void INPUT_update() {
+	_GCConnected = PAD_ScanPads();
 #ifdef WII
 	/* Read and process incoming wiimote data */
 	WPAD_ScanPads();
@@ -19,14 +20,12 @@ void INPUT_update() {
 		}
 	}
 #endif
-	_GCConnected = PAD_ScanPads();
 }
 
 void INPUT_init() {
 #ifdef WII
 	WPAD_Init();
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC);
-
 #endif
 	PAD_Init();
 }
@@ -112,13 +111,32 @@ BOOL INPUT_jump(controller_t* controller) {
 BOOL INPUT_checkControllers() {
 #ifdef WII
 	/* Wait for the WPAD subsystem to have initialized */
-	s8 status = WPAD_GetStatus();
-	while (status != WPAD_STATE_ENABLED) {
+	if (WPAD_GetStatus() != WPAD_STATE_ENABLED) {
 		return FALSE;
 	}
 #endif
-	INPUT_update();
-	return (_GCConnected == 0 && _Wiimotes == 0) ? FALSE : TRUE;
+	/* Check if any Gamecube pads pressed START */
+	u8 i;
+	for (i = 0; i < 4; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
+			if (PAD_ButtonsDown(i) & PAD_BUTTON_START) {
+				return TRUE;
+			}
+		}
+	}
+
+#ifdef WII
+	/* Check if a Wiimote pressed A */
+	for (i = WPAD_CHAN_0; i < WPAD_MAX_WIIMOTES; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
+			if (WPAD_ButtonsDown(i) & WPAD_BUTTON_A) {
+				return TRUE;
+			}
+		}
+	}
+#endif
+
+	return FALSE;
 }
 
 inline f32 _CLAMP(const f32 value, const f32 minVal, const f32 maxVal) {
