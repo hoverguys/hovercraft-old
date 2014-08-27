@@ -112,3 +112,10 @@ BOOL CalculateBounce(player_t* a, player_t* b) {
 
 	return TRUE;
 }
+
+inline f32 fioraRand() {
+	static u32 seed = 0xCE1E571A;
+	seed = 214013 * seed + 2531011;
+	const u32 temp = (seed & 0x007FFFFF) | 0x3F800000;
+	return *(f32*) &temp - 1.0f;
+}

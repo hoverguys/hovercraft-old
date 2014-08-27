@@ -1,6 +1,5 @@
 /* System and SDK libraries */
 #include <gccore.h>
-#include <stdlib.h>
 
 /* Generated assets headers */
 #include "hovercraft_bmb.h"
@@ -17,6 +16,7 @@
 #include "input.h"
 #include "audioutil.h"
 #include "raycast.h"
+#include "mathutil.h"
 
 #include "menumusic_mod.h"
 
@@ -131,7 +131,7 @@ void SCENE_createPlayers() {
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
-			guVector position = { rand() % 200, 30.f, rand() % 200 };
+			guVector position = { fioraRand() * 200.f, 30.f, fioraRand() * 200.f };
 			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i, 0 };
 			GAME_createPlayer(controller, modelHover, position);
 		}
@@ -141,7 +141,7 @@ void SCENE_createPlayers() {
 	/* Check for Wiimotes */
 	for (i = WPAD_CHAN_0; i < WPAD_MAX_WIIMOTES; i++) {
 		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
-			guVector position = { rand() % 200, 30.f, rand() % 200 };
+			guVector position = { fioraRand() * 200.f, 30.f, fioraRand() * 200.f };
 			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i, 0 };
 			INPUT_getExpansion(&controller);
 			GAME_createPlayer(controller, modelHover, position);
@@ -201,12 +201,12 @@ void SCENE_renderView(Mtx viewMtx) {
 
 void SCENE_moveCheckpoint() {
 	f32 distance = 0;
-	f32 minHeight = objectPlane->transform.position.y + 6.f;
+	f32 minHeight = objectPlane->transform.position.y - 0.7f;
 	const f32 rayoffset = 200;
 	guVector raydir = { 0, -1, 0 };
 	guVector position;
-	while (distance < minHeight) {
-		position = (guVector){ rand() % 200, rayoffset, rand() % 200 };
+	while (rayoffset - distance > minHeight) {
+		position = (guVector) { fioraRand() * 200.f, rayoffset, fioraRand() * 200.f };
 		Raycast(objectTerrain, &raydir, &position, &distance, NULL);
 	}
 	

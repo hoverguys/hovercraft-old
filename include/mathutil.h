@@ -95,6 +95,12 @@ f32 vecDistance(guVector* point1, guVector* point2);
 */
 BOOL CalculateBounce(player_t* a, player_t* b);
 
+
+/*! \brief Fast and dirty pseudorandom number generator by @FioraAeterna
+ *  \returns Float between 0.0f and 1.0f (not inclusive)
+ */
+f32 fioraRand();
+
 #endif
 
 
