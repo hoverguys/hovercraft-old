@@ -16,6 +16,7 @@
 #include "gxutils.h"
 #include "input.h"
 #include "audioutil.h"
+#include "raycast.h"
 
 #include "menumusic_mod.h"
 
@@ -36,6 +37,8 @@ static GXColor lightColor[] = {
 /* Spectator */
 camera_t spectatorCamera;
 Mtx spectatorView;
+
+guVector checkpoint;
 
 BOOL firstFrame = TRUE;
 guVector speedVec;
@@ -75,8 +78,6 @@ void SCENE_load() {
 
 	firstRing = OBJECT_create(modelRing);
 	secondRing = OBJECT_create(modelRing);
-	OBJECT_moveTo(firstRing, 0, 6.1f, 0);
-	OBJECT_moveTo(secondRing, 0, 6.1f, 0);
 	OBJECT_scaleTo(firstRing, 1.4f, 1, 1.4f);
 	OBJECT_scaleTo(secondRing, 1.7f, 0.7f, 1.7f);
 
@@ -90,7 +91,8 @@ void SCENE_load() {
 	guVector spectatorUp = { 0, 1, 0 };
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
-
+	
+	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
 }
 
@@ -195,4 +197,27 @@ void SCENE_renderView(Mtx viewMtx) {
 	OBJECT_render(planeRay, viewMtx);
 	OBJECT_render(firstRing, viewMtx);
 	OBJECT_render(secondRing, viewMtx);
+}
+
+void SCENE_moveCheckpoint() {
+	f32 distance = 0;
+	f32 minHeight = objectPlane->transform.position.y + 6.f;
+	const f32 rayoffset = 200;
+	guVector raydir = { 0, -1, 0 };
+	guVector position;
+	while (distance < minHeight) {
+		position = (guVector){ rand() % 200, rayoffset, rand() % 200 };
+		Raycast(objectTerrain, &raydir, &position, &distance, NULL);
+	}
+	
+	checkpoint = (guVector){ position.x, 0, position.z };
+
+	OBJECT_moveTo(planeRay, checkpoint.x, checkpoint.y, checkpoint.z);
+	OBJECT_flush(planeRay);
+	OBJECT_moveTo(firstRing, checkpoint.x, checkpoint.y + 6.1f, checkpoint.z);
+	OBJECT_moveTo(secondRing, checkpoint.x, checkpoint.y + 6.1f, checkpoint.z);
+}
+
+guVector SCENE_getCheckpoint() {
+	return checkpoint;
 }

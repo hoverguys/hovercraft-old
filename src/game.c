@@ -42,10 +42,10 @@ void GAME_removePlayer(player_t* player) {
 	playerCount--;
 }
 
+#define CHECKPOINT_RADIUS 2
 void GAME_updateWorld() {
-	//todo Checkpoint logic here
 
-	/* Calculate collisions
+	/* Check for collisions
 	 * To optimize and avoid glitches, collisions are calculated on the world loop
 	 * to both minimize physics getting in the way and assure that calculations between
 	 * different players are only evaluated once per frame
@@ -53,14 +53,22 @@ void GAME_updateWorld() {
 
 	playerArray_t players = GAME_getPlayersData();
 	u8 playerId, otherPlayerId;
+	guVector checkpoint = SCENE_getCheckpoint();
 	for (playerId = 0; playerId < players.playerCount; playerId++) {
 		player_t* actor = &players.players[playerId];
 
+		/* Collisions against other players */
 		for (otherPlayerId = playerId + 1; otherPlayerId < players.playerCount; otherPlayerId++) {
 			player_t* target = &players.players[otherPlayerId];
 
 			/* Check for collision between current player and other */
 			CalculateBounce(actor, target);
+		}
+
+		/* Collisions with the checkpoint */
+		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
+		if (distance < CHECKPOINT_RADIUS) {
+			SCENE_moveCheckpoint();
 		}
 	}
 }

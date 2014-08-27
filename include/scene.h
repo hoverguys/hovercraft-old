@@ -32,4 +32,13 @@ void SCENE_renderView(Mtx viewMtx);
  */
 void SCENE_createPlayers();
 
+/*! \brief Get checkpoint position
+ *  \return Checkpoint position as a guVector
+ */
+guVector SCENE_getCheckpoint();
+
+/*! \brief Move checkpoint to a random new position
+ */
+void SCENE_moveCheckpoint();
+
 #endif
