@@ -90,7 +90,9 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 
 	if (hit == TRUE) {
 		*distanceOut = sdist / rayScale;
-		*normalOut = *normal;
+		if (normalOut != NULL) {
+			*normalOut = *normal;
+		}
 	}
 
 	return hit;
