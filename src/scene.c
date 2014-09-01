@@ -1,6 +1,5 @@
 /* System and SDK libraries */
 #include <gccore.h>
-#include <stdlib.h>
 
 /* Generated assets headers */
 #include "hovercraft_bmb.h"
@@ -15,6 +14,11 @@
 #include "game.h"
 #include "gxutils.h"
 #include "input.h"
+#include "audioutil.h"
+#include "raycast.h"
+#include "mathutil.h"
+
+#include "menumusic_mod.h"
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing;
@@ -25,17 +29,24 @@ GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
-	{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
-	{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
-	{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
+		{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
+		{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
+		{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
 };
+
+/* Spectator */
+camera_t spectatorCamera;
+Mtx spectatorView;
+
+guVector checkpoint;
 
 BOOL firstFrame = TRUE;
 guVector speedVec;
+BOOL isWaiting;
 
 void SCENE_load() {
 	GXU_init();
-	//playMod();
+
 	GXU_loadTexture(hovercraftTex, &hoverTexObj);
 	GXU_loadTexture(terrainTex, &terrainTexObj);
 	GXU_loadTexture(waterTex, &waterTexObj);
@@ -67,59 +78,90 @@ void SCENE_load() {
 
 	firstRing = OBJECT_create(modelRing);
 	secondRing = OBJECT_create(modelRing);
-	OBJECT_moveTo(firstRing, 0, 6.1f, 0);
-	OBJECT_moveTo(secondRing, 0, 6.1f, 0);
 	OBJECT_scaleTo(firstRing, 1.4f, 1, 1.4f);
 	OBJECT_scaleTo(secondRing, 1.7f, 0.7f, 1.7f);
 
 	GAME_init(objectTerrain, objectPlane);
 
-	/* Wait for controllers */
-	INPUT_waitForControllers();
-
-	u8 i, split = 0;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		if (INPUT_isConnected(i) == TRUE) {
-			split++;
-			guVector position = { rand() % 200, 30.f, rand() % 200 };
-			GAME_createPlayer(i, modelHover, position);
-		}
-	}
-
-	/* We went through all players, so we know how to split the screen */
-	u8 splitCur = 0;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		if (INPUT_isConnected(i) == TRUE) {
-			GXU_setupCamera(&GAME_getPlayerData(i)->camera, split, ++splitCur);
-		}
-	}
+	/* Setup spectator matrix */
+	GXU_setupCamera(&spectatorCamera, 1, 0);
+	GX_SetViewport(spectatorCamera.offsetLeft, spectatorCamera.offsetTop, spectatorCamera.width, spectatorCamera.height, 0, 1);
+	guVector spectatorPos = { -30, 40, -10 };
+	guVector targetPos = { 100, 0, 100 };
+	guVector spectatorUp = { 0, 1, 0 };
+	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
+	GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
+	
+	SCENE_moveCheckpoint();
+	isWaiting = TRUE;
 }
 
 void SCENE_render() {
 	/* Render time */
 	GX_SetNumChans(1);
 
-	GAME_updateWorld();
-
 	/* Animate scene models */
 	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
 	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
 
-	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE) {
-			GAME_updatePlayer(i);
-			GAME_renderPlayerView(i);
+	/* Wait for controllers */
+	if (isWaiting) {
+		SCENE_renderView(spectatorView);
+		//todo Replace with prompt and stuff
+		if (INPUT_checkControllers()) {
+			SCENE_createPlayers();
+		}
+	} else {
+		u8 i;
+		playerArray_t players = GAME_getPlayersData();
+		for (i = 0; i < players.playerCount; i++) {
+			GAME_updatePlayer(&players.players[i]);
+			GAME_renderPlayerView(&players.players[i]);
 		}
 	}
+
+	GAME_updateWorld();
 
 	/* Flip framebuffer */
 	GXU_done();
 }
 
-void SCENE_renderPlayer(Mtx viewMtx) {
-	/* Set default blend mode*/
+void SCENE_createPlayers() {
+	/* Check for Gamecube pads */
+	u8 i;
+	for (i = 0; i < MAX_PLAYERS; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
+			guVector position = { fioraRand() * 200.f, 30.f, fioraRand() * 200.f };
+			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i, 0 };
+			GAME_createPlayer(controller, modelHover, position);
+		}
+	}
+
+#ifdef WII
+	/* Check for Wiimotes */
+	for (i = WPAD_CHAN_0; i < WPAD_MAX_WIIMOTES; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
+			guVector position = { fioraRand() * 200.f, 30.f, fioraRand() * 200.f };
+			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i, 0 };
+			INPUT_getExpansion(&controller);
+			GAME_createPlayer(controller, modelHover, position);
+		}
+	}
+#endif
+
+	/* We went through all players, so we know how to split the screen */
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		GXU_setupCamera(&players.players[i].camera, players.playerCount, i + 1);
+	}
+
+	isWaiting = FALSE;
+
+	AU_playMusic(menumusic_mod);
+}
+
+void SCENE_renderView(Mtx viewMtx) {
+	/* Set default blend mode */
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 
 	/* Enable Zbuf */
@@ -133,13 +175,12 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 
 	/* Draw players */
 	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		if (player->isPlaying == TRUE) {
-			OBJECT_render(player->hovercraft, viewMtx);
+	playerArray_t players = GAME_getPlayersData();
+	for (i = 0; i < players.playerCount; i++) {
+		if (players.players[i].isPlaying == TRUE) {
+			OBJECT_render(players.players[i].hovercraft, viewMtx);
 		}
 	}
-
 
 	/* Draw ray */
 	/* Lighting off */
@@ -156,4 +197,27 @@ void SCENE_renderPlayer(Mtx viewMtx) {
 	OBJECT_render(planeRay, viewMtx);
 	OBJECT_render(firstRing, viewMtx);
 	OBJECT_render(secondRing, viewMtx);
+}
+
+void SCENE_moveCheckpoint() {
+	f32 distance = 0;
+	f32 minHeight = objectPlane->transform.position.y - 0.9f;
+	const f32 rayoffset = 200;
+	guVector raydir = { 0, -1, 0 };
+	guVector position;
+	while (rayoffset - distance > minHeight) {
+		position = (guVector) { fioraRand() * 200.f, rayoffset, fioraRand() * 200.f };
+		Raycast(objectTerrain, &raydir, &position, &distance, NULL);
+	}
+	
+	checkpoint = (guVector){ position.x, 0, position.z };
+
+	OBJECT_moveTo(planeRay, checkpoint.x, checkpoint.y, checkpoint.z);
+	OBJECT_flush(planeRay);
+	OBJECT_moveTo(firstRing, checkpoint.x, checkpoint.y + 6.1f, checkpoint.z);
+	OBJECT_moveTo(secondRing, checkpoint.x, checkpoint.y + 6.1f, checkpoint.z);
+}
+
+guVector SCENE_getCheckpoint() {
+	return checkpoint;
 }

@@ -45,9 +45,9 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 
 	f32 cosOmega;
 	QUAT_dotProduct(q0, q1, &cosOmega);
-	guQuaternion q0c = *q0, 
+	guQuaternion q0c = *q0,
 				 q1c = *q1;
-	
+
 	if (cosOmega < 0.0f) {
 		f32 invert = -1.f;
 		QUAT_scale(&q1c, &q1c, &invert);
@@ -66,7 +66,7 @@ void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion*
 		k0 = sin((1.0f - t) * omega) * oneOverSinOmega;
 		k1 = sin(t * omega) * oneOverSinOmega;
 	}
-	
+
 	QUAT_scale(&q0c, &q0c, &k0);
 	QUAT_scale(&q1c, &q1c, &k1);
 	guQuatAdd(&q0c, &q1c, out);
@@ -111,4 +111,15 @@ BOOL CalculateBounce(player_t* a, player_t* b) {
 	guVecAdd(&b->velocity, &deltaB, &b->velocity);
 
 	return TRUE;
+}
+
+u32 seed = 0;
+inline f32 fioraRand() {
+	seed = 214013 * seed + 2531011;
+	const u32 temp = (seed & 0x007FFFFF) | 0x3F800000;
+	return *(f32*) &temp - 1.0f;
+}
+
+inline void fioraSeed(u32 _seed) {
+	seed = _seed;
 }

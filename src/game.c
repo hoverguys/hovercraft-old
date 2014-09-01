@@ -11,6 +11,7 @@ object_t* mapTerrain;
 object_t* mapPlane;
 
 player_t players[MAX_PLAYERS];
+u8 playerCount = 0;
 
 /* Game settings */
 const f32 maxSpeed = 0.3f;
@@ -19,51 +20,71 @@ guVector gravity = { 0, -.8f / 60.f, 0 };
 void GAME_init(object_t* terrain, object_t* plane) {
 	mapTerrain = terrain;
 	mapPlane = plane;
-
-	u8 i;
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		player_t* player = GAME_getPlayerData(i);
-		player->isPlaying = FALSE;
-		player->isGrounded = FALSE;
-	}
 }
 
-void GAME_createPlayer(u8 playerId, model_t* hovercraftModel, guVector startPosition) {
+void GAME_createPlayer(controller_t controllerInfo, model_t* hovercraftModel, guVector startPosition) {
+	/* We should tell the parent that we didn't actually make the player */
+	if (playerCount > MAX_PLAYERS) return;
+
 	/* Create player hovercraft object and position it */
-	player_t* player = GAME_getPlayerData(playerId);
+	player_t* player = &GAME_getPlayersData().players[playerCount];
 	player->hovercraft = OBJECT_create(hovercraftModel);
 	OBJECT_moveTo(player->hovercraft, startPosition.x, startPosition.y, startPosition.z);
 	OBJECT_flush(player->hovercraft);
 
-	/* Set player as playing */
 	player->isPlaying = TRUE;
+	player->controller = controllerInfo;
+	playerCount++;
 }
 
-void GAME_removePlayer(u8 playerId) {
-	player_t* player = GAME_getPlayerData(playerId);
+void GAME_removePlayer(player_t* player) {
 	OBJECT_destroy(player->hovercraft);
+	playerCount--;
 }
 
 void GAME_updateWorld() {
-	//todo Checkpoint logic here
+
+	/* Check for collisions
+	 * To optimize and avoid glitches, collisions are calculated on the world loop
+	 * to both minimize physics getting in the way and assure that calculations between
+	 * different players are only evaluated once per frame
+	 */
+
+	playerArray_t players = GAME_getPlayersData();
+	u8 playerId, otherPlayerId;
+	guVector checkpoint = SCENE_getCheckpoint();
+	for (playerId = 0; playerId < players.playerCount; playerId++) {
+		player_t* actor = &players.players[playerId];
+
+		/* Collisions against other players */
+		for (otherPlayerId = playerId + 1; otherPlayerId < players.playerCount; otherPlayerId++) {
+			player_t* target = &players.players[otherPlayerId];
+
+			/* Check for collision between current player and other */
+			CalculateBounce(actor, target);
+		}
+
+		/* Collisions with the checkpoint */
+		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
+		if (distance < 2) {
+			SCENE_moveCheckpoint();
+		}
+	}
 }
 
-void GAME_updatePlayer(u8 playerId) {
-	player_t* player = GAME_getPlayerData(playerId);
-
+void GAME_updatePlayer(player_t* player) {
 	/* Data */
-	guVector acceleration = {0,0,0}, deacceleration = { 0, 0, 0 };
+	guVector acceleration = { 0, 0, 0 };
 	guVector jump = { 0, 0.3f, 0 };
 	guVector *velocity = &player->velocity;
 	guVector *position = &player->hovercraft->transform.position;
 	guVector *right = &player->hovercraft->transform.right;
 	guVector *playerForward = &player->hovercraft->transform.forward;
-	guVector forward, worldUp = {0,1,0};
+	guVector forward, worldUp = { 0, 1, 0 };
 
 	/* Get input */
-	f32 rot = INPUT_AnalogX(playerId) * .033f;
-	f32 accel = INPUT_TriggerR(playerId) * .02f;
-	f32 decel = INPUT_TriggerL(playerId) * .033f;
+	f32 rot = INPUT_steering(&player->controller) * .033f;
+	f32 accel = INPUT_acceleration(&player->controller) * .02f;
 
 	/* Apply rotation */
 	OBJECT_rotateAxis(player->hovercraft, &worldUp, rot);
@@ -75,32 +96,20 @@ void GAME_updatePlayer(u8 playerId) {
 
 	/* Calculate physics */
 	guVecScale(playerForward, &acceleration, accel);
-	guVecScale(playerForward, &deacceleration, -decel);
 
 	/* Apply physics */
 	guVecScale(velocity, velocity, 0.95f);
 	guVecAdd(velocity, &acceleration, velocity);
-	guVecAdd(velocity, &deacceleration, velocity);
 	guVecAdd(velocity, &gravity, velocity);
-	if (player->isGrounded && INPUT_getButton(playerId, INPUT_BTN_JUMP) == TRUE) {
+	if (player->isGrounded && INPUT_jump(&player->controller) == TRUE) {
 		guVecAdd(velocity, &jump, velocity);
-	}
-
-	/* Calculate collisions */
-	u8 otherPlayerId;
-	for (otherPlayerId = playerId + 1; otherPlayerId < MAX_PLAYERS; otherPlayerId++) {
-		player_t* target = GAME_getPlayerData(otherPlayerId);
-		if (target->isPlaying != TRUE) continue;
-
-		/* Check for collision between current player and other */
-		CalculateBounce(player, target);
 	}
 
 	/* Limit speed */
 	/*if (guVecDotProduct(velocity, velocity) > (maxSpeed*maxSpeed)) {
 		guVecNormalize(velocity);
 		guVecScale(velocity, velocity, maxSpeed);
-	}*/
+		}*/
 
 	/* Move Player */
 	OBJECT_move(player->hovercraft, velocity->x, velocity->y, velocity->z);
@@ -164,9 +173,8 @@ void GAME_updatePlayer(u8 playerId) {
 	OBJECT_flush(player->hovercraft);
 }
 
-void GAME_renderPlayerView(u8 playerId) {
+void GAME_renderPlayerView(player_t* player) {
 	/* Setup camera view and perspective */
-	player_t* player = GAME_getPlayerData(playerId);
 	transform_t target = player->hovercraft->transform;
 	camera_t* camera = &player->camera;
 
@@ -177,14 +185,6 @@ void GAME_renderPlayerView(u8 playerId) {
 	const float cameraDistance = -5.0f;
 	const float t = 1.f / 5.f;
 	guVector up = { 0, 1, 0 };
-
-	/* Calculate forward vector*/
-	/*
-	guVector forward, right, up = { 0, 1, 0 };
-	guVecCross(&target.forward, &up, &right);
-	guVecCross(&up, &right, &forward);
-	guVecNormalize(&forward);
-	*/
 
 	/* Calculate camera position */
 	guVector posTemp, targetCameraPos = { 0, cameraHeight, 0 };
@@ -233,9 +233,9 @@ void GAME_renderPlayerView(u8 playerId) {
 	GX_SetViewport(camera->offsetLeft, camera->offsetTop, camera->width, camera->height, 0, 1);
 
 	/* Render the player's hovercraft */
-	SCENE_renderPlayer(viewMtx);
+	SCENE_renderView(viewMtx);
 }
 
-player_t* GAME_getPlayerData(u8 playerId) {
-	return &players[playerId];
+inline playerArray_t GAME_getPlayersData() {
+	return (playerArray_t) { players, playerCount };
 }

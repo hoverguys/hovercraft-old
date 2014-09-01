@@ -13,9 +13,9 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	const u32 indOffset = texOffset + (sizeof(f32)* header->vcount * 2);
 
 	f32* positions = (f32*) (model_bmb + posOffset);
-	f32* normals = (f32*)(model_bmb + nrmOffset);
-	f32* texcoords = (f32*)(model_bmb + texOffset);
-	u16* indices = (u16*)(model_bmb + indOffset);
+	f32* normals = (f32*) (model_bmb + nrmOffset);
+	f32* texcoords = (f32*) (model_bmb + texOffset);
+	u16* indices = (u16*) (model_bmb + indOffset);
 
 	/* Calculate cost */
 	const u32 indicesCount = header->fcount * 3;
@@ -44,9 +44,9 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 	GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-	GX_SetArray(GX_VA_POS, (void*)positions, 3 * sizeof(f32));
-	GX_SetArray(GX_VA_NRM, (void*)normals, 3 * sizeof(f32));
-	GX_SetArray(GX_VA_TEX0, (void*)texcoords, 2 * sizeof(f32));
+	GX_SetArray(GX_VA_POS, (void*) positions, 3 * sizeof(f32));
+	GX_SetArray(GX_VA_NRM, (void*) normals, 3 * sizeof(f32));
+	GX_SetArray(GX_VA_TEX0, (void*) texcoords, 2 * sizeof(f32));
 
 	/* Fill the list with indices */
 	GX_Begin(GX_TRIANGLES, GX_VTXFMT0, indicesCount);

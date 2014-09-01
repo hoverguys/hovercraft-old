@@ -54,7 +54,7 @@ void QUAT_lookat(guVector* forward, guVector *up, guQuaternion* out);
  */
 void QUAT_dotProduct(guQuaternion *p, guQuaternion *q, f32* res);
 
-/*! \brief Quaternion scalar multiplication 
+/*! \brief Quaternion scalar multiplication
  *  \param[in]  q     Input quaternion
  *  \param[out] r     Output quaternion
  *  \param[in]  scale Scale
@@ -69,7 +69,7 @@ void QUAT_scale(guQuaternion* q, guQuaternion* r, f32* scale);
  */
 void QUAT_slerp(guQuaternion* q0, guQuaternion* q1, const float t, guQuaternion* out);
 
-/*! \brief Vector magnitude 
+/*! \brief Vector magnitude
  *  \param vec Vector to calculate magnitude of
  *  \return Magnitude as a f32
  */
@@ -94,6 +94,16 @@ f32 vecDistance(guVector* point1, guVector* point2);
 *  \return TRUE if the players collided, FALSE otherwise
 */
 BOOL CalculateBounce(player_t* a, player_t* b);
+
+
+/*! \brief Fast and dirty pseudorandom number generator by @FioraAeterna
+ *  \returns Float between 0.0f and 1.0f (not inclusive)
+ */
+f32 fioraRand();
+
+/*! \brief Seeds the fioraRand() function
+ */
+void fioraSeed(u32 seed);
 
 #endif
 
