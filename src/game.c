@@ -65,8 +65,13 @@ void GAME_updateWorld() {
 		}
 
 		/* Collisions with the checkpoint */
-		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
-		if (distance < 3) {
+		guVector player2d = actor->hovercraft->transform.position;
+		player2d.y = 0;
+		checkpoint.y = 0;
+		
+
+		f32 distance = vecDistance(&player2d, &checkpoint);
+		if (distance < 3.5f) {
 			SCENE_moveCheckpoint();
 		}
 	}
