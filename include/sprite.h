@@ -5,6 +5,8 @@
 #ifndef _SPRITE_H
 #define _SPRITE_H
 
+#include <ogcsys.h>
+
 typedef struct {
 	GXTexObj* texture;
 	f32 UVoffsetX, UVoffsetY;

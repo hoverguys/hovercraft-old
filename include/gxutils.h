@@ -8,6 +8,9 @@
 #include <gccore.h>
 #include "scene.h"
 
+/*! Texture sizes for sprites and fonts */
+const f32 TexSize256 = 1.f / 256.f;
+
 /*! \brief Initialize the GX subsystem
  */
 void GXU_init();

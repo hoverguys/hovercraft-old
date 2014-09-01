@@ -1,6 +1,8 @@
 #include "sprite.h"
-#include <ogcsys.h>
 #include "gxutils.h"
+#include "mathutil.h"
+
+#include <malloc.h>
 
 Mtx44 perspective;
 void SPRITE_init() {
@@ -13,10 +15,14 @@ sprite_t* SPRITE_create() {
 	return sprite;
 }
 
-void SPRITE_setTexture(sprite_t* sprite, GXTexObj* texture, f32* position, f32* spriteSize, f32* texSize) {
+void SPRITE_setTexture(sprite_t* sprite, GXTexObj* texture, f32* position, f32* spriteSize, f32 texSize) {
 	sprite->texture = texture;
-	sprite->UVoffsetX = position[0] / texSize[0];
-	sprite->UVoffsetY = position[1] / texSize[1];
-	sprite->UVwidth  = spriteSize[0] / texSize[0];
-	sprite->UVheight = spriteSize[1] / texSize[1];
+	f32 res[2] = { 0, 0 };
+	f32 size[2] = { texSize, texSize };
+	ps_float2Mul(position, &size, &res);
+	sprite->UVoffsetX = res[0];
+	sprite->UVoffsetY = res[1];
+	ps_float2Mul(spriteSize, &size, &res);
+	sprite->UVwidth = res[0];
+	sprite->UVheight = res[1];
 }
