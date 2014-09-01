@@ -1,4 +1,5 @@
 #include "font.h"
+#include <malloc.h>
 
 font_t* FONT_load(GXTexObj* texture) {
 	font_t* font = malloc(sizeof(font_t));

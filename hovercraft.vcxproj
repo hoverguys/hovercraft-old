@@ -61,6 +61,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\audioutil.c" />
+    <ClCompile Include="src\font.c" />
     <ClCompile Include="src\game.c" />
     <ClCompile Include="src\gxutils.c" />
     <ClCompile Include="src\input.c" />
@@ -70,6 +71,7 @@
     <ClCompile Include="src\object.c" />
     <ClCompile Include="src\raycast.c" />
     <ClCompile Include="src\scene.c" />
+    <ClCompile Include="src\sprite.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -80,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audioutil.h" />
+    <ClInclude Include="include\font.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\gxutils.h" />
     <ClInclude Include="include\input.h" />
@@ -88,6 +91,7 @@
     <ClInclude Include="include\object.h" />
     <ClInclude Include="include\raycast.h" />
     <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="models\hovercraft.obj" />
@@ -101,6 +105,7 @@
     <Image Include="textures\ray.png" />
     <Image Include="textures\ring.png" />
     <Image Include="textures\terrain.png" />
+    <Image Include="textures\ubuntufont.png" />
     <Image Include="textures\water.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
