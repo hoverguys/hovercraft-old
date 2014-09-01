@@ -5,6 +5,9 @@
 #include <malloc.h>
 #include <gccore.h>
 
+/* Internal libs */
+#include "sprite.h"
+
 /* Texture definition */
 #include "textures_tpl.h"
 
@@ -50,6 +53,17 @@ void GXU_init() {
 	/* Init flipper */
 	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
 
+	/* Set aspect ratio (Wii only for now) */
+	aspectRatio = 4.f / 3;
+#ifdef WII
+	/* If 16:9 we need some hacks */
+	if (CONF_GetAspectRatio()) {
+		rmode->viWidth = 678;
+		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
+		aspectRatio = 16.f / 9;
+	}
+#endif
+
 	/* Clear the background to black and clear the Z buf */
 	GXColor background = { 0xa0, 0xe0, 0xf0, 0xff };
 	GX_SetCopyClear(background, 0x00ffffff);
@@ -79,17 +93,7 @@ void GXU_init() {
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
 	first_frame = TRUE;
-
-	/* Set aspect ratio (Wii only for now) */
-	aspectRatio = 4.f / 3;
-#ifdef WII
-	/* If 16:9 we need some hacks */
-	if (CONF_GetAspectRatio()) {
-		rmode->viWidth = 678;
-		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
-		aspectRatio = 16.f / 9;
-	}
-#endif
+	SPRITE_init();
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {

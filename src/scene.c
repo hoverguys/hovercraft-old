@@ -90,7 +90,6 @@ void SCENE_load() {
 	guVector targetPos = { 100, 0, 100 };
 	guVector spectatorUp = { 0, 1, 0 };
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
-	GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 	
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
@@ -106,6 +105,7 @@ void SCENE_render() {
 
 	/* Wait for controllers */
 	if (isWaiting) {
+		GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 		SCENE_renderView(spectatorView);
 		//todo Replace with prompt and stuff
 		if (INPUT_checkControllers()) {
