@@ -212,10 +212,10 @@ void SCENE_moveCheckpoint() {
 	
 	checkpoint = (guVector){ position.x, 0, position.z };
 
-	OBJECT_moveTo(planeRay, checkpoint.x, objectPlane->transform.position.y + 6.1f, checkpoint.z);
+	OBJECT_moveTo(planeRay, checkpoint.x, objectPlane->transform.position.y + 4, checkpoint.z);
 	OBJECT_flush(planeRay);
-	OBJECT_moveTo(firstRing, checkpoint.x, objectPlane->transform.position.y, checkpoint.z);
-	OBJECT_moveTo(secondRing, checkpoint.x, objectPlane->transform.position.y, checkpoint.z);
+	OBJECT_moveTo(firstRing, checkpoint.x, objectPlane->transform.position.y + 0.5f, checkpoint.z);
+	OBJECT_moveTo(secondRing, checkpoint.x, objectPlane->transform.position.y + 0.5f, checkpoint.z);
 }
 
 guVector SCENE_getCheckpoint() {
