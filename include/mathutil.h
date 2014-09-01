@@ -100,6 +100,9 @@ BOOL CalculateBounce(player_t* a, player_t* b);
  *  \returns Float between 0.0f and 1.0f (not inclusive)
  */
 f32 fioraRand();
+
+/*! \brief Seeds the fioraRand() function
+ */
 void fioraSeed(u32 seed);
 
 #endif

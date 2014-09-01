@@ -42,7 +42,6 @@ void GAME_removePlayer(player_t* player) {
 	playerCount--;
 }
 
-#define CHECKPOINT_RADIUS 2
 void GAME_updateWorld() {
 
 	/* Check for collisions
@@ -67,7 +66,7 @@ void GAME_updateWorld() {
 
 		/* Collisions with the checkpoint */
 		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
-		if (distance < CHECKPOINT_RADIUS) {
+		if (distance < 2) {
 			SCENE_moveCheckpoint();
 		}
 	}
