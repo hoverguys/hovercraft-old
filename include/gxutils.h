@@ -9,7 +9,8 @@
 #include "scene.h"
 
 /*! Texture sizes for sprites and fonts */
-const f32 TexSize256 = 1.f / 256.f;
+typedef f32 TexSize;
+const TexSize TexSize256 = 1.f / 256.f;
 
 /*! \brief Initialize the GX subsystem
  */

@@ -6,6 +6,7 @@
 #define _SPRITE_H
 
 #include <ogcsys.h>
+#include "gxutils.h"
 
 typedef struct {
 	GXTexObj* texture;
@@ -30,10 +31,10 @@ void SPRITE_free(sprite_t* sprite);
 /*! \brief Assign a texture to a sprite, including offset/size
  *  \param sprite     Sprite to assign texture to
  *  \param texture    Texture object to use
- *  \param position   f32[2] UV offset/position
- *  \param texSize    f32[2] UV total size
- *  \param spriteSize f32[2] Sprite size in the texture
+ *  \param position   UV offset/position
+ *  \param texSize    UV total size
+ *  \param spriteSize Sprite size in the texture
  */
-void SPRITE_setTexture(sprite_t* sprite, GXTexObj* texture, f32* position, f32* spriteSize, f32* texSize);
+void SPRITE_setTexture(sprite_t* sprite, GXTexObj* texture, f32 position[2], f32 spriteSize[2], TexSize texSize);
 
 #endif
