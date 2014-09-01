@@ -187,14 +187,6 @@ void GAME_renderPlayerView(player_t* player) {
 	const float t = 1.f / 5.f;
 	guVector up = { 0, 1, 0 };
 
-	/* Calculate forward vector*/
-	/*
-	guVector forward, right, up = { 0, 1, 0 };
-	guVecCross(&target.forward, &up, &right);
-	guVecCross(&up, &right, &forward);
-	guVecNormalize(&forward);
-	*/
-
 	/* Calculate camera position */
 	guVector posTemp, targetCameraPos = { 0, cameraHeight, 0 };
 	guVecScale(&target.forward, &posTemp, cameraDistance);

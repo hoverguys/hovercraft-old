@@ -201,7 +201,7 @@ void SCENE_renderView(Mtx viewMtx) {
 
 void SCENE_moveCheckpoint() {
 	f32 distance = 0;
-	f32 minHeight = objectPlane->transform.position.y - 0.7f;
+	f32 minHeight = objectPlane->transform.position.y - 0.9f;
 	const f32 rayoffset = 200;
 	guVector raydir = { 0, -1, 0 };
 	guVector position;
