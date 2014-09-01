@@ -10,7 +10,7 @@
 
 /*! Texture sizes for sprites and fonts */
 typedef f32 TexSize;
-const TexSize TexSize256 = 1.f / 256.f;
+extern const TexSize TexSize256;
 
 /*! \brief Initialize the GX subsystem
  */
