@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 		SCENE_render();
 	}
 
-	exit(0);
 	return 0;
 }
 
