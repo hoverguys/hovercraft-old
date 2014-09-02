@@ -14,8 +14,6 @@ typedef struct {
 
 typedef struct {
 	GXTexObj* texture;
-	u32       charHeight, charWidth;
-	u32       columns;
 	u8        charIndex[128];
 	charuv_t* charUV;
 } font_t;
