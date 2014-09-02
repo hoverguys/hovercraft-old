@@ -55,14 +55,14 @@ void GXU_init() {
 	/* Init flipper */
 	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
 
-	/* Set aspect ratio (Wii only for now) */
-	aspectRatio = 4.f / 3;
+	/* Set aspect ratio */
+	aspectRatio = 4.f / 3.f;
 #ifdef WII
 	/* If 16:9 we need some hacks */
 	if (CONF_GetAspectRatio()) {
 		rmode->viWidth = 678;
 		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
-		aspectRatio = 16.f / 9;
+		aspectRatio = 16.f / 9.f;
 	}
 #endif
 
