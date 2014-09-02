@@ -56,6 +56,7 @@
     <IntDir>log</IntDir>
     <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj;.\include</IncludePath>
     <LibraryPath>D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath);</LibraryPath>
+    <AdditionalOptions>-DHW_RVL -DWII</AdditionalOptions>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
