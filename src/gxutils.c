@@ -39,17 +39,6 @@ void GXU_init() {
 	xfb[0] = SYS_AllocateFramebuffer(rmode);
 	xfb[1] = SYS_AllocateFramebuffer(rmode);
 
-	/* Set aspect ratio */
-	aspectRatio = 4.f / 3.f;
-#ifdef WII
-	/* If 16:9 we need some hacks */
-	if (CONF_GetAspectRatio()) {
-		rmode->viWidth = 678;
-		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
-		aspectRatio = 16.f / 9.f;
-	}
-#endif
-
 	VIDEO_Configure(rmode);
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
 	VIDEO_SetBlack(FALSE);
@@ -60,6 +49,17 @@ void GXU_init() {
 	/* Enable USBGecko debugging */
 	//CON_EnableGecko(1, FALSE);
 	//CON_InitEx(rmode, 0, 0, rmode->viWidth, rmode->viHeight);
+
+	/* Set aspect ratio */
+	aspectRatio = 4.f / 3.f;
+#ifdef WII
+	/* If 16:9 we need some hacks */
+	if (CONF_GetAspectRatio()) {
+		rmode->viWidth = 678;
+		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
+		aspectRatio = 16.f / 9.f;
+	}
+#endif
 
 	/* Swap frames */
 	fbi ^= 1;
@@ -153,5 +153,5 @@ void GXU_setupCamera(camera_t* camera, u8 splitCount, u8 splitPlayer) {
 	camera->offsetLeft = splitCount > 2 && splitPlayer % 2 == 0 ? rmode->viWidth >> 1 : 0;
 	camera->offsetTop = splitPlayer > (splitCount > 2 ? 2 : 1) ? rmode->efbHeight >> 1 : 0;
 
-	guPerspective(camera->perspectiveMtx, 60, camera->width / camera->height, 0.1f, 300.0f);
+	guPerspective(camera->perspectiveMtx, 60, aspectRatio * (splitCount == 2 ? 2.f : 1.f), 0.1f, 300.0f);
 }
