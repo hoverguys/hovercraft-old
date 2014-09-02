@@ -85,7 +85,7 @@ void SCENE_load() {
 	GAME_init(objectTerrain, objectPlane);
 
 	/* Setup spectator matrix */
-	GXU_setupCamera(&spectatorCamera, 1, 0);
+	GXU_setupCamera(&spectatorCamera, 1, 1);
 	GX_SetViewport(spectatorCamera.offsetLeft, spectatorCamera.offsetTop, spectatorCamera.width, spectatorCamera.height, 0, 1);
 	guVector spectatorPos = { -30, 40, -10 };
 	guVector targetPos = { 100, 0, 100 };
