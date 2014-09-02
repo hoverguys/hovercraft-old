@@ -19,6 +19,7 @@
 #include "mathutil.h"
 
 #include "menumusic_mod.h"
+#include "gamemusic_mod.h"
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing;
@@ -157,7 +158,8 @@ void SCENE_createPlayers() {
 
 	isWaiting = FALSE;
 
-	AU_playMusic(menumusic_mod);
+	//AU_playMusic(menumusic_mod);
+	AU_playMusic(gamemusic_mod);
 }
 
 void SCENE_renderView(Mtx viewMtx) {
