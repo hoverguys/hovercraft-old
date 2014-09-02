@@ -39,6 +39,17 @@ void GXU_init() {
 	xfb[0] = SYS_AllocateFramebuffer(rmode);
 	xfb[1] = SYS_AllocateFramebuffer(rmode);
 
+	/* Set aspect ratio */
+	aspectRatio = 4.f / 3.f;
+#ifdef WII
+	/* If 16:9 we need some hacks */
+	if (CONF_GetAspectRatio()) {
+		rmode->viWidth = 678;
+		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
+		aspectRatio = 16.f / 9.f;
+	}
+#endif
+
 	VIDEO_Configure(rmode);
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
 	VIDEO_SetBlack(FALSE);
@@ -54,17 +65,6 @@ void GXU_init() {
 
 	/* Init flipper */
 	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
-
-	/* Set aspect ratio */
-	aspectRatio = 4.f / 3.f;
-#ifdef WII
-	/* If 16:9 we need some hacks */
-	if (CONF_GetAspectRatio()) {
-		rmode->viWidth = 678;
-		rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 678) / 2;
-		aspectRatio = 16.f / 9.f;
-	}
-#endif
 
 	/* Clear the background to black and clear the Z buf */
 	GXColor background = { 0xa0, 0xe0, 0xf0, 0xff };
@@ -148,9 +148,9 @@ GXRModeObj* GXU_getMode() {
 
 void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer) {
 	camera->width = splitType > 2 ? rmode->viWidth >> 1 : rmode->viWidth;
-	camera->height = splitType > 1 ? rmode->viHeight >> 1 : rmode->viHeight;
+	camera->height = splitType > 1 ? rmode->efbHeight >> 1 : rmode->efbHeight;
 	camera->offsetLeft = splitType > 2 && splitPlayer % 2 == 0 ? rmode->viWidth >> 1 : 0;
-	camera->offsetTop = splitPlayer > (splitType > 2 ? 2 : 1) ? rmode->viHeight >> 1 : 0;
+	camera->offsetTop = splitPlayer > (splitType > 2 ? 2 : 1) ? rmode->efbHeight >> 1 : 0;
 
 	guPerspective(camera->perspectiveMtx, 60, aspectRatio * (splitType == 2 ? 2.f : 1.f), 0.1f, 300.0f);
 }
