@@ -231,6 +231,7 @@ void GAME_renderPlayerView(player_t* player) {
 	camera->position = camPos;
 
 	/* Viewport setup */
+	GX_SetScissor(camera->offsetLeft, camera->offsetTop, camera->width, camera->height);
 	GX_SetViewport(camera->offsetLeft, camera->offsetTop, camera->width, camera->height, 0, 1);
 
 	/* Render the player's hovercraft */
