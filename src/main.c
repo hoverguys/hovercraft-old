@@ -12,7 +12,7 @@
 BOOL isRunning;
 void OnResetCalled();
 
-int main(int argc, char **argv) {
+int main() {
 
 	fioraSeed(time(NULL));
 

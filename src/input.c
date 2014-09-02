@@ -32,15 +32,15 @@ void INPUT_init() {
 
 
 inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id) {
-	u8 err, padId;
+	u8 padId;
 	switch (type) {
 	case INPUT_CONTROLLER_GAMECUBE:
 		padId = 1 << id;
 		return (_GCConnected & padId) == padId ? TRUE : FALSE;
 #ifdef WII
 	case INPUT_CONTROLLER_WIIMOTE:
-		err = WPAD_Probe(id, NULL);
-		return err == WPAD_ERR_NONE ? TRUE : FALSE;
+		padId = WPAD_Probe(id, NULL);
+		return padId == WPAD_ERR_NONE ? TRUE : FALSE;
 #endif
 	default:
 		return FALSE;
