@@ -58,7 +58,8 @@ void GXU_init() {
 	if (rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
 
 	/* Enable USBGecko debugging */
-	CON_EnableGecko(1, FALSE);
+	//CON_EnableGecko(1, FALSE);
+	//CON_InitEx(rmode, 0, 0, rmode->viWidth, rmode->viHeight);
 
 	/* Swap frames */
 	fbi ^= 1;
@@ -146,11 +147,11 @@ GXRModeObj* GXU_getMode() {
 	return rmode;
 }
 
-void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer) {
-	camera->width = splitType > 2 ? rmode->viWidth >> 1 : rmode->viWidth;
-	camera->height = splitType > 1 ? rmode->efbHeight >> 1 : rmode->efbHeight;
-	camera->offsetLeft = splitType > 2 && splitPlayer % 2 == 0 ? rmode->viWidth >> 1 : 0;
-	camera->offsetTop = splitPlayer > (splitType > 2 ? 2 : 1) ? rmode->efbHeight >> 1 : 0;
+void GXU_setupCamera(camera_t* camera, u8 splitCount, u8 splitPlayer) {
+	camera->width = splitCount > 2 ? rmode->viWidth >> 1 : rmode->viWidth;
+	camera->height = splitCount > 1 ? rmode->efbHeight >> 1 : rmode->efbHeight;
+	camera->offsetLeft = splitCount > 2 && splitPlayer % 2 == 0 ? rmode->viWidth >> 1 : 0;
+	camera->offsetTop = splitPlayer > (splitCount > 2 ? 2 : 1) ? rmode->efbHeight >> 1 : 0;
 
-	guPerspective(camera->perspectiveMtx, 60, aspectRatio * (splitType == 2 ? 2.f : 1.f), 0.1f, 300.0f);
+	guPerspective(camera->perspectiveMtx, 60, camera->width / camera->height, 0.1f, 300.0f);
 }
