@@ -51,6 +51,6 @@ font_t* FONT_load(GXTexObj* texture,
 }
 
 void FONT_free(font_t* font) {
-	free(font);
 	free(font->charUV);
+	free(font);
 }

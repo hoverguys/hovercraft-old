@@ -222,7 +222,6 @@ void GAME_renderPlayerView(player_t* player) {
 		}
 	}
 
-
 	/* Create camera matrix */
 	Mtx viewMtx;
 	guLookAt(viewMtx, &camPos, &up, &targetPos);
