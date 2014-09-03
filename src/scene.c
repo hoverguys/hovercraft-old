@@ -17,6 +17,7 @@
 #include "audioutil.h"
 #include "raycast.h"
 #include "mathutil.h"
+#include "font.h"
 
 #include "menumusic_mod.h"
 #include "gamemusic_mod.h"
@@ -26,7 +27,7 @@ model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing;
 object_t *objectTerrain, *objectPlane, *planeRay, *firstRing, *secondRing;
 
 /* Texture vars */
-GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj;
+GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj, fontTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
@@ -45,6 +46,8 @@ BOOL firstFrame = TRUE;
 guVector speedVec;
 BOOL isWaiting;
 
+font_t* font;
+
 void SCENE_load() {
 	GXU_init();
 
@@ -53,6 +56,7 @@ void SCENE_load() {
 	GXU_loadTexture(waterTex, &waterTexObj);
 	GXU_loadTexture(rayTex, &rayTexObj);
 	GXU_loadTexture(ringTex, &ringTexObj);
+	GXU_loadTexture(ubuntuFontTex, &fontTexObj);
 
 	modelHover = MODEL_setup(hovercraft_bmb);
 	modelTerrain = MODEL_setup(terrain_bmb);
@@ -92,6 +96,8 @@ void SCENE_load() {
 	guVector spectatorUp = { 0, 1, 0 };
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
+	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 20, 41, 12, TexSize256);
+
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
 }
@@ -108,7 +114,9 @@ void SCENE_render() {
 	if (isWaiting) {
 		GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 		SCENE_renderView(spectatorView);
-		//todo Replace with prompt and stuff
+
+		FONT_draw(font, "Press START or A on any controller", 0, 0, 10);
+
 		if (INPUT_checkControllers()) {
 			SCENE_createPlayers();
 		}
