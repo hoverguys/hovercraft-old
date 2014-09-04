@@ -9,7 +9,7 @@
 #include "gxutils.h"
 
 typedef struct {
-	f32 uvTop[2], uvBottom[2];
+	f32 uvs[8];
 } charuv_t;
 
 typedef struct {
@@ -27,7 +27,7 @@ typedef struct {
  *  \param columns    Number of characters per row
  *  \param texSize    Texture size
  */
-font_t* FONT_load(GXTexObj* texture, const char* chars, const u32 charWidth, const u32 charHeight, const u32 columns, const TexSize texSize);
+font_t* FONT_load(GXTexObj* texture, const char* chars, const u32 charWidth, const u32 charHeight, const f32 texSize);
 
 /*! \brief Draws a message using the provided font 
  *  \param font    Font to use

@@ -96,7 +96,7 @@ void SCENE_load() {
 	guVector spectatorUp = { 0, 1, 0 };
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
-	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 20, 41, 12, TexSize256);
+	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 20, 41, 256);
 
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
@@ -115,7 +115,7 @@ void SCENE_render() {
 		GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 		SCENE_renderView(spectatorView);
 
-		FONT_draw(font, "Press START or A on any controller", 0, 0, 10);
+		FONT_draw(font, "According to Hamcha, this entire text mesh is 4 vertices", 10, 10, 20);
 
 		if (INPUT_checkControllers()) {
 			SCENE_createPlayers();

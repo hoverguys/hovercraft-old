@@ -2,12 +2,6 @@
 #include "mathutil.h"
 #include <malloc.h>
 
-Mtx44 perspective;
-void SPRITE_init() {
-	GXRModeObj* rmode = GXU_getMode();
-	guOrtho(perspective, 0, rmode->viHeight - 1, 0, rmode->viWidth - 1, 0, 300);
-}
-
 sprite_t* SPRITE_create() {
 	sprite_t* sprite = malloc(sizeof(sprite_t));
 	return sprite;

@@ -21,6 +21,7 @@ static GXRModeObj *rmode = NULL;
 BOOL first_frame = FALSE;
 void *gpfifo = NULL;
 f32 aspectRatio;
+Mtx44 orthographicMatrix;
 
 /* Texture file */
 TPLFile TPLfile;
@@ -96,7 +97,8 @@ void GXU_init() {
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
 	first_frame = TRUE;
-	SPRITE_init();
+
+	guOrtho(orthographicMatrix, 0, rmode->viHeight-1, 0, rmode->viWidth-1, 0, rmode->viWidth);
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
@@ -154,4 +156,8 @@ void GXU_setupCamera(camera_t* camera, u8 splitCount, u8 splitPlayer) {
 	camera->offsetTop = splitPlayer > (splitCount > 2 ? 2 : 1) ? rmode->efbHeight >> 1 : 0;
 
 	guPerspective(camera->perspectiveMtx, 60, aspectRatio * (splitCount == 2 ? 2.f : 1.f), 0.1f, 300.0f);
+}
+
+void GXU_2DMode() {
+	GX_LoadProjectionMtx(orthographicMatrix, GX_ORTHOGRAPHIC);
 }
