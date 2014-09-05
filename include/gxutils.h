@@ -33,6 +33,11 @@ void GXU_setLight(Mtx view, GXColor lightColor[]);
  */
 GXRModeObj* GXU_getMode();
 
+/*! \brief Get current aspect ratio
+ *  \return Aspect ratio as width/height
+ */
+f32 GXU_getAspectRatio();
+
 /*! \brief Finish rendering and swap buffers
  */
 void GXU_done();
@@ -44,6 +49,8 @@ void GXU_done();
  */
 void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer);
 
+/*! \brief Load 2D ortho matrix for sprite/font rendering 
+ */
 void GXU_2DMode();
 
 #endif

@@ -19,6 +19,10 @@ typedef struct {
 	f32       charRatio;
 } font_t;
 
+/*! \brief Initialize font subsystem (requires GXU) 
+ */
+void FONT_init();
+
 /*! \brief Load a font from texture and data
  *  \param texture    Font texture
  *  \param chars      Character order (required for UV generation)

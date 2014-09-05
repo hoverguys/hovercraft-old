@@ -62,6 +62,7 @@ void GXU_init() {
 	}
 #endif
 
+
 	/* Swap frames */
 	fbi ^= 1;
 
@@ -98,7 +99,7 @@ void GXU_init() {
 
 	first_frame = TRUE;
 
-	guOrtho(orthographicMatrix, 0, rmode->viHeight-1, 0, rmode->viWidth-1, 0, rmode->viWidth);
+	guOrtho(orthographicMatrix, 0, rmode->viHeight - 1, 0, rmode->viWidth - 1, 0, rmode->viWidth);
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
@@ -147,6 +148,10 @@ void GXU_setLight(Mtx view, GXColor lightColor[]) {
 
 GXRModeObj* GXU_getMode() {
 	return rmode;
+}
+
+f32 GXU_getAspectRatio() {
+	return aspectRatio;
 }
 
 void GXU_setupCamera(camera_t* camera, u8 splitCount, u8 splitPlayer) {

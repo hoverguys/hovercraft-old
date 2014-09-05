@@ -96,6 +96,7 @@ void SCENE_load() {
 	guVector spectatorUp = { 0, 1, 0 };
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
+	FONT_init();
 	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 20, 41, 256);
 
 	SCENE_moveCheckpoint();
@@ -115,7 +116,7 @@ void SCENE_render() {
 		GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 		SCENE_renderView(spectatorView);
 
-		FONT_draw(font, "According to Hamcha, this entire text mesh is 4 vertices", 10, 10, 20);
+		FONT_draw(font, "Connect at least one controller\nand press START [Gamecube controller]\nor the A button [Wiimote]", 10, 10, 32);
 
 		if (INPUT_checkControllers()) {
 			SCENE_createPlayers();
