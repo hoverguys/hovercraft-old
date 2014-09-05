@@ -8,14 +8,14 @@ f32 fontRatio;
 
 void generateUV(font_t* font,
 	const char* chars,
-	const u32 charWidth,
-	const u32 charHeight,
-	const f32 texSize) {
+	const u16 charWidth,
+	const u16 charHeight,
+	const u16 texSize) {
 	/* Find out char count and allocate the quad UV array */
 	u16 charCount = strlen(chars);
 	font->charUV = malloc(sizeof(charuv_t)* charCount);
 	
-	f32 texRepr = 1 / texSize;
+	f32 texRepr = 1.0f / texSize;
 
 	f32 texRepr2[2] = { texRepr, texRepr };
 	f32 uvSize[2] = { charWidth, charHeight };
@@ -50,7 +50,7 @@ void generateUV(font_t* font,
 	}
 }
 
-void FONT_draw(font_t* font, const char* message, f32 x, f32 y) {
+void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
 	u16 messagelength = strlen(message);
 	const char* msgpointer = message;
 	f32 height = font->height;
@@ -84,9 +84,13 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y) {
 	GXU_2DMode();
 
 	u16 charCount = 0, offset = 0;
-	f32 xoffset = 0, yoffset = 0;
+	f32 xoffset = 0, yoffset = 0, centreoffset = 0;
 	do {
 		charCount = strcspn(msgpointer, "\n"); //length till newline (exclusive)
+
+		if (centre) {
+			centreoffset = -(charCount / 2) * width;
+		}
 
 		//Skip recurring
 		if (charCount > 0) {
@@ -95,7 +99,7 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y) {
 			for (i = 0; i < charCount; i++) {
 				u8 index = font->charIndex[(u8)msgpointer[i]];
 
-				f32 xx = xoffset + x;
+				f32 xx = centreoffset + xoffset + x;
 				f32 yy = yoffset + y;
 
 				/* CCW */
@@ -137,7 +141,7 @@ font_t* FONT_load(GXTexObj* texture,
 	const char* chars,
 	const u16 charWidth,
 	const u16 charHeight,
-	const f32 texSize) {
+	const u16 texSize) {
 	font_t* font = malloc(sizeof(font_t));
 	font->width = charWidth;
 	font->height = charHeight;

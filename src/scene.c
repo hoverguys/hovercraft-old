@@ -116,7 +116,8 @@ void SCENE_render() {
 		GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
 		SCENE_renderView(spectatorView);
 
-		FONT_draw(font, "Connect at least one controller\nand press START [Gamecube controller]\nor the A button [Wiimote]", 10, 10);
+		GXRModeObj* rmode = GXU_getMode();
+		FONT_draw(font, "Connect at least one controller\nPress START or A to play", rmode->viWidth / 2, rmode->viHeight - 200, TRUE);
 
 		if (INPUT_checkControllers()) {
 			SCENE_createPlayers();
