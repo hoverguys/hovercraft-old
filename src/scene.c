@@ -97,7 +97,7 @@ void SCENE_load() {
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
 	FONT_init();
-	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 20, 41, 256);
+	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 10, 20, 256);
 
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;

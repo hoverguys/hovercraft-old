@@ -51,8 +51,8 @@ void generateUV(font_t* font,
 }
 
 void FONT_draw(font_t* font, const char* message, f32 x, f32 y) {
-	u32 charCount = strlen(message);
-	u32 currentCharId;
+	u16 messagelength = strlen(message);
+	const char* msgpointer = message;
 	f32 height = font->height;
 	f32 width = font->width;
 
@@ -82,36 +82,48 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y) {
 
 	/* Orthographic mode */
 	GXU_2DMode();
-	GX_Begin(GX_QUADS, GX_VTXFMT0, 4 * charCount);
+
+	u16 charCount = 0, offset = 0;
 	f32 xoffset = 0, yoffset = 0;
-	for (currentCharId = 0; currentCharId < charCount; currentCharId++) {
-		u8 index;
-		/* Check for control characters */
-		if (message[currentCharId] == '\n') {
-			xoffset = - width;
-			yoffset += height;
-			index = font->charIndex[(u8)' '];
-		} else {
-			index = font->charIndex[(u8) message[currentCharId]];
+	do {
+		charCount = strcspn(msgpointer, "\n"); //length till newline (exclusive)
+
+		//Skip recurring
+		if (charCount > 0) {
+			GX_Begin(GX_QUADS, GX_VTXFMT0, 4 * charCount);
+			u16 i;
+			for (i = 0; i < charCount; i++) {
+				u8 index = font->charIndex[(u8)msgpointer[i]];
+
+				f32 xx = xoffset + x;
+				f32 yy = yoffset + y;
+
+				/* CCW */
+				/* Top left */
+				GX_Position2f32(xx, yy);
+				GX_TexCoord2f32(font->charUV[index].uvs[0], font->charUV[index].uvs[1]);
+				/* Bottom left */
+				GX_Position2f32(xx, yy + height);
+				GX_TexCoord2f32(font->charUV[index].uvs[2], font->charUV[index].uvs[3]);
+				/* Bottom right */
+				GX_Position2f32(xx + width, yy + height);
+				GX_TexCoord2f32(font->charUV[index].uvs[4], font->charUV[index].uvs[5]);
+				/* Top right */
+				GX_Position2f32(xx + width, yy);
+				GX_TexCoord2f32(font->charUV[index].uvs[6], font->charUV[index].uvs[7]);
+
+				xoffset += width;
+			}
+			GX_End();
 		}
 
-		/* CCW */
-		/* Top left */
-		GX_Position2f32(xoffset + x, yoffset + y);
-		GX_TexCoord2f32(font->charUV[index].uvs[0], font->charUV[index].uvs[1]);
-		/* Bottom left */
-		GX_Position2f32(xoffset + x, yoffset + y + height - 1);
-		GX_TexCoord2f32(font->charUV[index].uvs[2], font->charUV[index].uvs[3]);
-		/* Bottom right */
-		GX_Position2f32(xoffset + x + width - 1, yoffset + y + height - 1);
-		GX_TexCoord2f32(font->charUV[index].uvs[4], font->charUV[index].uvs[5]);
-		/* Top right */
-		GX_Position2f32(xoffset + x + width - 1, yoffset + y);
-		GX_TexCoord2f32(font->charUV[index].uvs[6], font->charUV[index].uvs[7]);
+		// Newline
+		xoffset = 0;
+		yoffset += height;
 
-		xoffset += width;
-	}
-	GX_End();
+		msgpointer += charCount + 1;
+		offset += charCount + 1;
+	} while (offset < messagelength);
 
 	/* Re-enable Z Reading/Writing */
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -127,11 +139,13 @@ font_t* FONT_load(GXTexObj* texture,
 	const u16 charHeight,
 	const f32 texSize) {
 	font_t* font = malloc(sizeof(font_t));
-	font->texture = texture;
 	font->width = charWidth;
 	font->height = charHeight;
+
+	font->texture = texture;
 	GX_InitTexObjWrapMode(texture, GX_CLAMP, GX_CLAMP);
 	GX_InitTexObjFilterMode(texture, GX_NEAR, GX_NEAR);
+
 	generateUV(font, chars, charWidth, charHeight, texSize);
 	return font;
 }

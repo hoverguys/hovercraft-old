@@ -99,7 +99,7 @@ void GXU_init() {
 
 	first_frame = TRUE;
 
-	guOrtho(orthographicMatrix, 0, rmode->viHeight - 1, 0, rmode->viWidth - 1, 0, rmode->viWidth);
+	guOrtho(orthographicMatrix, 0, rmode->viHeight, 0, rmode->viWidth, 0, rmode->viWidth);
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
