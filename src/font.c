@@ -48,14 +48,13 @@ void generateUV(font_t* font,
 
 		x += uvStride[0];
 	}
-	font->charRatio = (f32)charWidth / (f32)charHeight;
 }
 
-void FONT_draw(font_t* font, const char* message, f32 x, f32 y, f32 size) {
+void FONT_draw(font_t* font, const char* message, f32 x, f32 y) {
 	u32 charCount = strlen(message);
 	u32 currentCharId;
-	f32 height = size;
-	f32 width = height * font->charRatio * fontRatio;
+	f32 height = font->height;
+	f32 width = font->width;
 
 	GX_ClearVtxDesc();
 	GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -124,13 +123,15 @@ void FONT_init() {
 
 font_t* FONT_load(GXTexObj* texture,
 	const char* chars,
-	const u32 charWidth,
-	const u32 charHeight,
+	const u16 charWidth,
+	const u16 charHeight,
 	const f32 texSize) {
 	font_t* font = malloc(sizeof(font_t));
 	font->texture = texture;
+	font->width = charWidth;
+	font->height = charHeight;
 	GX_InitTexObjWrapMode(texture, GX_CLAMP, GX_CLAMP);
-	GX_InitTexObjFilterMode(texture, GX_LINEAR, GX_LINEAR);
+	GX_InitTexObjFilterMode(texture, GX_NEAR, GX_NEAR);
 	generateUV(font, chars, charWidth, charHeight, texSize);
 	return font;
 }
