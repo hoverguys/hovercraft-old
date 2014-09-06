@@ -53,4 +53,8 @@ void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer);
  */
 void GXU_2DMode();
 
+/*! \brief Wrapper for changing viewport (adds scissors and 2d update)
+*/
+void GXU_SetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht, f32 nearZ, f32 farZ);
+
 #endif

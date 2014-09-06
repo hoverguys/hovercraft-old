@@ -97,7 +97,7 @@ void SCENE_load() {
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
 	FONT_init();
-	font = FONT_load(&fontTexObj, " +,-.0123456789:=?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]abcdefghijklmnopqrstuvwxyz", 10, 20, 256);
+	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256);
 
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
@@ -128,6 +128,7 @@ void SCENE_render() {
 		for (i = 0; i < players.playerCount; i++) {
 			GAME_updatePlayer(&players.players[i]);
 			GAME_renderPlayerView(&players.players[i]);
+			FONT_draw(font, "Score: 0000", 1, 1, FALSE);
 		}
 	}
 

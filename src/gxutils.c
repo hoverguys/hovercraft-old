@@ -75,7 +75,6 @@ void GXU_init() {
 
 	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
-	GX_SetScissor(0, 0, rmode->fbWidth, rmode->efbHeight);
 	GX_SetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
 	GX_SetDispCopyDst(rmode->fbWidth, xfbHeight);
 	GX_SetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
@@ -99,7 +98,7 @@ void GXU_init() {
 
 	first_frame = TRUE;
 
-	guOrtho(orthographicMatrix, 0, rmode->viHeight, 0, rmode->viWidth, 0, rmode->viWidth);
+	GXU_SetViewport(0, 0, rmode->viWidth, rmode->viHeight, 0, 1);
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
@@ -165,4 +164,11 @@ void GXU_setupCamera(camera_t* camera, u8 splitCount, u8 splitPlayer) {
 
 void GXU_2DMode() {
 	GX_LoadProjectionMtx(orthographicMatrix, GX_ORTHOGRAPHIC);
+}
+
+void GXU_SetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht, f32 nearZ, f32 farZ) {
+	GX_SetScissor(xOrig, yOrig, wd, ht);
+	GX_SetViewport(xOrig, yOrig, wd, ht, nearZ, farZ);
+
+	guOrtho(orthographicMatrix, 0, ht, 0,wd, 0, rmode->viWidth);
 }
