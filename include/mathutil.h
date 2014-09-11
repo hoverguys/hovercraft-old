@@ -105,6 +105,12 @@ f32 fioraRand();
  */
 void fioraSeed(u32 seed);
 
+
+/*! \brief Make object matrix from properties 
+ *  \param t Transform to calculate matrix of
+ */
+void MakeMatrix(transform_t* t);
+
 #endif
 
 

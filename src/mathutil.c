@@ -127,3 +127,29 @@ inline f32 fioraRand() {
 inline void fioraSeed(u32 _seed) {
 	seed = _seed;
 }
+
+guVector worldUp = { 0, 1, 0 };
+guVector worldForward = { 0, 0, 1 };
+guVector worldRight = { 1, 0, 0 };
+
+inline void MakeMatrix(transform_t* t) {
+	/* Reset matrix to identity */
+	guMtxIdentity(t->matrix);
+
+	/* Rotate, Scale, Translate */
+	guQuatNormalize(&t->rotation, &t->rotation);
+	c_guMtxQuat(t->matrix, &t->rotation);
+	guMtxScaleApply(t->matrix, t->matrix, t->scale.x, t->scale.y, t->scale.z);
+	guMtxTransApply(t->matrix, t->matrix, t->position.x, t->position.y, t->position.z);
+
+	/* Calculate forward/up/left vectors */
+	guVecMultiplySR(t->matrix, &worldUp, &t->up);
+	guVecMultiplySR(t->matrix, &worldForward, &t->forward);
+	guVecMultiplySR(t->matrix, &worldRight, &t->right);
+
+	guVecNormalize(&t->up);
+	guVecNormalize(&t->forward);
+	guVecNormalize(&t->right);
+
+	t->dirty = FALSE;
+}

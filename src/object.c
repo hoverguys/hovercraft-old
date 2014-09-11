@@ -8,8 +8,6 @@
  * Can become a waste if we do more translations per frame        */
 #define TRANSLATE_DIRECT
 
-void _MakeMatrix(object_t* object);
-
 object_t* OBJECT_create(model_t* mesh) {
 	guVector position = { 0, 0, 0 }, scale = { 1, 1, 1 };
 	guQuaternion rotation;
@@ -30,7 +28,7 @@ object_t* OBJECT_createEx(model_t*     mesh,
 	object->transform.scale = scale;
 	object->transform.dirty = TRUE;
 
-	_MakeMatrix(object);
+	MakeMatrix(&object->transform);
 
 	return object;
 }
@@ -41,7 +39,7 @@ void OBJECT_destroy(object_t* object) {
 
 void OBJECT_flush(object_t* object) {
 	if (object->transform.dirty == TRUE) {
-		_MakeMatrix(object);
+		MakeMatrix(&object->transform);
 	}
 }
 
@@ -58,32 +56,7 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 	MODEL_render(object->mesh);
 }
 
-guVector worldUp = { 0, 1, 0 };
-guVector worldForward = { 0, 0, 1 };
-guVector worldRight = { 1, 0, 0 };
 
-inline void _MakeMatrix(object_t* object) {
-	/* Reset matrix to identity */
-	transform_t* t = &object->transform;
-	guMtxIdentity(t->matrix);
-
-	/* Rotate, Scale, Translate */
-	guQuatNormalize(&t->rotation, &t->rotation);
-	c_guMtxQuat(t->matrix, &t->rotation);
-	guMtxScaleApply(t->matrix, t->matrix, t->scale.x, t->scale.y, t->scale.z);
-	guMtxTransApply(t->matrix, t->matrix, t->position.x, t->position.y, t->position.z);
-
-	/* Calculate forward/up/left vectors */
-	guVecMultiplySR(t->matrix, &worldUp, &t->up);
-	guVecMultiplySR(t->matrix, &worldForward, &t->forward);
-	guVecMultiplySR(t->matrix, &worldRight, &t->right);
-
-	guVecNormalize(&t->up);
-	guVecNormalize(&t->forward);
-	guVecNormalize(&t->right);
-
-	object->transform.dirty = FALSE;
-}
 
 void OBJECT_moveTo(object_t* object, const f32 tX, const f32 tY, const f32 tZ) {
 	transform_t* t = &object->transform;
