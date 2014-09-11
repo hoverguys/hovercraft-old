@@ -7,14 +7,16 @@
 
 #include <ogcsys.h>
 #include "gxutils.h"
+#include "object.h"
 
 typedef struct {
-	GXTexObj* texture;
-	f32 UVoffsetX, UVoffsetY;
-	f32 UVwidth, UVheight;
+	GXTexObj*   texture;
+	transform_t transform;
+	f32         UVoffsetX, UVoffsetY;
+	f32         UVwidth, UVheight;
 } sprite_t;
 
-/*! \brief Initialize sprite system, including 2D camera 
+/*! \brief Initialize sprite system, including 2D camera
  */
 void SPRITE_init();
 
@@ -23,7 +25,7 @@ void SPRITE_init();
  */
 sprite_t* SPRITE_create();
 
-/*! \brief Frees a sprite 
+/*! \brief Frees a sprite
  *  \param sprite Sprite to destroy
  */
 void SPRITE_free(sprite_t* sprite);
@@ -36,5 +38,15 @@ void SPRITE_free(sprite_t* sprite);
  *  \param spriteSize Sprite size in the texture
  */
 void SPRITE_setTexture(sprite_t* sprite, GXTexObj* texture, f32 position[2], f32 spriteSize[2], TexSize texSize);
+
+/*! \brief Renders a sprite on screen 
+ *  \param sprite Sprite to render
+ */
+void SPRITE_render(sprite_t* sprite);
+
+/*! \brief Force Matrix regeneration o sprite
+*  \param sprite Sprite to process
+*/
+void SPRITE_flush(sprite_t* sprite);
 
 #endif

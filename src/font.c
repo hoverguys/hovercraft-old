@@ -14,7 +14,7 @@ void generateUV(font_t* font,
 	/* Find out char count and allocate the quad UV array */
 	u16 charCount = strlen(chars);
 	font->charUV = malloc(sizeof(charuv_t)* charCount);
-	
+
 	f32 texRepr = 1.0f / texSize;
 
 	f32 texRepr2[2] = { texRepr, texRepr };
@@ -44,7 +44,7 @@ void generateUV(font_t* font,
 		font->charUV[i].uvs[6] = x + uvSize[0];
 		font->charUV[i].uvs[7] = y;
 
-		font->charIndex[(u8)chars[i]] = i;
+		font->charIndex[(u8) chars[i]] = i;
 
 		x += uvStride[0];
 	}
@@ -97,7 +97,7 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
 			GX_Begin(GX_QUADS, GX_VTXFMT0, 4 * charCount);
 			u16 i;
 			for (i = 0; i < charCount; i++) {
-				u8 index = font->charIndex[(u8)msgpointer[i]];
+				u8 index = font->charIndex[(u8) msgpointer[i]];
 
 				f32 xx = centreoffset + xoffset + x;
 				f32 yy = yoffset + y;
