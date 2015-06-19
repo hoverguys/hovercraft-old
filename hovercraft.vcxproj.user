@@ -2,12 +2,12 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gamecube|Win32'">
     <LocalDebuggerCommand>tools\Emulator\Dolphin.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>/d /b /e $(SolutionDir)hovercraft.elf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/b /e $(SolutionDir)hovercraft.elf</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Wii|Win32'">
     <LocalDebuggerCommand>tools\Emulator\Dolphin.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>/d /b /e $(SolutionDir)hovercraft.wii.elf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/b /e $(SolutionDir)hovercraft.wii.elf</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

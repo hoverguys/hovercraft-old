@@ -42,7 +42,7 @@ void GXU_init() {
 
 	VIDEO_Configure(rmode);
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
-	VIDEO_SetBlack(FALSE);
+	VIDEO_SetBlack(TRUE);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
@@ -71,7 +71,7 @@ void GXU_init() {
 
 	/* Clear the background to black and clear the Z buf */
 	GXColor background = { 0xa0, 0xe0, 0xf0, 0xff };
-	GX_SetCopyClear(background, 0x00ffffff);
+	GX_SetCopyClear(background, GX_MAX_Z24);
 
 	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);

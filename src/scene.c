@@ -170,7 +170,6 @@ void SCENE_createPlayers() {
 	isWaiting = FALSE;
 
 	//AU_playMusic(menumusic_mod);
-	AU_playMusic(menumusic_mod);
 }
 
 void SCENE_renderView(Mtx viewMtx) {

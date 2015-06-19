@@ -49,14 +49,16 @@ void OBJECT_render(object_t* object, Mtx viewMtx) {
 	/* Check dirty flag */
 	OBJECT_flush(object);
 
-	Mtx modelviewMtx;
+	Mtx modelviewMtx, modelviewInverseMtx;
 	guMtxConcat(viewMtx, object->transform.matrix, modelviewMtx);
 	GX_LoadPosMtxImm(modelviewMtx, GX_PNMTX0);
 
+	guMtxInverse(modelviewMtx, modelviewInverseMtx);
+	guMtxTranspose(modelviewInverseMtx, modelviewMtx);
+	GX_LoadNrmMtxImm(modelviewMtx, GX_PNMTX0);
+
 	MODEL_render(object->mesh);
 }
-
-
 
 void OBJECT_moveTo(object_t* object, const f32 tX, const f32 tY, const f32 tZ) {
 	transform_t* t = &object->transform;
