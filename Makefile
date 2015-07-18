@@ -18,7 +18,7 @@ PATH        :=  $(PATH):$(CURDIR)/tools
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+TARGET		:=	build/$(notdir $(CURDIR))
 BUILD		:=	obj
 SOURCES		:=	src
 DATA		:=	data 
