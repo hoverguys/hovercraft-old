@@ -16,6 +16,8 @@ extern const TexSize TexSize256;
  */
 void GXU_init();
 
+void GXU_closeTPL();
+
 /*! \brief Load texture from Id
  *  \param[in]  texId  Texture Id, from generated assets
  *  \param[out] texObj Texture object to bind the texture to

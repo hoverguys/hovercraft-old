@@ -3,10 +3,11 @@
 #include "mathutil.h"
 #include <string.h>
 #include <malloc.h>
+#include <math.h>
 
 f32 fontRatio;
 
-void generateUV(font_t* font,
+void _FONT_GenerateUV(font_t* font,
 	const char* chars,
 	const u16 charWidth,
 	const u16 charHeight,
@@ -44,18 +45,13 @@ void generateUV(font_t* font,
 		font->charUV[i].uvs[6] = x + uvSize[0];
 		font->charUV[i].uvs[7] = y;
 
-		font->charIndex[(u8) chars[i]] = i;
+		font->charIndex[(u8)chars[i]] = i;
 
 		x += uvStride[0];
 	}
 }
 
-void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
-	u16 messagelength = strlen(message);
-	const char* msgpointer = message;
-	f32 height = font->height;
-	f32 width = font->width;
-
+void _FONT_Prep(font_t* font) {
 	GX_ClearVtxDesc();
 	GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
@@ -66,7 +62,13 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
 	/* Set position to identity */
 	Mtx modelView;
 	guMtxIdentity(modelView);
+	GX_LoadNrmMtxImm(modelView, GX_PNMTX0); //dummies required
+	guMtxTransApply(modelView, modelView, 0, 0, -1); //0 isnt allowed, -1 is minimum TODO: sync with near plane value
 	GX_LoadPosMtxImm(modelView, GX_PNMTX0);
+
+	/* Set color */
+	GX_SetChanAmbColor(GX_COLOR0A0, font->color);
+	GX_SetChanMatColor(GX_COLOR0A0, font->color);
 
 	/* Set font texture */
 	GX_LoadTexObj(font->texture, GX_TEXMAP0);
@@ -77,18 +79,41 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 
-	/* Disable Z Reading/Writing */
-	GX_SetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-
 	/* Orthographic mode */
 	GXU_2DMode();
+}
+
+void _FONT_Rect(font_t* font, u32 index, f32 x, f32 y) {
+	const f32 height = font->height * font->scale;
+	const f32 width = font->width * font->scale;
+
+	GX_Position2f32(x, y);
+	GX_TexCoord2f32(font->charUV[index].uvs[0], font->charUV[index].uvs[1]);
+	/* Bottom left */
+	GX_Position2f32(x, y + height);
+	GX_TexCoord2f32(font->charUV[index].uvs[2], font->charUV[index].uvs[3]);
+	/* Bottom right */
+	GX_Position2f32(x + width, y + height);
+	GX_TexCoord2f32(font->charUV[index].uvs[4], font->charUV[index].uvs[5]);
+	/* Top right */
+	GX_Position2f32(x + width, y);
+	GX_TexCoord2f32(font->charUV[index].uvs[6], font->charUV[index].uvs[7]);
+}
+
+void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL center) {
+	const u16 messagelength = strlen(message);
+	const char* msgpointer = message;
+	const f32 height = font->height * font->scale;
+	const f32 width = font->width * font->scale;
+
+	_FONT_Prep(font);
 
 	u16 charCount = 0, offset = 0;
 	f32 xoffset = 0, yoffset = 0, centreoffset = 0;
 	do {
 		charCount = strcspn(msgpointer, "\n"); //length till newline (exclusive)
 
-		if (centre) {
+		if (center) {
 			centreoffset = -(charCount / 2) * width;
 		}
 
@@ -97,24 +122,12 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
 			GX_Begin(GX_QUADS, GX_VTXFMT0, 4 * charCount);
 			u16 i;
 			for (i = 0; i < charCount; i++) {
-				u8 index = font->charIndex[(u8) msgpointer[i]];
-
+				u8 index = font->charIndex[(u8)msgpointer[i]];
 				f32 xx = centreoffset + xoffset + x;
 				f32 yy = yoffset + y;
 
-				/* CCW */
-				/* Top left */
-				GX_Position2f32(xx, yy);
-				GX_TexCoord2f32(font->charUV[index].uvs[0], font->charUV[index].uvs[1]);
-				/* Bottom left */
-				GX_Position2f32(xx, yy + height);
-				GX_TexCoord2f32(font->charUV[index].uvs[2], font->charUV[index].uvs[3]);
-				/* Bottom right */
-				GX_Position2f32(xx + width, yy + height);
-				GX_TexCoord2f32(font->charUV[index].uvs[4], font->charUV[index].uvs[5]);
-				/* Top right */
-				GX_Position2f32(xx + width, yy);
-				GX_TexCoord2f32(font->charUV[index].uvs[6], font->charUV[index].uvs[7]);
+				//Build vertices
+				_FONT_Rect(font, index, xx, yy);
 
 				xoffset += width;
 			}
@@ -128,9 +141,40 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL centre) {
 		msgpointer += charCount + 1;
 		offset += charCount + 1;
 	} while (offset < messagelength);
+}
 
-	/* Re-enable Z Reading/Writing */
-	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+void FONT_drawScroller(font_t* font, const char* message, f32 x, f32 y, f32 padding, f32 freq, f32 amplitude, f32 progress) {
+	const u16 messagelength = strlen(message);
+	const char* msgpointer = message;
+	const f32 width = font->width * font->scale;
+
+	_FONT_Prep(font);
+
+	u16 charCount = 0, offset = 0;
+	f32 xoffset = 0;
+	do {
+		charCount = strcspn(msgpointer, "\n"); //length till newline (exclusive)
+
+											   //Skip recurring
+		if (charCount > 0) {
+			GX_Begin(GX_QUADS, GX_VTXFMT0, 4 * charCount);
+			u16 i;
+			for (i = 0; i < charCount; i++) {
+				u8 index = font->charIndex[(u8)msgpointer[i]];
+				f32 xx = xoffset + x + (i * padding);
+				f32 yy = y + cos(progress + i * freq) * amplitude;
+
+				//Build vertices
+				_FONT_Rect(font, index, xx, yy);
+
+				xoffset += width;
+			}
+			GX_End();
+		}
+
+		msgpointer += charCount + 1;
+		offset += charCount + 1;
+	} while (offset < messagelength);
 }
 
 void FONT_init() {
@@ -141,17 +185,24 @@ font_t* FONT_load(GXTexObj* texture,
 	const char* chars,
 	const u16 charWidth,
 	const u16 charHeight,
-	const u16 texSize) {
+	const u16 texSize,
+	const f32 scale) {
 	font_t* font = malloc(sizeof(font_t));
 	font->width = charWidth;
 	font->height = charHeight;
+	font->scale = scale;
+	font->color = (GXColor) { 0xFF, 0xFF, 0xFF, 0xFF };
 
 	font->texture = texture;
 	GX_InitTexObjWrapMode(texture, GX_CLAMP, GX_CLAMP);
 	GX_InitTexObjFilterMode(texture, GX_NEAR, GX_NEAR);
 
-	generateUV(font, chars, charWidth, charHeight, texSize);
+	_FONT_GenerateUV(font, chars, charWidth, charHeight, texSize);
 	return font;
+}
+
+void FONT_color(font_t* font, GXColor color) {
+	font->color = color;
 }
 
 void FONT_free(font_t* font) {

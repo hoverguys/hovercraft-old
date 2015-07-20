@@ -42,7 +42,8 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make clean &amp;&amp; make -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)</OutDir>
-    <IntDir>log</IntDir>
+    <IntDir>
+    </IntDir>
     <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj;.\include</IncludePath>
     <LibraryPath>D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath);</LibraryPath>
   </PropertyGroup>
@@ -53,7 +54,8 @@
     <NMakeCleanCommandLine>make -f MakefileWii clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make -f MakefileWii clean &amp;&amp; make -f MakefileWii -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)</OutDir>
-    <IntDir>log</IntDir>
+    <IntDir>
+    </IntDir>
     <IncludePath>$(DVPRO)\libogc\include;$(DVPRO)\devkitPPC\powerpc-eabi\include;.\obj;.\include</IncludePath>
     <LibraryPath>D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath);</LibraryPath>
     <AdditionalOptions>-DHW_RVL -DWII</AdditionalOptions>

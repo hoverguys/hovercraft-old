@@ -30,15 +30,19 @@ void GXU_init() {
 	VIDEO_Init();
 
 	/* Get render mode */
-	rmode = VIDEO_GetPreferredMode(NULL);
+	rmode = &TVPal528Int;//VIDEO_GetPreferredMode(NULL);
 
 	/* Allocate the fifo buffer */
 	gpfifo = memalign(32, DEFAULT_FIFO_SIZE);
 	memset(gpfifo, 0, DEFAULT_FIFO_SIZE);
 
 	/* Allocate frame buffers */
-	xfb[0] = SYS_AllocateFramebuffer(rmode);
-	xfb[1] = SYS_AllocateFramebuffer(rmode);
+	xfb[0] = (u32 *)MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
+	xfb[1] = (u32 *)MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
+
+	/* Clean buffers */
+	VIDEO_ClearFrameBuffer(rmode, xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer(rmode, xfb[1], COLOR_BLACK);
 
 	VIDEO_Configure(rmode);
 	VIDEO_SetNextFramebuffer(xfb[fbi]);
@@ -73,10 +77,9 @@ void GXU_init() {
 	GXColor background = { 0xa0, 0xe0, 0xf0, 0xff };
 	GX_SetCopyClear(background, GX_MAX_Z24);
 
-	f32 yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
-	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetDispCopyYScale(GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight));
 	GX_SetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
-	GX_SetDispCopyDst(rmode->fbWidth, xfbHeight);
+	GX_SetDispCopyDst(rmode->fbWidth, rmode->xfbHeight);
 	GX_SetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
 	GX_SetFieldMode(rmode->field_rendering, ((rmode->viHeight == 2 * rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE));
 
@@ -99,6 +102,10 @@ void GXU_init() {
 	first_frame = TRUE;
 
 	GXU_SetViewport(0, 0, rmode->viWidth, rmode->viHeight, 0, 1);
+}
+
+void GXU_closeTPL() {
+	TPL_CloseTPLFile(&TPLfile);
 }
 
 void GXU_loadTexture(s32 texId, GXTexObj* texObj) {
@@ -170,5 +177,5 @@ void GXU_SetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht, f32 nearZ, f32 farZ) 
 	GX_SetScissor(xOrig, yOrig, wd, ht);
 	GX_SetViewport(xOrig, yOrig, wd, ht, nearZ, farZ);
 
-	guOrtho(orthographicMatrix, 0, ht, 0,wd, 0, rmode->viWidth);
+	guOrtho(orthographicMatrix, 0, ht, 0, wd, 0.1f, 300.0f);
 }

@@ -58,6 +58,8 @@ void SCENE_load() {
 	GXU_loadTexture(ringTex, &ringTexObj);
 	GXU_loadTexture(ubuntuFontTex, &fontTexObj);
 
+	GXU_closeTPL();
+
 	modelHover = MODEL_setup(hovercraft_bmb);
 	modelTerrain = MODEL_setup(terrain_bmb);
 	modelPlane = MODEL_setup(plane_bmb);
@@ -97,7 +99,7 @@ void SCENE_load() {
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
 	FONT_init();
-	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256);
+	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256, 1.0f);
 
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
