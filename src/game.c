@@ -72,9 +72,9 @@ BOOL isWaiting;
 font_t* font;
 
 /* Util functions */
-void moveCheckpoint();
-void createPlayers();
-void getPickup(u8 playerId, u8 pickupId);
+void _moveCheckpoint();
+void _createPlayers();
+void _getPickup(u8 playerId, u8 pickupId);
 
 void GAME_init() {
 	GXU_init();
@@ -145,7 +145,7 @@ void GAME_init() {
 	FONT_init();
 	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256, 1.f);
 
-	moveCheckpoint();
+	_moveCheckpoint();
 	isWaiting = TRUE;
 }
 
@@ -193,15 +193,17 @@ void GAME_updateWorld() {
 		checkpoint.y = actor->hovercraft->transform.position.y;
 		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
 		if (distance < 3.5f) {
-			moveCheckpoint();
+			_moveCheckpoint();
 		}
 
 		/* Collisions with pickups */
 		u8 pickupId;
 		for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
-			distance = vecDistance(&actor->hovercraft->transform.position, &pickups[pickupId].object->transform.position);
-			if (distance < 2.f) {
-				getPickup(playerId, pickupId);
+			if (pickups[pickupId].enable == TRUE) {
+				distance = vecDistance(&actor->hovercraft->transform.position, &pickups[pickupId].object->transform.position);
+				if (distance < 2.f) {
+					_getPickup(playerId, pickupId);
+				}
 			}
 		}
 	}
@@ -214,7 +216,7 @@ void GAME_updateWorld() {
 	u8 pickupId;
 	for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
 		if (pickups[pickupId].enable == FALSE) {
-			pickups[pickupId].timeout -= 0.1666f;
+			pickups[pickupId].timeout -= 1.f/60.f;
 
 			if (pickups[pickupId].timeout <= 0) {
 				pickups[pickupId].enable = TRUE;
@@ -341,7 +343,7 @@ void GAME_render() {
 		FONT_draw(font, "Connect at least one controller\nPress START or A to play", rmode->viWidth / 2, rmode->viHeight - 200, TRUE);
 
 		if (INPUT_checkControllers()) {
-			createPlayers();
+			_createPlayers();
 		}
 	} else {
 		u8 i;;
@@ -469,7 +471,7 @@ void GAME_renderPlayerView(player_t* player) {
 	GAME_renderView(viewMtx);
 }
 
-void moveCheckpoint() {
+void _moveCheckpoint() {
 	f32 distance = 0;
 	f32 minHeight = objectPlane->transform.position.y - 0.9f;
 	const f32 rayoffset = 200;
@@ -488,7 +490,7 @@ void moveCheckpoint() {
 	OBJECT_moveTo(secondRing, checkpoint.x, objectPlane->transform.position.y + 0.5f, checkpoint.z);
 }
 
-void createPlayers() {
+void _createPlayers() {
 	/* Check for Gamecube pads */
 	u8 i;
 	for (i = 0; i < MAX_PLAYERS; i++) {
@@ -521,7 +523,7 @@ void createPlayers() {
 	AU_playMusic(menumusic_mod);
 }
 
-void getPickup(u8 playerId, u8 pickupId) {
+void _getPickup(u8 playerId, u8 pickupId) {
 	pickups[pickupId].enable = FALSE;
 	pickups[pickupId].timeout = pickupTimeout;
 }
