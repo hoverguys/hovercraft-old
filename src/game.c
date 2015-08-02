@@ -574,12 +574,12 @@ void _setPlayerTEV() {
 	GX_SetTevDirect(GX_TEVSTAGE0);
 	GX_SetTevDirect(GX_TEVSTAGE1);
 
-	// Stage 1: Multiply color with brightness map
+	// Stage 1: Multiply color with brightness map, ignore alpha
 	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR0A0);
 	GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
 	GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
 
-	// Stage 2: Add colored brightness map to global map
+	// Stage 2: Add colored brightness map to global map, use alpha from global map
 	GX_SetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORNULL);
 	GX_SetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
 	GX_SetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
@@ -587,9 +587,11 @@ void _setPlayerTEV() {
 	GX_SetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
 	GX_SetZTexture(GX_ZT_DISABLE, GX_TF_I4, 0);
 
+	// Set alpha blending
 	GX_SetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
 	GX_SetZCompLoc(GX_TRUE);
 
+	// Load brightness texture into slot 1
 	GX_LoadTexObj(&hoverShadeTexObj, GX_TEXMAP1);
 }
 
