@@ -4,7 +4,7 @@
 #include <time.h>
 
 /* Internal libraries */
-#include "scene.h"
+#include "game.h"
 #include "input.h"
 #include "audioutil.h"
 #include "mathutil.h"
@@ -20,14 +20,14 @@ int main() {
 	SYS_SetResetCallback(OnResetCalled);
 
 	INPUT_init();
-	SCENE_load();
+	GAME_init();
 
 	AU_init();
 
 	isRunning = TRUE;
 	while (isRunning) {
 		INPUT_update();
-		SCENE_render();
+		GAME_render();
 	}
 
 	return 0;

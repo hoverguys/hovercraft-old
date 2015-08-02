@@ -45,9 +45,6 @@
     <ClCompile Include="src\raycast.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scene.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\game.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,9 +85,6 @@
     <ClInclude Include="include\raycast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -121,6 +115,9 @@
       <Filter>Resource Files\models</Filter>
     </Object>
     <Object Include="models\ring.obj">
+      <Filter>Resource Files\models</Filter>
+    </Object>
+    <Object Include="models\pickup.obj">
       <Filter>Resource Files\models</Filter>
     </Object>
   </ItemGroup>

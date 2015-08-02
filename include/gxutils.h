@@ -6,7 +6,7 @@
 #define _GXUTILS_H
 
 #include <gccore.h>
-#include "scene.h"
+#include "game.h"
 
 /*! Texture sizes for sprites and fonts */
 typedef f32 TexSize;

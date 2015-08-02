@@ -1,14 +1,30 @@
-#include "game.h"
-
+/* System and SDK libraries */
 #include <malloc.h>
+#include <gccore.h>
+#include <stdio.h>
 
+/* Internal headers */
+#include "game.h"
+#include "model.h"
+#include "object.h"
+#include "font.h"
+#include "audioutil.h"
 #include "gxutils.h"
 #include "mathutil.h"
 #include "raycast.h"
 #include "input.h"
 
-object_t* mapTerrain;
-object_t* mapPlane;
+/* Generated assets headers */
+#include "hovercraft_bmb.h"
+#include "plane_bmb.h"
+#include "terrain_bmb.h"
+#include "ray_bmb.h"
+#include "ring_bmb.h"
+#include "pickup_bmb.h"
+#include "textures.h"
+
+#include "menumusic_mod.h"
+#include "gamemusic_mod.h"
 
 player_t players[MAX_PLAYERS];
 u8 playerCount = 0;
@@ -17,17 +33,128 @@ u8 playerCount = 0;
 const f32 maxSpeed = 0.3f;
 guVector gravity = { 0, -.8f / 60.f, 0 };
 
-void GAME_init(object_t* terrain, object_t* plane) {
-	mapTerrain = terrain;
-	mapPlane = plane;
+/* Model info */
+model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing, *modelPickup;
+object_t *objectTerrain, *objectPlane, *planeRay, *firstRing, *secondRing;
+
+/* Texture vars */
+GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj, fontTexObj;
+
+/* Light */
+static GXColor lightColor[] = {
+	{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
+	{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
+	{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
+};
+
+/* Spectator */
+camera_t spectatorCamera;
+Mtx spectatorView;
+
+/* Pickup points */
+static const guVector pickupPoints[] = {
+	{ 76, 7, 136 },
+	{ 90, 7, 59 },
+	{ 148, 7, 21 },
+	{ 200, 7, 82 },
+	{ 113, 22, 134 },
+	{ 6, 7, 136 }
+};
+static const int pickupPointsCount = sizeof(pickupPoints) / sizeof(pickupPoints[0]);
+pickup_t pickups[sizeof(pickupPoints) / sizeof(pickupPoints[0])];
+
+guVector checkpoint;
+
+BOOL firstFrame = TRUE;
+guVector speedVec;
+BOOL isWaiting;
+
+font_t* font;
+
+/* Util functions */
+void moveCheckpoint();
+void createPlayers();
+
+void GAME_init() {
+	GXU_init();
+
+	GXU_loadTexture(hovercraftTex, &hoverTexObj);
+	GXU_loadTexture(terrainTex, &terrainTexObj);
+	GXU_loadTexture(waterTex, &waterTexObj);
+	GXU_loadTexture(rayTex, &rayTexObj);
+	GXU_loadTexture(ringTex, &ringTexObj);
+	GXU_loadTexture(ubuntuFontTex, &fontTexObj);
+	GX_InitTexObjWrapMode(&fontTexObj, GX_CLAMP, GX_CLAMP); //Point filtering
+
+	GXU_closeTPL();
+
+	modelHover = MODEL_setup(hovercraft_bmb);
+	modelTerrain = MODEL_setup(terrain_bmb);
+	modelPlane = MODEL_setup(plane_bmb);
+	modelRay = MODEL_setup(ray_bmb);
+	modelRing = MODEL_setup(ring_bmb);
+	modelPickup = MODEL_setup(pickup_bmb);
+
+	MODEL_setTexture(modelHover, &hoverTexObj);
+	MODEL_setTexture(modelTerrain, &terrainTexObj);
+	MODEL_setTexture(modelPlane, &waterTexObj);
+	MODEL_setTexture(modelRay, &rayTexObj);
+	MODEL_setTexture(modelRing, &ringTexObj);
+	MODEL_setTexture(modelPickup, &rayTexObj);
+
+	objectTerrain = OBJECT_create(modelTerrain);
+	OBJECT_scaleTo(objectTerrain, 200, 200, 200);
+
+	objectPlane = OBJECT_create(modelPlane);
+	OBJECT_scaleTo(objectPlane, 1000, 1, 1000);
+	OBJECT_moveTo(objectPlane, -500, 6.1f, -500);
+
+	planeRay = OBJECT_create(modelRay);
+	OBJECT_moveTo(planeRay, 0, 6.1f, 0);
+	OBJECT_scaleTo(planeRay, 1.5f, 4, 1.5f);
+
+	firstRing = OBJECT_create(modelRing);
+	secondRing = OBJECT_create(modelRing);
+	OBJECT_scaleTo(firstRing, 1.4f, 1, 1.4f);
+	OBJECT_scaleTo(secondRing, 1.7f, 0.7f, 1.7f);
+
+	/* Setup pickup points */
+	u8 pickupIndex;
+	for (pickupIndex = 0; pickupIndex < pickupPointsCount; pickupIndex++) {
+		pickup_t currentPickup;
+		currentPickup.enable = TRUE;
+
+		// Create the pickup object and move it to its position
+		object_t* pickupObject = OBJECT_create(modelPickup);
+		currentPickup.object = pickupObject;
+		guVector pickupPosition = pickupPoints[pickupIndex];
+		OBJECT_moveTo(pickupObject, pickupPosition.x, pickupPosition.y, pickupPosition.z);
+
+		pickups[pickupIndex] = currentPickup;
+	}
+
+	/* Setup spectator matrix */
+	GXU_setupCamera(&spectatorCamera, 1, 1);
+	GX_SetViewport(spectatorCamera.offsetLeft, spectatorCamera.offsetTop, spectatorCamera.width, spectatorCamera.height, 0, 1);
+	guVector spectatorPos = { -30, 40, -10 };
+	guVector targetPos = { 100, 0, 100 };
+	guVector spectatorUp = { 0, 1, 0 };
+	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
+
+	FONT_init();
+	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256, 1.f);
+
+	moveCheckpoint();
+	isWaiting = TRUE;
 }
+
 
 void GAME_createPlayer(controller_t controllerInfo, model_t* hovercraftModel, guVector startPosition) {
 	/* We should tell the parent that we didn't actually make the player */
 	if (playerCount > MAX_PLAYERS) return;
 
 	/* Create player hovercraft object and position it */
-	player_t* player = &GAME_getPlayersData().players[playerCount];
+	player_t* player = &players[playerCount];
 	player->hovercraft = OBJECT_create(hovercraftModel);
 	OBJECT_moveTo(player->hovercraft, startPosition.x, startPosition.y, startPosition.z);
 	OBJECT_flush(player->hovercraft);
@@ -50,15 +177,13 @@ void GAME_updateWorld() {
 	 * different players are only evaluated once per frame
 	 */
 
-	playerArray_t players = GAME_getPlayersData();
 	u8 playerId, otherPlayerId;
-	guVector checkpoint = SCENE_getCheckpoint();
-	for (playerId = 0; playerId < players.playerCount; playerId++) {
-		player_t* actor = &players.players[playerId];
+	for (playerId = 0; playerId < playerCount; playerId++) {
+		player_t* actor = &players[playerId];
 
 		/* Collisions against other players */
-		for (otherPlayerId = playerId + 1; otherPlayerId < players.playerCount; otherPlayerId++) {
-			player_t* target = &players.players[otherPlayerId];
+		for (otherPlayerId = playerId + 1; otherPlayerId < playerCount; otherPlayerId++) {
+			player_t* target = &players[otherPlayerId];
 
 			/* Check for collision between current player and other */
 			CalculateBounce(actor, target);
@@ -68,7 +193,7 @@ void GAME_updateWorld() {
 		checkpoint.y = actor->hovercraft->transform.position.y;
 		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
 		if (distance < 3.5f) {
-			SCENE_moveCheckpoint();
+			moveCheckpoint();
 		}
 	}
 }
@@ -122,11 +247,11 @@ void GAME_updatePlayer(player_t* player) {
 	guVector rayhit, normalhit;
 	guVecAdd(&raypos, position, &raypos);
 	f32 dist = 0;
-	f32 minHeight = mapPlane->transform.position.y;
+	f32 minHeight = objectPlane->transform.position.y;
 	guQuaternion rotation;
 
 	/* Raycast track */
-	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
+	if (Raycast(objectTerrain, &raydir, &raypos, &dist, &normalhit)) {
 		/* Get hit position */
 		guVecScale(&raydir, &rayhit, dist);
 		guVecAdd(&rayhit, &raypos, &rayhit);
@@ -174,6 +299,89 @@ void GAME_updatePlayer(player_t* player) {
 	OBJECT_flush(player->hovercraft);
 }
 
+void GAME_render() {
+	/* Render time */
+	GX_SetNumChans(1);
+
+	/* Animate scene models */
+	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
+	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
+
+	/* Wait for controllers */
+	if (isWaiting) {
+		GX_LoadProjectionMtx(spectatorCamera.perspectiveMtx, GX_PERSPECTIVE);
+		GAME_renderView(spectatorView);
+
+		GXRModeObj* rmode = GXU_getMode();
+		FONT_draw(font, "Connect at least one controller\nPress START or A to play", rmode->viWidth / 2, rmode->viHeight - 200, TRUE);
+
+		if (INPUT_checkControllers()) {
+			createPlayers();
+		}
+	} else {
+		u8 i;;
+		for (i = 0; i < playerCount; i++) {
+			GAME_updatePlayer(&players[i]);
+			GAME_renderPlayerView(&players[i]);
+			FONT_draw(font, "Score: 0000", 1, 1, FALSE);
+			char debugPos[30];
+			guVector* playerPosition = &(players[i].hovercraft->transform.position);
+			sprintf(debugPos, "X %.2f Y %.2f Z %.2f", playerPosition->x, playerPosition->y, playerPosition->z);
+			FONT_draw(font, debugPos, 1, 30, FALSE);
+		}
+	}
+
+	GAME_updateWorld();
+
+	/* Flip framebuffer */
+	GXU_done();
+}
+
+void GAME_renderView(Mtx viewMtx) {
+	/* Set default blend mode */
+	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+
+	/* Enable Zbuf */
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+	/* Enable Light */
+	GXU_setLight(viewMtx, lightColor);
+
+	/* Draw terrain */
+	OBJECT_render(objectTerrain, viewMtx);
+
+	/* Draw players */
+	u8 i;
+	for (i = 0; i < playerCount; i++) {
+		if (players[i].isPlaying == TRUE) {
+			OBJECT_render(players[i].hovercraft, viewMtx);
+		}
+	}
+
+	/* Draw pickups */
+	for (i = 0; i < pickupPointsCount; i++) {
+		if (pickups[i].enable == TRUE) {
+			OBJECT_render(pickups[i].object, viewMtx);
+		}
+	}
+
+	/* Draw ray */
+	/* Lighting off */
+	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+	GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+
+	/* Draw water */
+	OBJECT_render(objectPlane, viewMtx);
+
+	/* Special blend mode */
+	/* Disable Zbuf */
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
+	OBJECT_render(planeRay, viewMtx);
+	OBJECT_render(firstRing, viewMtx);
+	OBJECT_render(secondRing, viewMtx);
+}
+
 void GAME_renderPlayerView(player_t* player) {
 	/* Setup camera view and perspective */
 	transform_t target = player->hovercraft->transform;
@@ -211,7 +419,7 @@ void GAME_renderPlayerView(player_t* player) {
 	guVecAdd(&raypos, &camPos, &raypos);
 	guVector normalhit;
 	f32 dist = 0;
-	if (Raycast(mapTerrain, &raydir, &raypos, &dist, &normalhit)) {
+	if (Raycast(objectTerrain, &raydir, &raypos, &dist, &normalhit)) {
 		if (dist < (rayoffset + cameraMinHeight)) {
 			/* the camera is lower then it should be, move up */
 			camPos.y += (rayoffset + cameraMinHeight) - dist;
@@ -233,9 +441,57 @@ void GAME_renderPlayerView(player_t* player) {
 	GXU_SetViewport(camera->offsetLeft, camera->offsetTop, camera->width, camera->height, 0, 1);
 
 	/* Render the player's hovercraft */
-	SCENE_renderView(viewMtx);
+	GAME_renderView(viewMtx);
 }
 
-inline playerArray_t GAME_getPlayersData() {
-	return (playerArray_t) { players, playerCount };
+void moveCheckpoint() {
+	f32 distance = 0;
+	f32 minHeight = objectPlane->transform.position.y - 0.9f;
+	const f32 rayoffset = 200;
+	guVector raydir = { 0, -1, 0 };
+	guVector position;
+	while (rayoffset - distance > minHeight) {
+		position = (guVector) { fioraRand() * 200.f, rayoffset, fioraRand() * 200.f };
+		Raycast(objectTerrain, &raydir, &position, &distance, NULL);
+	}
+
+	checkpoint = (guVector) { position.x, 0, position.z };
+
+	OBJECT_moveTo(planeRay, checkpoint.x, objectPlane->transform.position.y + 4, checkpoint.z);
+	OBJECT_flush(planeRay);
+	OBJECT_moveTo(firstRing, checkpoint.x, objectPlane->transform.position.y + 0.5f, checkpoint.z);
+	OBJECT_moveTo(secondRing, checkpoint.x, objectPlane->transform.position.y + 0.5f, checkpoint.z);
+}
+
+void createPlayers() {
+	/* Check for Gamecube pads */
+	u8 i;
+	for (i = 0; i < MAX_PLAYERS; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_GAMECUBE, i) == TRUE) {
+			guVector position = { fioraRand() * 200.f, 30.f, fioraRand() * 200.f };
+			controller_t controller = { INPUT_CONTROLLER_GAMECUBE, i, 0 };
+			GAME_createPlayer(controller, modelHover, position);
+		}
+	}
+
+#ifdef WII
+	/* Check for Wiimotes */
+	for (i = WPAD_CHAN_0; i < WPAD_MAX_WIIMOTES; i++) {
+		if (INPUT_isConnected(INPUT_CONTROLLER_WIIMOTE, i) == TRUE) {
+			guVector position = { fioraRand() * 200.f, 30.f, fioraRand() * 200.f };
+			controller_t controller = { INPUT_CONTROLLER_WIIMOTE, i, 0 };
+			INPUT_getExpansion(&controller);
+			GAME_createPlayer(controller, modelHover, position);
+		}
+	}
+#endif
+
+	/* We went through all players, so we know how to split the screen */
+	for (i = 0; i < playerCount; i++) {
+		GXU_setupCamera(&players[i].camera, playerCount, i + 1);
+	}
+
+	isWaiting = FALSE;
+
+	AU_playMusic(menumusic_mod);
 }
