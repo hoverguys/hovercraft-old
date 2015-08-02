@@ -1,5 +1,4 @@
 # Hovercraft #
----
 
 ## Building ##
 
@@ -9,7 +8,7 @@ Install DevkitPPC: Instructions [here](http://devkitpro.org/wiki/Getting_Started
 
 #### Linux ####
 
-For the purposes of this guide, we will assume you are using a debian-based distro with `apt-get`. 
+For the purposes of this guide, we will assume you are using a debian-based distro with `apt-get`.
 
 Install Boost Program Options: `sudo apt-get install libboost-program-options-dev`
 
