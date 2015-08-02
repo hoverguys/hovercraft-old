@@ -109,12 +109,12 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL center) {
 	_FONT_Prep(font);
 
 	u16 charCount = 0, offset = 0;
-	f32 xoffset = 0, yoffset = 0, centreoffset = 0;
+	f32 xoffset = 0, yoffset = 0, centeroffset = 0;
 	do {
 		charCount = strcspn(msgpointer, "\n"); //length till newline (exclusive)
 
 		if (center) {
-			centreoffset = -(charCount / 2) * width;
+			centeroffset = -(charCount / 2) * width;
 		}
 
 		//Skip recurring
@@ -123,7 +123,7 @@ void FONT_draw(font_t* font, const char* message, f32 x, f32 y, BOOL center) {
 			u16 i;
 			for (i = 0; i < charCount; i++) {
 				u8 index = font->charIndex[(u8)msgpointer[i]];
-				f32 xx = centreoffset + xoffset + x;
+				f32 xx = centeroffset + xoffset + x;
 				f32 yy = yoffset + y;
 
 				//Build vertices

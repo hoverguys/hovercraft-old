@@ -1,6 +1,6 @@
 /*! \file audioutil.h
-*  \brief Audio / Music / SFX utilities
-*/
+ *  \brief Audio / Music / SFX utilities
+ */
 #ifndef _AUDIOUTIL_H
 #define _AUDIOUTIL_H
 
