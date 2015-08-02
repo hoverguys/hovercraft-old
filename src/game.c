@@ -31,7 +31,7 @@ u8 playerCount = 0;
 
 /* Game settings */
 const f32 maxSpeed = 0.3f;
-guVector gravity = { 0, -.8f / 60.f, 0 };
+guVector gravity;
 
 /* Model info */
 model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing, *modelPickup;
@@ -147,6 +147,9 @@ void GAME_init() {
 	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256, 1.f);
 
 	_moveCheckpoint();
+
+	gravity = (guVector){ 0, -0.8f * frameTime, 0 };
+
 	isWaiting = TRUE;
 }
 
@@ -178,7 +181,6 @@ void GAME_updateWorld() {
 	 * to both minimize physics getting in the way and assure that calculations
 	 * between different players are only evaluated once per frame.
 	 */
-
 	u8 playerId, otherPlayerId;
 	for (playerId = 0; playerId < playerCount; playerId++) {
 		player_t* actor = &players[playerId];
@@ -356,7 +358,7 @@ void GAME_render() {
 			_createPlayers();
 		}
 	} else {
-		u8 i;;
+		u8 i;
 		for (i = 0; i < playerCount; i++) {
 			GAME_updatePlayer(&players[i]);
 			GAME_renderPlayerView(&players[i]);
