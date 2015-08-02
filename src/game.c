@@ -216,7 +216,7 @@ void GAME_updateWorld() {
 	u8 pickupId;
 	for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
 		if (pickups[pickupId].enable == FALSE) {
-			pickups[pickupId].timeout -= 1.f/60.f;
+			pickups[pickupId].timeout -= frameTime;
 
 			if (pickups[pickupId].timeout <= 0) {
 				pickups[pickupId].enable = TRUE;
@@ -353,7 +353,7 @@ void GAME_render() {
 			FONT_draw(font, "Score: 0000", 1, 1, FALSE);
 			char debugPos[30];
 			guVector* playerPosition = &(players[i].hovercraft->transform.position);
-			sprintf(debugPos, "X %.2f Y %.2f Z %.2f", playerPosition->x, playerPosition->y, playerPosition->z);
+			sprintf(debugPos, "X %.2f Y %.2f Z %.2f %d", playerPosition->x, playerPosition->y, playerPosition->z, GXU_framerate());
 			FONT_draw(font, debugPos, 1, 30, FALSE);
 		}
 	}

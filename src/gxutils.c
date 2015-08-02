@@ -28,7 +28,10 @@ void GXU_init() {
 	VIDEO_Init();
 
 	/* Get render mode */
-	rmode = &TVPal528Int;//VIDEO_GetPreferredMode(NULL);
+	rmode = VIDEO_GetPreferredMode(NULL); //&TVPal528Int;
+	
+	/* Try to get the framerate */
+	frameTime = 1.f / GXU_framerate();
 
 	/* Allocate the fifo buffer */
 	gpfifo = memalign(32, DEFAULT_FIFO_SIZE);
@@ -186,4 +189,19 @@ void GXU_SetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht, f32 nearZ, f32 farZ) 
 	GX_SetViewport(xOrig, yOrig, wd, ht, nearZ, farZ);
 
 	guOrtho(orthographicMatrix, 0, ht, 0, wd, 0.1f, 300.0f);
+}
+
+u32 GXU_framerate() {
+	u32 tvmode = rmode->viTVMode >> 2;
+	switch (tvmode) {
+	case VI_NTSC:
+	case VI_EURGB60:
+	case VI_DEBUG:
+	case VI_MPAL:
+		return 60;
+	case VI_PAL:
+	case VI_DEBUG_PAL:
+	default:
+		return 50;
+	}
 }

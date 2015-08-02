@@ -17,6 +17,9 @@ typedef struct {
 	Mtx44    perspectiveMtx; /*< Perspective Matrix */
 } camera_t;
 
+/* Frame time (1/60 or 1/50 depending on video mode) */
+f32 frameTime;
+
 /*! \brief Initialize the GX subsystem
  */
 void GXU_init();
@@ -70,7 +73,11 @@ void GXU_setupCamera(camera_t* camera, u8 splitType, u8 splitPlayer);
 void GXU_2DMode();
 
 /*! \brief Wrapper for changing viewport (adds scissors and 2d update)
-*/
+ */
 void GXU_SetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht, f32 nearZ, f32 farZ);
+
+/*! \brief Get frame rate depending on current TV mode
+ */
+u32 GXU_framerate();
 
 #endif
