@@ -140,5 +140,14 @@
     <Image Include="textures\ubuntufont.png">
       <Filter>Resource Files\textures</Filter>
     </Image>
+    <Image Include="textures\pickup.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\hovercraftGlobal.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="textures\hovercraftShade.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>

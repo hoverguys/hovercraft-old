@@ -38,13 +38,21 @@ model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing, *modelPi
 object_t *objectTerrain, *objectPlane, *planeRay, *firstRing, *secondRing;
 
 /* Texture vars */
-GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj, fontTexObj, pickupTexObj;
+GXTexObj hoverGlobalTexObj, hoverShadeTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj, fontTexObj, pickupTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
 	{ 0xF0, 0xF0, 0xF0, 0xff }, /* Light color   */
 	{ 0xB0, 0xB0, 0xB0, 0xff }, /* Ambient color */
 	{ 0xFF, 0xFF, 0xFF, 0xff }  /* Mat color     */
+};
+
+/* Player colors */
+static GXColor playerColors[] = {
+	{ 0xff, 0x29, 0x5b, 0xff }, /* Cherry */
+	{ 0xac, 0xff, 0x29, 0xff }, /* Olive  */
+	{ 0x29, 0xff, 0xb6, 0xff }, /* Teal   */
+	{ 0xff, 0xe3, 0x29, 0xff }  /* Yellow */
 };
 
 /* Spectator */
@@ -75,11 +83,14 @@ font_t* font;
 void _moveCheckpoint();
 void _createPlayers();
 void _getPickup(u8 playerId, u8 pickupId);
+void _setPlayerTEV();
+void _resetTEV();
 
 void GAME_init() {
 	GXU_init();
 
-	GXU_loadTexture(hovercraftTex, &hoverTexObj);
+	GXU_loadTexture(hovercraftGlobalTex, &hoverGlobalTexObj);
+	GXU_loadTexture(hovercraftShadeTex, &hoverShadeTexObj);
 	GXU_loadTexture(terrainTex, &terrainTexObj);
 	GXU_loadTexture(waterTex, &waterTexObj);
 	GXU_loadTexture(rayTex, &rayTexObj);
@@ -97,7 +108,7 @@ void GAME_init() {
 	modelRing = MODEL_setup(ring_bmb);
 	modelPickup = MODEL_setup(pickup_bmb);
 
-	MODEL_setTexture(modelHover, &hoverTexObj);
+	MODEL_setTexture(modelHover, &hoverGlobalTexObj);
 	MODEL_setTexture(modelTerrain, &terrainTexObj);
 	MODEL_setTexture(modelPlane, &waterTexObj);
 	MODEL_setTexture(modelRay, &rayTexObj);
@@ -390,13 +401,20 @@ void GAME_renderView(Mtx viewMtx) {
 	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
 
+	/* Setup TEV for player palettes */
+	_setPlayerTEV();
+
 	/* Draw players */
 	u8 i;
 	for (i = 0; i < playerCount; i++) {
 		if (players[i].isPlaying == TRUE) {
+			GX_SetChanMatColor(GX_COLOR0A0, playerColors[i]);
 			OBJECT_render(players[i].hovercraft, viewMtx);
 		}
 	}
+
+	/* Reset TEV */
+	_resetTEV();
 
 	/* Draw pickups */
 	for (i = 0; i < pickupPointsCount; i++) {
@@ -543,4 +561,50 @@ void _getPickup(u8 playerId, u8 pickupId) {
 
 	/* Assign pickup's weapon to the player */
 	players[playerId].currentPickup = pickups[pickupId].type;
+}
+
+void _setPlayerTEV() {
+	// 2 TEV Stages, 1 channel (color), 2 Textures (global + color brightness)
+	GX_SetNumTevStages(2);
+	GX_SetNumChans(1);
+	GX_SetNumTexGens(2);
+
+	// No indirect stages
+	GX_SetNumIndStages(0);
+	GX_SetTevDirect(GX_TEVSTAGE0);
+	GX_SetTevDirect(GX_TEVSTAGE1);
+
+	// Stage 1: Multiply color with brightness map
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR0A0);
+	GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+	GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+
+	// Stage 2: Add colored brightness map to global map
+	GX_SetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORNULL);
+	GX_SetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+	GX_SetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+	GX_SetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+	GX_SetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+	GX_SetZTexture(GX_ZT_DISABLE, GX_TF_I4, 0);
+
+	GX_SetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GX_SetZCompLoc(GX_TRUE);
+
+	GX_LoadTexObj(&hoverShadeTexObj, GX_TEXMAP1);
+}
+
+void _resetTEV() {
+	// 1 TEV Stage, 1 Texture (current)
+	GX_SetNumTevStages(1);
+	GX_SetNumTexGens(1);
+
+	// Stage 1: Standard blending
+	GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+	GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+	GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+	GX_SetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+	GX_SetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+
+	// Reset color to #fff
+	GX_SetChanMatColor(GX_COLOR0A0, (GXColor){ 0xff, 0xff, 0xff, 0xff });
 }

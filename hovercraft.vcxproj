@@ -104,6 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\hovercraft.png" />
+    <Image Include="textures\hovercraftGlobal.png" />
+    <Image Include="textures\hovercraftShade.png" />
+    <Image Include="textures\pickup.png" />
     <Image Include="textures\ray.png" />
     <Image Include="textures\ring.png" />
     <Image Include="textures\terrain.png" />
