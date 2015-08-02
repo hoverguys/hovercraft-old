@@ -17,10 +17,6 @@ typedef struct {
 	Mtx44    perspectiveMtx; /*< Perspective Matrix */
 } camera_t;
 
-/*! Texture sizes for sprites and fonts */
-typedef f32 TexSize;
-extern const TexSize TexSize256;
-
 /*! \brief Initialize the GX subsystem
  */
 void GXU_init();

@@ -11,8 +11,6 @@
 /* Texture definition */
 #include "textures_tpl.h"
 
-const TexSize TexSize256 = 1.f / 256.f;
-
 /* GX vars */
 #define DEFAULT_FIFO_SIZE	(256*1024)
 static void *xfb[2] = { NULL, NULL };
