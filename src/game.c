@@ -38,7 +38,7 @@ model_t *modelHover, *modelTerrain, *modelPlane, *modelRay, *modelRing, *modelPi
 object_t *objectTerrain, *objectPlane, *planeRay, *firstRing, *secondRing;
 
 /* Texture vars */
-GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj, fontTexObj;
+GXTexObj hoverTexObj, terrainTexObj, waterTexObj, rayTexObj, ringTexObj, fontTexObj, pickupTexObj;
 
 /* Light */
 static GXColor lightColor[] = {
@@ -85,6 +85,7 @@ void GAME_init() {
 	GXU_loadTexture(rayTex, &rayTexObj);
 	GXU_loadTexture(ringTex, &ringTexObj);
 	GXU_loadTexture(ubuntuFontTex, &fontTexObj);
+	GXU_loadTexture(pickupTex, &pickupTexObj);
 	GX_InitTexObjWrapMode(&fontTexObj, GX_CLAMP, GX_CLAMP); //Point filtering
 
 	GXU_closeTPL();
@@ -101,7 +102,7 @@ void GAME_init() {
 	MODEL_setTexture(modelPlane, &waterTexObj);
 	MODEL_setTexture(modelRay, &rayTexObj);
 	MODEL_setTexture(modelRing, &ringTexObj);
-	MODEL_setTexture(modelPickup, &rayTexObj);
+	MODEL_setTexture(modelPickup, &pickupTexObj);
 
 	objectTerrain = OBJECT_create(modelTerrain);
 	OBJECT_scaleTo(objectTerrain, 200, 200, 200);

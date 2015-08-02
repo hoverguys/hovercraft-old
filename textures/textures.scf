@@ -1,4 +1,5 @@
 <filepath="hovercraft.png" id="hovercraftTex" colfmt=5 />
+<filepath="pickup.png" id="pickupTex" colfmt=5 />
 <filepath="terrain.png" id="terrainTex" colfmt=14 mipmap=yes minlod=0 maxlod=3 />
 <filepath="water.png" id="waterTex" colfmt=14 mipmap=yes minlod=0 maxlod=3 />
 <filepath="ray.png" id="rayTex" colfmt=5 />
