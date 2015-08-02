@@ -31,9 +31,18 @@ void GXU_loadTexture(s32 texId, GXTexObj* texObj);
 
 /*! \brief Set light color
  *  \param view View matrix
- *  \param lightColor Colors of Diffuse, Ambient and Material lights
+ *  \param lightColor Light color
+ *  \param lpos Light position
  */
-void GXU_setLight(Mtx view, GXColor lightColor[]);
+void GXU_setLight(Mtx view, GXColor lightColor, guVector lpos);
+
+/*! \brief Set Directional light
+*  \param view View matrix
+*  \param lightColor Colors of Diffuse, Ambient and Material lights
+*  \param ldir Light direction in the world
+*  \param shininess Specular shininess
+*/
+void GXU_setDirLight(Mtx view, GXColor lightColor[], guVector ldir, f32 shininess);
 
 /*! \brief Get video mode
  *  \return Currently preferred/used video mode

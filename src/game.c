@@ -372,7 +372,7 @@ void GAME_renderView(Mtx viewMtx) {
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
 	/* Enable Light */
-	GXU_setLight(viewMtx, lightColor);
+	GXU_setDirLight(viewMtx, lightColor, (guVector) { 0, 0, 1 }, 12.0f);
 
 	/* Draw terrain */
 	OBJECT_render(objectTerrain, viewMtx);
