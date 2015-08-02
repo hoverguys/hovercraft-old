@@ -7,19 +7,10 @@
 #include <ogc/gu.h>
 #include "object.h"
 #include "input.h"
+#include "gxutils.h"
 
 /*! Maximum number of players */
 #define MAX_PLAYERS 4
-
-/*! Camera structure */
-typedef struct {
-	guVector position;       /*< Camera position    */
-	f32      width,          /*< Viewport width     */
-		height,         /*< Viewport height    */
-		offsetTop,      /*< Viewport Y         */
-		offsetLeft;     /*< Viewport X         */
-	Mtx44    perspectiveMtx; /*< Perspective Matrix */
-} camera_t;
 
 /*! Player structure */
 typedef struct {

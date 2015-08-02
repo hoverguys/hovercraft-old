@@ -6,7 +6,16 @@
 #define _GXUTILS_H
 
 #include <gccore.h>
-#include "game.h"
+
+/*! Camera structure */
+typedef struct {
+	guVector position;       /*< Camera position    */
+	f32      width,          /*< Viewport width     */
+	         height,         /*< Viewport height    */
+	         offsetTop,      /*< Viewport Y         */
+	         offsetLeft;     /*< Viewport X         */
+	Mtx44    perspectiveMtx; /*< Perspective Matrix */
+} camera_t;
 
 /*! Texture sizes for sprites and fonts */
 typedef f32 TexSize;

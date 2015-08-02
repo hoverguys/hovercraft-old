@@ -199,7 +199,7 @@ void GAME_updateWorld() {
 		/* Collisions with pickups */
 		u8 pickupId;
 		for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
-			distance = vecDistance(&actor->hovercraft->transform.position, &pickups[pickupId].object->transform);
+			distance = vecDistance(&actor->hovercraft->transform.position, &pickups[pickupId].object->transform.position);
 			if (distance < 2.f) {
 				getPickup(playerId, pickupId);
 			}
