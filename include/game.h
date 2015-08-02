@@ -12,21 +12,28 @@
 /*! Maximum number of players */
 #define MAX_PLAYERS 4
 
+typedef enum {
+	PICKUP_NONE      = 0,
+	PICKUP_SOMETHING = 1
+} pickupType;
+
 /*! Player structure */
 typedef struct {
-	BOOL         isPlaying;  /*< Is the player... playing? */
-	BOOL         isGrounded; /*< Is it on the ground?      */
-	object_t*    hovercraft; /*< Hovercraft object         */
-	guVector     velocity;   /*< Current velocity          */
-	camera_t     camera;     /*< Player's camera           */
-	controller_t controller; /*< Player's controller data  */
+	BOOL         isPlaying;     /*< Is the player... playing?  */
+	BOOL         isGrounded;    /*< Is it on the ground?       */
+	object_t*    hovercraft;    /*< Hovercraft object          */
+	guVector     velocity;      /*< Current velocity           */
+	camera_t     camera;        /*< Player's camera            */
+	controller_t controller;    /*< Player's controller data   */
+	pickupType   currentPickup; /*< Current pickup (0 if none) */
 } player_t;
 
 /*! Pickup data */
 typedef struct {
-	object_t* object;  /*< Pickup object                    */
-	BOOL      enable;  /*< Is the pickup enabled?           */
-	float     timeout; /*< Time before the pickup reappears */
+	object_t*  object;  /*< Pickup object                    */
+	BOOL       enable;  /*< Is the pickup enabled?           */
+	float      timeout; /*< Time before the pickup reappears */
+	pickupType type;    /*< Pickup type                      */
 } pickup_t;
 
 /*! \brief Initialize In-game data

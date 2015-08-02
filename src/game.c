@@ -124,6 +124,7 @@ void GAME_init() {
 	for (pickupIndex = 0; pickupIndex < pickupPointsCount; pickupIndex++) {
 		pickup_t currentPickup;
 		currentPickup.enable = TRUE;
+		currentPickup.type = PICKUP_SOMETHING;
 
 		// Create the pickup object and move it to its position
 		object_t* pickupObject = OBJECT_create(modelPickup);
@@ -162,6 +163,7 @@ void GAME_createPlayer(controller_t controllerInfo, model_t* hovercraftModel, gu
 
 	player->isPlaying = TRUE;
 	player->controller = controllerInfo;
+	player->currentPickup = PICKUP_NONE;
 	playerCount++;
 }
 
@@ -331,8 +333,16 @@ void GAME_render() {
 	GX_SetNumChans(1);
 
 	/* Animate scene models */
-	OBJECT_rotate(firstRing, 0, 0.3f / 60.f, 0);
-	OBJECT_rotate(secondRing, 0, -0.2f / 60.f, 0);
+	OBJECT_rotate(firstRing, 0, 0.3f * frameTime, 0);
+	OBJECT_rotate(secondRing, 0, -0.2f * frameTime, 0);
+
+	/* Animate pickups */
+	u8 pickupId;
+	for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
+		if (pickups[pickupId].enable == TRUE) {
+			OBJECT_rotate(pickups[pickupId].object, 0, 0.5f * frameTime, 0);
+		}
+	}
 
 	/* Wait for controllers */
 	if (isWaiting) {
@@ -524,6 +534,10 @@ void _createPlayers() {
 }
 
 void _getPickup(u8 playerId, u8 pickupId) {
+	/* Make pickup disappear */
 	pickups[pickupId].enable = FALSE;
 	pickups[pickupId].timeout = pickupTimeout;
+
+	/* Assign pickup's weapon to the player */
+	players[playerId].currentPickup = pickups[pickupId].type;
 }
