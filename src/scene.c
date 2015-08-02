@@ -57,6 +57,7 @@ void SCENE_load() {
 	GXU_loadTexture(rayTex, &rayTexObj);
 	GXU_loadTexture(ringTex, &ringTexObj);
 	GXU_loadTexture(ubuntuFontTex, &fontTexObj);
+	GX_InitTexObjWrapMode(&fontTexObj, GX_CLAMP, GX_CLAMP); //Point filtering
 
 	GXU_closeTPL();
 
@@ -99,7 +100,7 @@ void SCENE_load() {
 	guLookAt(spectatorView, &spectatorPos, &spectatorUp, &targetPos);
 	
 	FONT_init();
-	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256, 1.0f);
+	font = FONT_load(&fontTexObj, " !,.0123456789:<>?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 12, 22, 256, 1.5f);
 
 	SCENE_moveCheckpoint();
 	isWaiting = TRUE;
@@ -171,7 +172,7 @@ void SCENE_createPlayers() {
 
 	isWaiting = FALSE;
 
-	//AU_playMusic(menumusic_mod);
+	AU_playMusic(menumusic_mod);
 }
 
 void SCENE_renderView(Mtx viewMtx) {

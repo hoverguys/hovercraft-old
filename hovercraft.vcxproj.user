@@ -9,6 +9,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Wii|Win32'">
     <LocalDebuggerCommand>tools\Emulator\Dolphin.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>/b /e $(SolutionDir)hovercraft.wii.elf</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>/b /e $(SolutionDir)build/hovercraft.wii.elf</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
