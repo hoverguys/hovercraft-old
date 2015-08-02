@@ -65,8 +65,6 @@ pickup_t pickups[sizeof(pickupPoints) / sizeof(pickupPoints[0])];
 
 guVector checkpoint;
 
-BOOL firstFrame = TRUE;
-guVector speedVec;
 BOOL isWaiting;
 
 font_t* font;
