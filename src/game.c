@@ -63,6 +63,8 @@ static const guVector pickupPoints[] = {
 static const int pickupPointsCount = sizeof(pickupPoints) / sizeof(pickupPoints[0]);
 pickup_t pickups[sizeof(pickupPoints) / sizeof(pickupPoints[0])];
 
+f32 pickupTimeout = 10;
+
 guVector checkpoint;
 
 BOOL isWaiting;
@@ -72,6 +74,7 @@ font_t* font;
 /* Util functions */
 void moveCheckpoint();
 void createPlayers();
+void getPickup(u8 playerId, u8 pickupId);
 
 void GAME_init() {
 	GXU_init();
@@ -168,11 +171,10 @@ void GAME_removePlayer(player_t* player) {
 }
 
 void GAME_updateWorld() {
-
 	/* Check for collisions
 	 * To optimize and avoid glitches, collisions are calculated on the world loop
-	 * to both minimize physics getting in the way and assure that calculations between
-	 * different players are only evaluated once per frame
+	 * to both minimize physics getting in the way and assure that calculations
+	 * between different players are only evaluated once per frame.
 	 */
 
 	u8 playerId, otherPlayerId;
@@ -192,6 +194,31 @@ void GAME_updateWorld() {
 		f32 distance = vecDistance(&actor->hovercraft->transform.position, &checkpoint);
 		if (distance < 3.5f) {
 			moveCheckpoint();
+		}
+
+		/* Collisions with pickups */
+		u8 pickupId;
+		for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
+			distance = vecDistance(&actor->hovercraft->transform.position, &pickups[pickupId].object->transform);
+			if (distance < 2.f) {
+				getPickup(playerId, pickupId);
+			}
+		}
+	}
+
+	/* Update pickup timers
+	 * If a pickup is disabled (has been taken) it will have a positive "timeout" value.
+	 * Each update loop should decrease the timeout by the delta time value and re-enable
+	 * the pickup when it reaches zero (or lower).
+	 */
+	u8 pickupId;
+	for (pickupId = 0; pickupId < pickupPointsCount; pickupId++) {
+		if (pickups[pickupId].enable == FALSE) {
+			pickups[pickupId].timeout -= 0.1666f;
+
+			if (pickups[pickupId].timeout <= 0) {
+				pickups[pickupId].enable = TRUE;
+			}
 		}
 	}
 }
@@ -492,4 +519,9 @@ void createPlayers() {
 	isWaiting = FALSE;
 
 	AU_playMusic(menumusic_mod);
+}
+
+void getPickup(u8 playerId, u8 pickupId) {
+	pickups[pickupId].enable = FALSE;
+	pickups[pickupId].timeout = pickupTimeout;
 }
