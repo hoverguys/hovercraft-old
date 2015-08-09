@@ -274,12 +274,6 @@ void GAME_updatePlayer(player_t* player) {
 		guVecAdd(velocity, &jump, velocity);
 	}
 
-	/* Limit speed */
-	/*if (guVecDotProduct(velocity, velocity) > (maxSpeed*maxSpeed)) {
-		guVecNormalize(velocity);
-		guVecScale(velocity, velocity, maxSpeed);
-		}*/
-
 	/* Move Player */
 	OBJECT_move(player->hovercraft, velocity->x, velocity->y, velocity->z);
 
@@ -567,7 +561,7 @@ void _setPlayerTEV() {
 	// 2 TEV Stages, 1 channel (color), 2 Textures (global + color brightness)
 	GX_SetNumTevStages(2);
 	GX_SetNumChans(1);
-	GX_SetNumTexGens(2);
+	GX_SetNumTexGens(1);
 
 	// No indirect stages
 	GX_SetNumIndStages(0);

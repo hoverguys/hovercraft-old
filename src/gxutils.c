@@ -33,10 +33,6 @@ void GXU_init() {
 	/* Try to get the framerate */
 	frameTime = 1.f / GXU_framerate();
 
-	/* Allocate the fifo buffer */
-	gpfifo = memalign(32, DEFAULT_FIFO_SIZE);
-	memset(gpfifo, 0, DEFAULT_FIFO_SIZE);
-
 	/* Allocate frame buffers */
 	xfb[0] = (u32 *)MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
 	xfb[1] = (u32 *)MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
@@ -51,10 +47,7 @@ void GXU_init() {
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	if (rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
-
-	/* Enable USBGecko debugging */
-	//CON_EnableGecko(1, FALSE);
-	//CON_InitEx(rmode, 0, 0, rmode->viWidth, rmode->viHeight);
+	else while (VIDEO_GetNextField())   VIDEO_WaitVSync();
 
 	/* Set aspect ratio */
 	aspectRatio = 4.f / 3.f;
@@ -72,6 +65,8 @@ void GXU_init() {
 	fbi ^= 1;
 
 	/* Init flipper */
+	gpfifo = MEM_K0_TO_K1(memalign(32, DEFAULT_FIFO_SIZE));
+	memset(gpfifo, 0, DEFAULT_FIFO_SIZE);
 	GX_Init(gpfifo, DEFAULT_FIFO_SIZE);
 
 	/* Clear the background to black and clear the Z buf */
