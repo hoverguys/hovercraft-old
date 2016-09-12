@@ -36,7 +36,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Gamecube|Win32'">
-    <NMakeOutput>/build/hovercraft.elf</NMakeOutput>
+    <NMakeOutput>build/hovercraft.gc.elf</NMakeOutput>
     <NMakePreprocessorDefinitions>GEKKO;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>make -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
@@ -50,9 +50,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Wii|Win32'">
     <NMakeOutput>./build/hovercraft.wii.elf</NMakeOutput>
     <NMakePreprocessorDefinitions>GEKKO;WII;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>make -f MakefileWii -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>make -f MakefileWii clean</NMakeCleanCommandLine>
-    <NMakeReBuildCommandLine>make -f MakefileWii clean &amp;&amp; make -f MakefileWii -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
+    <NMakeBuildCommandLine>make build_target=wii -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>make build_target=wii clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make build_target=wii clean &amp;&amp; make build_target=wii -r 2&gt;&amp;1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>
     </IntDir>
