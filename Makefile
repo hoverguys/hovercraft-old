@@ -7,7 +7,15 @@ ifeq ($(strip $(DEVKITPPC)),)
 $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
 endif
 
-include $(DEVKITPPC)/gamecube_rules
+BUILD_TARGET ?= gc
+
+ifeq ($(BUILD_TARGET),wii)
+	include $(DEVKITPPC)/wii_rules
+	CFLAGS_EXTRA := -DWII
+else
+	include $(DEVKITPPC)/gamecube_rules
+	CFLAGS_EXTRA := -DGEKKO
+endif
 
 # Put tools into the path (temporary)
 PATH        :=  $(PATH):$(CURDIR)/tools
@@ -18,8 +26,8 @@ PATH        :=  $(PATH):$(CURDIR)/tools
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	build/$(notdir $(CURDIR))
-BUILD		:=	obj
+TARGET		:=	build/$(notdir $(CURDIR)).$(BUILD_TARGET)
+BUILD		:=	obj-$(BUILD_TARGET)
 SOURCES		:=	src
 DATA		:=	data 
 MODELS		:=	models 
@@ -30,7 +38,7 @@ TEXTURES	:=	textures
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS		= -g -O2 -Wall -Wextra $(MACHDEP) $(INCLUDE) -DGEKKO
+CFLAGS		= -g -O2 -Wall -Wextra $(MACHDEP) $(INCLUDE) $(CFLAGS_EXTRA)
 CXXFLAGS	= $(CFLAGS)
 
 LDFLAGS		= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -38,7 +46,11 @@ LDFLAGS		= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lmodplay -laesnd -logc -lm
+ifeq ($(BUILD_TARGET),wii)
+	LIBS := -lwiiuse -lbte -lmodplay -laesnd -logc -lm
+else
+	LIBS :=	-lmodplay -laesnd -logc -lm
+endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
