@@ -16,6 +16,12 @@ typedef struct {
 } binheader_t;
 
 typedef struct {
+	u16 vertex;
+	u16 uv;
+	u16 normal;
+} index_t;
+
+typedef struct {
 	GXTexObj* textureObject; /*< Texture Object	               */
 	void*     modelList;     /*< Storage for the display lists */
 	u32       modelListSize; /*< Real display list sizes       */
@@ -24,7 +30,7 @@ typedef struct {
 	f32* modelPositions;
 	f32* modelNormals;
 	f32* modelTexcoords;
-	u16* modelIndices;
+	index_t* modelIndices;
 } model_t;
 
 /*! \brief Create a new model from mesh data

@@ -9,17 +9,17 @@ model_t* MODEL_setup(const u8* model_bmb) {
 
 	const u32 posOffset = sizeof(binheader_t);
 	const u32 nrmOffset = posOffset + (sizeof(f32)* header->vcount * 3);
-	const u32 texOffset = nrmOffset + (sizeof(f32)* header->vcount * 3);
-	const u32 indOffset = texOffset + (sizeof(f32)* header->vcount * 2);
+	const u32 texOffset = nrmOffset + (sizeof(f32)* header->ncount * 3);
+	const u32 indOffset = texOffset + (sizeof(f32)* header->vtcount * 2);
 
 	f32* positions = (f32*) (model_bmb + posOffset);
 	f32* normals = (f32*) (model_bmb + nrmOffset);
 	f32* texcoords = (f32*) (model_bmb + texOffset);
-	u16* indices = (u16*) (model_bmb + indOffset);
+	index_t* indices = (index_t*) (model_bmb + indOffset);
 
 	/* Calculate cost */
 	const u32 indicesCount = header->fcount * 3;
-	const u32 indicesSize = indicesCount * 3 * sizeof(u16); /* 3 indices per vertex index (p,n,t) that are u16 in size */
+	const u32 indicesSize = indicesCount * sizeof(index_t); /* 3 indices per vertex index (p,n,t) that are u16 in size */
 	const u32 callSize = 89; /* Size of setup var */
 	/* Round up to nearest 32 multiplication */
 	const u32 dispSize = (((indicesSize + callSize + 63) >> 5) + 1) << 5;
@@ -51,9 +51,10 @@ model_t* MODEL_setup(const u8* model_bmb) {
 	/* Fill the list with indices */
 	GX_Begin(GX_TRIANGLES, GX_VTXFMT0, indicesCount);
 	for (i = 0; i < indicesCount; i++) {
-		GX_Position1x16(indices[i]);
-		GX_Normal1x16(indices[i]);
-		GX_TexCoord1x16(indices[i]);
+		index_t index = indices[i];
+		GX_Position1x16(index.vertex);
+		GX_Normal1x16(index.normal);
+		GX_TexCoord1x16(index.uv);
 	}
 	GX_End();
 

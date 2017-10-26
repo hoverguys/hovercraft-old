@@ -9,16 +9,21 @@ void EulerToQuaternion(guQuaternion* q, const f32 rX, const f32 rY, const f32 rZ
 
 	f32 x[2], y[2], z[2];
 
-	sincosf(vec.x, &x[0], &x[1]);
-	sincosf(vec.y, &y[0], &y[1]);
-	sincosf(vec.z, &z[0], &z[1]);
+	x[0] = sinf(vec.x); x[1] = cosf(vec.x);
+	y[0] = sinf(vec.y); y[1] = cosf(vec.y);
+	z[0] = sinf(vec.z); z[1] = cosf(vec.z);
+	//sincosf(vec.x, &x[0], &x[1]);
+	//sincosf(vec.y, &y[0], &y[1]);
+	//sincosf(vec.z, &z[0], &z[1]);
 
 	ps_eulerQuat(x, y, z, q);
 }
 
 void AxisAngleToQuaternion(guQuaternion* q, guVector rAxis, const f32 rAngle) {
-	f32 s, c;
-	sincosf(rAngle / 2.0f, &s, &c);
+	f32 s = sinf(rAngle / 2.0f);
+	f32 c = cosf(rAngle / 2.0f);
+	//sincosf(rAngle / 2.0f, &s, &c);
+
 	guVector out;
 	guVecScale(&rAxis, &out, s);
 	q->x = out.x;

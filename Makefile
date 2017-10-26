@@ -136,7 +136,7 @@ $(OUTPUT).elf: $(OFILES)
 #---------------------------------------------------------------------------------
 %.bmb : %.obj
 	@echo $(notdir $<)
-	@obj2bin -i $< -o $@
+	@objconv -in $< -out $@
 
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .jpg extension

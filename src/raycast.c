@@ -7,7 +7,7 @@
 BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* distanceOut, guVector* normalOut) {
 	/* Init data */
 	model_t * const mesh = object->mesh;
-	u16 *baseindices = mesh->modelIndices;
+	index_t *baseindices = mesh->modelIndices;
 	guVector *vertices = (guVector*) mesh->modelPositions;
 	guVector *normals = (guVector*) mesh->modelNormals;
 	Mtx InverseObjMtx;
@@ -37,12 +37,12 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 	/* Iterate over every triangle */
 	u32 f = 0;
 	for (; f < mesh->modelFaceCount; ++f) {
-		u16 *indices = baseindices + (f * 3);
+		index_t *indices = &baseindices[f * 3];
 
 		/* Get data */
-		guVector *point0 = &vertices[indices[0]],
-				 *point1 = &vertices[indices[1]],
-				 *point2 = &vertices[indices[2]];
+		guVector *point0 = &vertices[indices[0].vertex],
+				 *point1 = &vertices[indices[1].vertex],
+				 *point2 = &vertices[indices[2].vertex];
 
 		guVecSub(point1, point0, &e1);
 		guVecSub(point2, point0, &e2);
@@ -82,7 +82,7 @@ BOOL Raycast(object_t* object, guVector* raydir, guVector* rayorigin, f32* dista
 		if (t > EPSILON) { /* Got a ray intersection! */
 			if (t < sdist || hit == 0) {
 				sdist = t;
-				normal = &normals[indices[0]]; //TODO Interpolate 3 normals to get the positional one?
+				normal = &normals[indices[0].normal]; //TODO Interpolate 3 normals to get the positional one?
 				hit = TRUE;
 			}
 		}

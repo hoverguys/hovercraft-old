@@ -30,7 +30,7 @@ void AxisAngleToQuaternion(guQuaternion* q, guVector rAxis, const f32 rAngle);
  *  \param[in] opB Second pair of float32 to multiply
  *  \param[out] result Result pair
  */
-inline void ps_float2Mul(f32* opA, f32* opB, f32* result);
+void ps_float2Mul(f32* opA, f32* opB, f32* result);
 
 /*! \brief ASM part of EulerToQuaternion, don't use alone!
  *  \param[in] x Sin/Cos of Euler X
@@ -38,7 +38,7 @@ inline void ps_float2Mul(f32* opA, f32* opB, f32* result);
  *  \param[in] z Sin/Cos of Euler Z
  *  \param[out] out Resultant quaternion
  */
-inline void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
+void ps_eulerQuat(f32* x, f32* y, f32* z, guQuaternion* out);
 
 /*! \brief Quaternion lookAt
  *  \param[in]  forward Forward vector (Direction)

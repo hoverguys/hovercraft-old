@@ -371,8 +371,8 @@ void GAME_render() {
 			FONT_draw(font, "Score: 0000", 1, 1, FALSE);
 			char debugPos[30];
 			guVector* playerPosition = &(players[i].hovercraft->transform.position);
-			sprintf(debugPos, "X %.2f Y %.2f Z %.2f %d", playerPosition->x, playerPosition->y, playerPosition->z, GXU_framerate());
-			FONT_draw(font, debugPos, 1, 30, FALSE);
+			sprintf(debugPos, "X %.2f Y %.2f Z %.2f %lu", playerPosition->x, playerPosition->y, playerPosition->z, GXU_framerate());
+			//FONT_draw(font, debugPos, 1, 30, FALSE);
 		}
 	}
 

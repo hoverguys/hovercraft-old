@@ -50,7 +50,7 @@ void INPUT_update();
  *  \param id Gamepad slot / Wiimote channel
  *  \return TRUE if connected, FALSE otherwise
  */
-inline BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id);
+BOOL INPUT_isConnected(const Input_ControllerType type, const u8 id);
 
 /*! \brief Checks for a gamepad expansion
  *  \param controller Controller to check expansion of
